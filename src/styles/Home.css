@@ -1,0 +1,19 @@
+.Home {
+    width: 100%;
+    height: 100vh;
+
+    .nextButton {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        padding: 10px;
+        z-index: 400;
+    }
+    .prevButton {
+        position: absolute;
+        top: 20px;
+        right: 130px;
+        padding: 10px;
+        z-index: 400;
+    }
+}
