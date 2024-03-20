@@ -1,8 +1,9 @@
-import { Button, Drawer} from '@mantine/core';
+import { Button, Drawer } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import { useState } from 'react';
 import GeotiffLayer from '../components/GeorasterLayerCustom';
+import DrawerContents from '../components/DrawerContents';
 import '../styles/Home.css';
 import 'leaflet/dist/leaflet.css';
 
@@ -18,7 +19,7 @@ function Home(this: any) {
     'https://avianinfluenza.s3.us-east-2.amazonaws.com/ducks/real/buwtea_distr_01'
   );
 
-  const [num, setNum] = useState(1); 
+  const [num, setNum] = useState(1);
 
   const onClickPrevTiff = () => {
     const n = num - 1;
@@ -44,6 +45,7 @@ function Home(this: any) {
         center={position}
         zoom={3.5}
         style={{ height: '100vh', width: '100%' }}
+        className="Map"
       >
         <Button className="prevButton" onClick={onClickPrevTiff}>
           Previous TIFF
@@ -52,11 +54,13 @@ function Home(this: any) {
           Next TIFF
         </Button>
 
-        <Drawer opened={opened} onClose={close}>
-          {/* Drawer content */}
+        <Drawer className="drawerComponent" opened={opened} onClose={close}>
+          <DrawerContents />
         </Drawer>
 
-        <Button onClick={open}>Open Drawer</Button>
+        <Button className="drawerButton" onClick={open}>
+          Open Drawer
+        </Button>
 
         <TileLayer
           attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
