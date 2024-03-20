@@ -1,4 +1,5 @@
-import { Button } from '@mantine/core';
+import { Button, Drawer} from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import { useState } from 'react';
 import GeotiffLayer from '../components/GeorasterLayerCustom';
@@ -35,6 +36,8 @@ function Home(this: any) {
     setUrl(`${urlBase}_${ans}`);
   };
 
+  const [opened, { open, close }] = useDisclosure(false);
+
   return (
     <div className="Home">
       <MapContainer
@@ -48,6 +51,13 @@ function Home(this: any) {
         <Button className="nextButton" onClick={onClickNextTiff}>
           Next TIFF
         </Button>
+
+        <Drawer opened={opened} onClose={close}>
+          {/* Drawer content */}
+        </Drawer>
+
+        <Button onClick={open}>Open Drawer</Button>
+
         <TileLayer
           attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
