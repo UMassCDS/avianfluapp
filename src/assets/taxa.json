@@ -40,19 +40,11 @@
     "label": "Gadwall"
   },
   {
-    "value": "motduc",
-    "label": "Mottled Duck"
-  },
-  {
     "value": "wooduc",
     "label": "Wood Duck"
   },
   {
     "value": "lotduc",
     "label": "Long-tailed Duck"
-  },
-  {
-    "value": "mexduc",
-    "label": "Mexican Duck"
   }
 ]
