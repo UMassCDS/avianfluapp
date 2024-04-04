@@ -14,6 +14,7 @@ function GeotiffLayer(props: GeotiffLayerProps) {
   const context = useLeafletContext();
   const map = useMap();
   const { url } = props;
+  const prevLayer = useRef();
 
   useEffect(() => {
     const container = context.layerContainer || context.map;
@@ -58,6 +59,10 @@ function GeotiffLayer(props: GeotiffLayerProps) {
             },
             resolution: 256, // optional parameter for adjusting display resolution
           });
+          if (prevLayer.current) {
+            container.removeLayer(prevLayer.current);
+          }
+          prevLayer.current = layer;
           container.addLayer(layer);
           // map.fitBounds(layer.getBounds());
 
