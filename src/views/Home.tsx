@@ -1,6 +1,6 @@
 import { Button, Drawer } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { MapContainer, TileLayer, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer } from 'react-leaflet';
 import { useState } from 'react';
 import GeotiffLayer from '../components/GeorasterLayerCustom';
 import DrawerContents from '../components/DrawerContents';
@@ -47,18 +47,13 @@ function Home(this: any) {
   return (
     <div className="Home">
       <MapContainer
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         center={position}
         zoom={3.5}
         style={{ height: '100vh', width: '100%' }}
         className="Map"
       >
-        {/*  <Button className="prevButton" onClick={onClickPrevTiff}>
-          Previous TIFF
-        </Button>
-        <Button className="nextButton" onClick={onClickNextTiff}>
-          Next TIFF
-        </Button> */}
-
         <Drawer className="drawerComponent" opened={opened} onClose={close}>
           <DrawerContents onSubmit={onSubmitDrawer} />
         </Drawer>
@@ -67,10 +62,7 @@ function Home(this: any) {
           Data Control
         </Button>
 
-        <TileLayer
-          attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
+        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         <GeotiffLayer key={1} url={url} />
       </MapContainer>
     </div>
