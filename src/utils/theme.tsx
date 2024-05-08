@@ -1,7 +1,6 @@
 import { MantineThemeOverride } from '@mantine/core';
 
 const Theme: MantineThemeOverride = {
-  colorScheme: 'light',
   colors: {
     gray: [
       '#F2F3F2',
