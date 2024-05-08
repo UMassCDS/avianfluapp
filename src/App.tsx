@@ -3,6 +3,7 @@ import { MantineProvider } from '@mantine/core';
 import Home from './views/Home';
 import NotFound from './views/NotFound';
 import Theme from './utils/theme';
+import '@mantine/core/styles.css';
 
 export function App() {
   return (

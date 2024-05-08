@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+build/index.html
+build/assets/index-2f86436e.js
+build/assets/index-7fb1b246.css

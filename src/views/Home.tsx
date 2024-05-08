@@ -1,8 +1,7 @@
 import { Button, Drawer } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { MapContainer, TileLayer } from 'react-leaflet';
+import { MapContainer, TileLayer, ImageOverlay } from 'react-leaflet';
 import { useState } from 'react';
-import GeotiffLayer from '../components/GeorasterLayerCustom';
 import DrawerContents from '../components/DrawerContents';
 import { abundanceUrl } from '../hooks/abundanceUrl';
 import '../styles/Home.css';
@@ -14,27 +13,7 @@ function Home(this: any) {
     lng: -95,
   };
 
-  /*   const urlBase =
-      'https://avianinfluenza.s3.us-east-2.amazonaws.com/ducks/real/buwtea_distr'; */
   const [url, setUrl] = useState('');
-
-  /* const [num, setNum] = useState(1);
-
- const onClickPrevTiff = () => {
-    const n = num - 1;
-    setNum(n);
-    const pad = '00';
-    const ans = pad.substring(0, pad.length - n.toString().length) + n;
-    setUrl(`${urlBase}_${ans}`);
-  };
-
-  const onClickNextTiff = () => {
-    const n = num + 1;
-    setNum(n);
-    const pad = '00';
-    const ans = pad.substring(0, pad.length - n.toString().length) + n;
-    setUrl(`${urlBase}_${ans}`);
-  }; */
 
   const [opened, { open, close }] = useDisclosure(false);
 
@@ -44,6 +23,10 @@ function Home(this: any) {
     close();
   };
 
+  const imageBounds = [
+    [9.622994, -170.291626],
+    [79.98956, -49.783429],
+  ];
   return (
     <div className="Home">
       <MapContainer
@@ -63,7 +46,14 @@ function Home(this: any) {
         </Button>
 
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-        <GeotiffLayer key={1} url={url} />
+
+        <ImageOverlay
+          url={url}
+          bounds={imageBounds}
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          opacity={0.7}
+        />
       </MapContainer>
     </div>
   );
