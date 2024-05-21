@@ -1,9 +1,9 @@
-import { Button, Drawer } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
+import { Menu, ActionIcon } from '@mantine/core';
 import { MapContainer, TileLayer, ImageOverlay } from 'react-leaflet';
 import { useState } from 'react';
-import DrawerContents from '../components/DrawerContents';
-import { abundanceUrl } from '../hooks/abundanceUrl';
+import { IconFileDatabase, IconFeather } from '@tabler/icons-react';
+import { speciesChange, dataTypeChange } from '../hooks/abundanceUrl';
+import taxa from '../assets/taxa.json';
 import '../styles/Home.css';
 import 'leaflet/dist/leaflet.css';
 
@@ -13,20 +13,36 @@ function Home(this: any) {
     lng: -95,
   };
 
-  const [url, setUrl] = useState('');
+  const [url, setUrl] = useState(
+    'https://avianinfluenza.s3.us-east-2.amazonaws.com/abundance/mean/abundance_mean_1.png'
+  );
 
-  const [opened, { open, close }] = useDisclosure(false);
+  const [dataType, setDataType] = useState('abundance');
+  const [speciesType, setSpeciesType] = useState('mean');
+  const [week, setWeek] = useState('1');
 
-  const onSubmitDrawer = (vals: any) => {
-    const u = abundanceUrl(vals);
+  const onClickSpecies = (val: string) => {
+    const u = speciesChange(dataType, val, week);
+    setSpeciesType(val);
     setUrl(u);
-    close();
+  };
+
+  const onClickDataType = (val: string) => {
+    const u = dataTypeChange(val, speciesType, week);
+    setDataType(val);
+    setUrl(u);
   };
 
   const imageBounds = [
     [9.622994, -170.291626],
     [79.98956, -49.783429],
   ];
+
+  const taxaOptions = taxa.map((t) => (
+    <Menu.Item key={t.value} onClick={() => onClickSpecies(t.value)}>
+      {t.label}
+    </Menu.Item>
+  ));
   return (
     <div className="Home">
       <MapContainer
@@ -37,15 +53,44 @@ function Home(this: any) {
         style={{ height: '100vh', width: '100%' }}
         className="Map"
       >
-        <Drawer className="drawerComponent" opened={opened} onClose={close}>
-          <DrawerContents onSubmit={onSubmitDrawer} />
-        </Drawer>
-
-        <Button className="drawerButton" onClick={open}>
-          Data Control
-        </Button>
-
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+        <Menu position="left-start" withArrow>
+          <Menu.Target>
+            <ActionIcon
+              className="dataType-button"
+              variant="filled"
+              aria-label="Data Type"
+            >
+              <IconFileDatabase
+                style={{ width: '70%', height: '70%' }}
+                stroke={1.5}
+              />
+            </ActionIcon>
+          </Menu.Target>
+          <Menu.Dropdown>
+            <Menu.Item onClick={() => onClickDataType('abundance')}>
+              Abundance
+            </Menu.Item>
+            <Menu.Item onClick={() => onClickDataType('netmovement')}>
+              Net Movement
+            </Menu.Item>
+          </Menu.Dropdown>
+        </Menu>
+        <Menu position="left-start" withArrow>
+          <Menu.Target>
+            <ActionIcon
+              className="speciesType-button"
+              variant="filled"
+              aria-label="Data Type"
+            >
+              <IconFeather
+                style={{ width: '70%', height: '70%' }}
+                stroke={1.5}
+              />
+            </ActionIcon>
+          </Menu.Target>
+          <Menu.Dropdown>{taxaOptions}</Menu.Dropdown>
+        </Menu>
 
         <ImageOverlay
           url={url}

@@ -21,13 +21,19 @@
         z-index: 400;
     }
 
-    .drawerButton {
+    .dataType-button {
         position: absolute;
         top: 20px;
-        left: 130px;
-        padding: 10px;
+        right: 20px;
         z-index: 400;
 
+    }
+
+    .speciesType-button{
+        position: absolute;
+        top: 60px;
+        right: 20px;
+        z-index: 400;
     }
 
 
