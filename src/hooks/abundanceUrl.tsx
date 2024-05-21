@@ -1,22 +1,32 @@
-import moment from 'moment';
-
-interface AbundanceProps {
-  dataType: string;
-  speciesType: string;
-  date: Date;
-}
+const baseUrl = 'https://avianinfluenza.s3.us-east-2.amazonaws.com/';
 
 // eslint-disable-next-line import/prefer-default-export
-export function abundanceUrl(props: Record<string, unknown>): string {
-  const baseUrl = 'https://avianinfluenza.s3.us-east-2.amazonaws.com/';
-  const dataType = 'abundance';
-  let week = '1';
-  if (props.date) {
-    week = moment(props.date).format('W');
-  }
+/* export function dataTypeChange(dataType: string, url: string): string {
+  const finalUrl = `${
+    baseUrl + dataType
+  }/${speciesType}/${dataType}_${speciesType}_${week}.png`;
+  return finalUrl;
+} */
 
-  const finalUrl = `${baseUrl + dataType}/${props.speciesType}/${dataType}_${
-    props.speciesType
-  }_${week}.png`;
+// eslint-disable-next-line import/prefer-default-export
+export function speciesChange(
+  dataType: string,
+  speciesType: string,
+  week: string
+): string {
+  const finalUrl = `${
+    baseUrl + dataType
+  }/${speciesType}/${dataType}_${speciesType}_${week}.png`;
+  return finalUrl;
+}
+
+export function dataTypeChange(
+  dataType: string,
+  speciesType: string,
+  week: string
+): string {
+  const finalUrl = `${
+    baseUrl + dataType
+  }/${speciesType}/${dataType}_${speciesType}_${week}.png`;
   return finalUrl;
 }
