@@ -36,5 +36,12 @@
         z-index: 400;
     }
 
+    .date-button{
+        position: absolute;
+        top: 100px;
+        right: 20px;
+        z-index: 400;
+    }
+
 
 }

@@ -4,6 +4,7 @@ import Home from './views/Home';
 import NotFound from './views/NotFound';
 import Theme from './utils/theme';
 import '@mantine/core/styles.css';
+import '@mantine/dates/styles.css';
 
 export function App() {
   return (
@@ -19,7 +20,7 @@ export function App() {
 export function WrappedApp() {
   return (
     <BrowserRouter>
-      <MantineProvider theme={Theme}>
+      <MantineProvider>
         <App />
       </MantineProvider>
     </BrowserRouter>
