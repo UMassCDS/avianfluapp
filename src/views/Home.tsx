@@ -1,11 +1,10 @@
 import { Menu, ActionIcon } from '@mantine/core';
 import { MapContainer, TileLayer, ImageOverlay } from 'react-leaflet';
-import { DatePickerInput } from '@mantine/dates';
 import { useState, useEffect, useCallback } from 'react';
 import { IconFileDatabase, IconFeather } from '@tabler/icons-react';
-import moment from 'moment';
 import { changeURL } from '../hooks/abundanceUrl';
 import taxa from '../assets/taxa.json';
+import Timeline from '../components/Timeline';
 import '../styles/Home.css';
 import 'leaflet/dist/leaflet.css';
 
@@ -35,11 +34,16 @@ function Home(this: any) {
     setUrl(u);
   };
 
-  const onClickDate = (val: Date) => {
+  /*   const onClickDate = (val: Date) => {
     const w = moment(val).format('W');
-    console.log(w);
     const u = changeURL(dataType, speciesType, w);
     setWeek(w);
+    setUrl(u);
+  }; */
+
+  const onClickWeek = (val: string) => {
+    const u = changeURL(dataType, speciesType, val);
+    setWeek(val);
     setUrl(u);
   };
 
@@ -94,6 +98,7 @@ function Home(this: any) {
   ));
   return (
     <div className="Home">
+      <Timeline week={parseInt(week, 10)} onChangeWeek={onClickWeek} />
       <MapContainer
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
@@ -104,13 +109,13 @@ function Home(this: any) {
         keyboard={false}
       >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-        <DatePickerInput
+        {/* <DatePickerInput
           clearable
           onChange={(value) => value && onClickDate(value)}
           label="Date input"
           placeholder="Date input"
           className="date-button"
-        />
+        /> */}
         <Menu position="left-start" withArrow>
           <Menu.Target>
             <ActionIcon
