@@ -101,6 +101,7 @@ function Home(this: any) {
         zoom={3.5}
         style={{ height: '100vh', width: '100%' }}
         className="Map"
+        keyboard={false}
       >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         <DatePickerInput
