@@ -1,7 +1,7 @@
 import { Menu, ActionIcon } from '@mantine/core';
 import { MapContainer, TileLayer, ImageOverlay } from 'react-leaflet';
 import { DatePickerInput } from '@mantine/dates';
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { IconFileDatabase, IconFeather } from '@tabler/icons-react';
 import moment from 'moment';
 import { changeURL } from '../hooks/abundanceUrl';
@@ -47,6 +47,45 @@ function Home(this: any) {
     [9.622994, -170.291626],
     [79.98956, -49.783429],
   ];
+
+  // Key press code
+
+  // captures up/down/enter/escape keys
+  const handleSelection = useCallback(
+    (event: KeyboardEvent) => {
+      const { key } = event;
+      const arrowLeftPressed = key === 'ArrowLeft';
+      const arrowRightPressed = key === 'ArrowRight';
+
+      // increments active index (wraps around when at top)
+      if (arrowLeftPressed) {
+        event.preventDefault();
+        let temp = parseInt(week, 10) - 1;
+        if (temp <= 0) temp = 52;
+        const u = changeURL(dataType, speciesType, temp.toString());
+        setWeek(temp.toString());
+        setUrl(u);
+
+        // decrements active index (wraps around when at bottom)
+      } else if (arrowRightPressed) {
+        event.preventDefault();
+        let temp = parseInt(week, 10) + 1;
+        if (temp >= 53) temp = 1;
+        const u = changeURL(dataType, speciesType, temp.toString());
+        setWeek(temp.toString());
+        setUrl(u);
+      }
+    },
+    [dataType, speciesType, week]
+  );
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleSelection);
+
+    return () => {
+      document.removeEventListener('keydown', handleSelection);
+    };
+  }, [handleSelection]);
 
   const taxaOptions = taxa.map((t) => (
     <Menu.Item key={t.value} onClick={() => onClickSpecies(t.value)}>
