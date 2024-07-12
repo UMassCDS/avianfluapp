@@ -60,5 +60,16 @@
 
     }
 
+    .Legend {
+        position: absolute;
+        bottom: 150px;
+        left: 20px;
+        z-index: 400;
+        border-radius: 10px;
+        height: 250px; 
+        width: 100px; 
+        background-color: lightgrey;
+    }
+
 
 }
