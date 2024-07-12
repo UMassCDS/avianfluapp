@@ -1,5 +1,3 @@
-
-
 const baseUrl = 'https://avianinfluenza.s3.us-east-2.amazonaws.com/';
 
 // eslint-disable-next-line import/prefer-default-export

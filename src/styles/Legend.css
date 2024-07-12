@@ -1,0 +1,16 @@
+.Legend {
+
+    display: flex;
+    justify-content: center;
+    padding: 20px; 
+
+
+    .Legend-titles{
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+
+}
