@@ -45,6 +45,7 @@ function Legend(props: LegendProps) {
   return (
     <div className="Legend">
       <div className="Legend-titles">
+        {/* TODO: Change high and low text to scale values */}
         <div>High</div>
         <div
           className="Legend-innerGradient"
@@ -52,8 +53,8 @@ function Legend(props: LegendProps) {
             display: 'inline-block',
             width: '10px',
             height: '200px',
-            background: `linear-gradient( 0deg, ${data} )`, // The values from the JSON are inserted here
-          }}
+            background: `linear-gradient( 0deg, ${data} )`,
+            }}
         />
         <div>Low</div>
       </div>
