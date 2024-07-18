@@ -106,11 +106,12 @@ function Home(this: any) {
   // Here is where you list the components and elements that you want rendered. 
   return (
     <div className="Home">
-      // Calls the custom timeline component with the current week onChange function as parameters
+      {/* Calls the custom timeline component with the current week onChange function as parameters */}
       <Timeline week={parseInt(week, 10)} onChangeWeek={onClickWeek} />
-      // Calls the custom legend component with the data type and species type as parameters. 
+      {/* Calls the custom legend component with the data type and species type as parameters. */}
       <Legend dataType={dataType} speciesType={speciesType} />
-      // The leaflet map container 
+      
+      {/* Creates a map using the leaflet component */}
       <MapContainer
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
@@ -120,14 +121,14 @@ function Home(this: any) {
         className="Map"
         keyboard={false}
       >
-      // Adds the attributions to the map
+       {/* Adds the attributions to the map */}
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           attribution='Abundance data provided by <a href="https://science.ebird.org/science/status-and-trends">Cornell Lab of Ornithology | eBird</a> | <a href="https://birdflow-science.github.io/"> BirdFlow </a>'
         />
-        // Dropdown for data type
+        {/* Dropdown for data type */}
         <Menu position="left-start" withArrow>
           <Menu.Target>
             <ActionIcon
@@ -141,8 +142,8 @@ function Home(this: any) {
               />
             </ActionIcon>
           </Menu.Target>
-          // The options for the data type and the corresponsing onClick function call 
-          // TODO: add influx and outflux
+          {/* The options for the data type and the corresponsing onClick function call 
+           TODO: add influx and outflux */}
           <Menu.Dropdown>
             <Menu.Item onClick={() => onClickDataType('abundance')}>
               Abundance
@@ -152,7 +153,7 @@ function Home(this: any) {
             </Menu.Item>
           </Menu.Dropdown>
         </Menu>
-        //The dropdown for the species type
+        {/*The dropdown for the species type */}
         <Menu position="left-start" withArrow>
           <Menu.Target>
             <ActionIcon
@@ -168,7 +169,7 @@ function Home(this: any) {
           </Menu.Target>
           <Menu.Dropdown>{taxaOptions}</Menu.Dropdown>
         </Menu>
-        // Overlays an image that contains the data to be displayed on top of the map
+        { /* Overlays an image that contains the data to be displayed on top of the map */}
         <ImageOverlay
           url={url}
           bounds={imageBounds}
