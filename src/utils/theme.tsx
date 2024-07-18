@@ -1,5 +1,6 @@
 import { MantineThemeOverride } from '@mantine/core';
-
+// Override for the default mantine theming settings
+// https://v1.mantine.dev/pages/theming/
 const Theme: MantineThemeOverride = {
   colors: {
     gray: [
