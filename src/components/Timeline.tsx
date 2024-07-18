@@ -1,12 +1,14 @@
 import { Slider } from '@mantine/core';
 import { useState, useEffect } from 'react';
-
+// Keeps track of the props and prop type going into the component (look up interfaces in TypeScript)
 interface TimelineProps {
   week: number;
   onChangeWeek: (val: string) => void;
 }
 
+/* Creates a custom timeline slider that updates what week number of the year the user is currently on. */
 function Timeline(props: TimelineProps) {
+  // Displays tick marks and labels 
   const marks = [
     { value: 1, label: 'Jan' },
     { value: 2 },
@@ -65,10 +67,12 @@ function Timeline(props: TimelineProps) {
   const { week, onChangeWeek } = props;
   const [weekVal, setWeekVal] = useState(week);
 
+  // Sets the week value on load and every time the user changes it
   useEffect(() => {
     setWeekVal(week);
   }, [week, weekVal]);
-
+  
+  /* On change of the slider, the week number is updated. */
   const onChangeNumber = (v: number) => {
     setWeekVal(v);
     onChangeWeek(v.toString());
