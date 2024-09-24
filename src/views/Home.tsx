@@ -2,95 +2,70 @@ import { Menu, ActionIcon } from '@mantine/core';
 import { MapContainer, TileLayer, ImageOverlay } from 'react-leaflet';
 import { useState, useEffect, useCallback } from 'react';
 import { IconFileDatabase, IconFeather } from '@tabler/icons-react';
-import { changeURL } from '../hooks/abundanceUrl';
+import { imageURL, DataTypes } from '../hooks/dataUrl';
 import taxa from '../assets/taxa.json';
 import Timeline from '../components/Timeline';
 import Legend from '../components/Legend';
 import '../styles/Home.css';
 import 'leaflet/dist/leaflet.css';
 
-/* This is the main page and only page of the application. Here, the map renders as well as all the AvianFluApp feature controls */
+const MAX_WEEK = 52;  // number of weeks in a year
+
+/* This is the main page and only page of the application. 
+   Here, the map renders as well as all the AvianFluApp feature controls */
 function Home(this: any) {
-  
   // Sets the default position for the map.
   const position = {
     lat: 45,
     lng: -95,
   };
 
-  // Calls the useState hook provided by React to create state for and set the default state of the url for the current data displayed.
-  
-  const [url, setUrl] = useState(
-    'https://avianinfluenza.s3.us-east-2.amazonaws.com/abundance/mean/abundance_mean_1.png'
-  );
-  
-  //Sets state for the data type 
-  const [dataType, setDataType] = useState('abundance');
-  //Sets state for the species type 
-  const [speciesType, setSpeciesType] = useState('mean');
-  //Sets state for the week number
-  const [week, setWeek] = useState('1');
-
-  /* onClick function for the Species dropdown. When you click on a species, it updates the species state and url state to reflect the changes. */
-  const onClickSpecies = (val: string) => {
-    const u = changeURL(dataType, val, week);
-    setSpeciesType(val);
-    setUrl(u);
-  };
-
-  /* onClick function for the data type dropdown. When you select a data type, it updates the data state as well as the url. */
-  const onClickDataType = (val: string) => {
-    const u = changeURL(val, speciesType, week);
-    setDataType(val);
-    setUrl(u);
-  };
-
-  /* onClick function for the week number. When you change the week by sliding the timeline or using arrow keys, it uodstes the week number and the url. */ 
-  const onClickWeek = (val: string) => {
-    const u = changeURL(dataType, speciesType, val);
-    setWeek(val);
-    setUrl(u);
-  };
-  
-  // the bounds of the data image provided by the backend
+  // the bounds of the data image provided by the backend TODO PAM needs better explanation
   const imageBounds = [
     [9.622994, -170.291626],
     [79.98956, -49.783429],
   ];
 
-  /* Allows the user to use the front and back arrow keys to control the week number and which image files are being displayed. */ 
-  const handleSelection = useCallback(
-    (event: KeyboardEvent) => {
-      const { key } = event;
-      const arrowLeftPressed = key === 'ArrowLeft';
-      const arrowRightPressed = key === 'ArrowRight';
-
-      // increments active index (wraps around when at top)
-      if (arrowLeftPressed) {
-        event.preventDefault();
-        let temp = parseInt(week, 10) - 1;
-        if (temp <= 0) temp = 52;
-        const u = changeURL(dataType, speciesType, temp.toString());
-        setWeek(temp.toString());
-        setUrl(u);
-
-        // decrements active index (wraps around when at bottom)
-      } else if (arrowRightPressed) {
-        event.preventDefault();
-        let temp = parseInt(week, 10) + 1;
-        if (temp >= 53) temp = 1;
-        const u = changeURL(dataType, speciesType, temp.toString());
-        setWeek(temp.toString());
-        setUrl(u);
-      }
-    },
-    [dataType, speciesType, week]
-  );
+  
+  // Sets state for the data type - so far this is abundance or netmovement
+  const [dataType, setDataType] = useState(DataTypes.ABUNDANCE);
+  // Sets state for the species type 
+  const [speciesType, setSpeciesType] = useState('mean');
+  // Sets state for the week number
+  let this_week = 1;  // TODO change to current week
+  const [week, setWeek] = useState(this_week);
+  // default state of the url for the current data displayed.
+  const [url, setUrl] = useState(imageURL(DataTypes.ABUNDANCE, 'mean', this_week));
 
   // Adds a listener for the event in which a user presses a key on the keyboard. 
   useEffect(() => {
-    document.addEventListener('keydown', handleSelection);
+    const u = imageURL(dataType, speciesType, week);
+    setUrl(u);
+  }, [speciesType, dataType, week]);
 
+  /* Allows the user to use the front and back arrow keys to control the week number 
+     and which image files are being displayed. */ 
+  const handleSelection = useCallback(
+    (event: KeyboardEvent) => {
+      if (event.key === 'ArrowRight') {
+        // increments active index (wraps around when at top)
+        event.preventDefault();
+        let temp = week + 1;
+        if (temp > MAX_WEEK) temp = 1;
+        setWeek(temp);
+      } else if (event.key === 'ArrowLeft') {
+        // decrements active index (wraps around when at bottom)
+        event.preventDefault();
+        let temp = week - 1;
+        if (temp <= 0) temp = MAX_WEEK;
+        setWeek(temp);
+      }
+    },[speciesType, dataType, week]
+  );
+
+  // Adds a listener for user keyboard events. 
+  useEffect(() => {
+    document.addEventListener('keydown', handleSelection);
     return () => {
       document.removeEventListener('keydown', handleSelection);
     };
@@ -98,7 +73,7 @@ function Home(this: any) {
 
   // Maps the species from the taxa file provided to a dropdown with options. 
   const taxaOptions = taxa.map((t) => (
-    <Menu.Item key={t.value} onClick={() => onClickSpecies(t.value)}>
+    <Menu.Item key={t.value} onClick={() => setSpeciesType(t.value)}>
       {t.label}
     </Menu.Item>
   ));
@@ -107,7 +82,7 @@ function Home(this: any) {
   return (
     <div className="Home">
       {/* Calls the custom timeline component with the current week onChange function as parameters */}
-      <Timeline week={parseInt(week, 10)} onChangeWeek={onClickWeek} />
+      <Timeline week={week} onChangeWeek={setWeek} />
       {/* Calls the custom legend component with the data type and species type as parameters. */}
       <Legend dataType={dataType} speciesType={speciesType} />
       
@@ -145,15 +120,15 @@ function Home(this: any) {
           {/* The options for the data type and the corresponsing onClick function call 
            TODO: add influx and outflux */}
           <Menu.Dropdown>
-            <Menu.Item onClick={() => onClickDataType('abundance')}>
+            <Menu.Item onClick={() => setDataType(DataTypes.ABUNDANCE)}>
               Abundance
             </Menu.Item>
-            <Menu.Item onClick={() => onClickDataType('netmovement')}>
+            <Menu.Item onClick={() => setDataType(DataTypes.MOVEMENT)}>
               Net Movement
             </Menu.Item>
           </Menu.Dropdown>
         </Menu>
-        {/*The dropdown for the species type */}
+        {/* The dropdown for the species type */}
         <Menu position="left-start" withArrow>
           <Menu.Target>
             <ActionIcon
