@@ -10,6 +10,7 @@ import '../styles/Home.css';
 import 'leaflet/dist/leaflet.css';
 
 const MAX_WEEK = 52;  // number of weeks in a year
+const WEEK_TO_MSEC = 7*24*60*60*1000;
 
 /* This is the main page and only page of the application. 
    Here, the map renders as well as all the AvianFluApp feature controls */
@@ -20,19 +21,22 @@ function Home(this: any) {
     lng: -95,
   };
 
-  // the bounds of the data image provided by the backend TODO PAM needs better explanation
+  // the lat/long bounds of the data image provided by the backend
   const imageBounds = [
     [9.622994, -170.291626],
     [79.98956, -49.783429],
   ];
 
-  
   // Sets state for the data type - so far this is abundance or netmovement
   const [dataType, setDataType] = useState(DataTypes.ABUNDANCE);
   // Sets state for the species type 
   const [speciesType, setSpeciesType] = useState('mean');
+  const today = new Date()
+  const startOfYear = new Date(today.getFullYear(),0,1);
+  // convert both dates into msec since 1970 and find the difference
+  const diff_dates = today.valueOf()-startOfYear.valueOf()
   // Sets state for the week number
-  let this_week = 1;  // TODO change to current week
+  let this_week = Math.floor(diff_dates/WEEK_TO_MSEC); 
   const [week, setWeek] = useState(this_week);
   // default state of the url for the current data displayed.
   const [url, setUrl] = useState(imageURL(DataTypes.ABUNDANCE, 'mean', this_week));
