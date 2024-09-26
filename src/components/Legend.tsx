@@ -1,5 +1,6 @@
 /* eslint-disable no-template-curly-in-string */
 import { useEffect, useState } from 'react';
+import { Grid } from '@mantine/core';
 import { changeLegend, DataTypes} from '../hooks/dataUrl';
 import '../styles/Legend.css';
 
@@ -13,7 +14,9 @@ interface LegendProps {
 function Legend(props: LegendProps) {
   const { dataType, speciesType } = props;
   const [data, setData] = useState<string>();
-
+  const [lowLabel, setLowLabel] = useState<number>(0);
+  const [midLabel, setMidLabel] = useState<number>(50);
+  const [highLabel, setHighLabel] = useState<number>(100);
   // Fetches the JSON of values from the backend 
   const getJSON = async (url: string) => {
     const response = await fetch(url);
@@ -36,24 +39,35 @@ function Legend(props: LegendProps) {
         d.map((i: any) => pushed.push(`${i.color} ${i.position}%`));
         const x = pushed.join(', ');
         setData(x);
+        // grab top and bottom values
+        setLowLabel(d[0].value);
+        setHighLabel(d[d.length-1].value);
+        setMidLabel(Math.floor((d[d.length-1].value-d[0].value)/2));
       });
   }, [dataType, speciesType]);
 
   return (
     <div className="Legend">
-      <div className="Legend-titles">
-        <div>High</div>
-        <div
-          className="Legend-innerGradient"
-          style={{
-            display: 'inline-block',
-            width: '10px',
-            height: '200px',
-            background: `linear-gradient( 0deg, ${data} )`,
+      <Grid align='stretch'>
+        <Grid.Col span={4}>
+          <div
+            className="Legend-innerGradient"
+            style={{
+              display: 'inline-block',
+              width: '14px',
+              height: '200px',
+              background: `linear-gradient( 0deg, ${data} )`,
             }}
-        />
-        <div>Low</div>
-      </div>
+          />
+        </Grid.Col>
+        <Grid.Col span={8} >
+          {/* PAM - this is a little hacky, couldn't get lowLabel to align "bottom"
+             so made it so the midLabel would push it to the right place. */ }
+          <div style={{alignContent:"top"}}>{highLabel}</div>
+          <div style={{height:'75%', alignContent:"center"}}>{midLabel}</div>
+          <div>{lowLabel}</div>
+        </Grid.Col>
+      </Grid>
     </div>
   );
 }
