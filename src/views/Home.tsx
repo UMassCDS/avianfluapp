@@ -99,6 +99,7 @@ function Home(this: any) {
         style={{ height: '100vh', width: '100%' }}
         className="Map"
         keyboard={false}
+        maxBounds={imageBounds}
       >
        {/* Adds the attributions to the map */}
         <TileLayer
