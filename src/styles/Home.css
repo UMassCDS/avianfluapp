@@ -6,22 +6,6 @@
         z-index: 0;
     }
 
-    .nextButton {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        padding: 10px;
-        z-index: 400;
-    }
-
-    .prevButton {
-        position: absolute;
-        top: 20px;
-        right: 130px;
-        padding: 10px;
-        z-index: 400;
-    }
-
     .dataType-button {
         position: absolute;
         top: 20px;
@@ -66,10 +50,10 @@
         left: 20px;
         z-index: 400;
         border-radius: 10px;
-        height: 250px; 
+        padding: 10px;
+        height: 280px; 
         width: 100px; 
         background-color: lightgrey;
     }
-
 
 }
