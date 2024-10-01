@@ -1,8 +1,8 @@
 import { Menu, ActionIcon } from '@mantine/core';
 import { MapContainer, TileLayer, ImageOverlay } from 'react-leaflet';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { IconFileDatabase, IconFeather } from '@tabler/icons-react';
-import { imageURL, DataTypes } from '../hooks/dataUrl';
+import { imageURL, changeLegend, DataTypes } from '../hooks/dataUrl';
 import taxa from '../assets/taxa.json';
 import Timeline from '../components/Timeline';
 import Legend from '../components/Legend';
@@ -31,6 +31,7 @@ function Home(this: any) {
   const [dataType, setDataType] = useState(DataTypes.ABUNDANCE);
   // Sets state for the species type 
   const [speciesType, setSpeciesType] = useState('mean');
+  const [speciesName, setSpeciesName] = useState('mean');
   const today = new Date()
   const startOfYear = new Date(today.getFullYear(),0,1);
   // convert both dates into msec since 1970 and find the difference
@@ -38,34 +39,39 @@ function Home(this: any) {
   // Sets state for the week number
   let this_week = Math.floor(diff_dates/WEEK_TO_MSEC); 
   const [week, setWeek] = useState(this_week);
-  // default state of the url for the current data displayed.
-  const [url, setUrl] = useState(imageURL(DataTypes.ABUNDANCE, 'mean', this_week));
+  // default state of the map overlay url for the current data displayed.
+  const [overlayUrl, setOverlayUrl] = useState(imageURL(DataTypes.ABUNDANCE, 'mean', this_week));
 
-  // Adds a listener for the event in which a user presses a key on the keyboard. 
-  useEffect(() => {
-    const u = imageURL(dataType, speciesType, week);
-    setUrl(u);
-  }, [speciesType, dataType, week]);
+  async function checkForImage(this_week: number) {
+    var image_url = imageURL(dataType, speciesType, this_week);
+    var response = await fetch(image_url);
+    if (!response.ok) {
+      var message = "The file for week "+this_week+" on "+dataType+" of "+speciesType+" is missing.";
+      console.log(message);
+      alert(message);
+      return;
+    }
+    setWeek(this_week);
+    setOverlayUrl(image_url);
+  }
 
   /* Allows the user to use the front and back arrow keys to control the week number 
      and which image files are being displayed. */ 
-  const handleSelection = useCallback(
-    (event: KeyboardEvent) => {
-      if (event.key === 'ArrowRight') {
-        // increments active index (wraps around when at top)
-        event.preventDefault();
-        let temp = week + 1;
-        if (temp > MAX_WEEK) temp = 1;
-        setWeek(temp);
-      } else if (event.key === 'ArrowLeft') {
-        // decrements active index (wraps around when at bottom)
-        event.preventDefault();
-        let temp = week - 1;
-        if (temp <= 0) temp = MAX_WEEK;
-        setWeek(temp);
-      }
-    },[speciesType, dataType, week]
-  );
+  const handleSelection = (event: KeyboardEvent) => {
+    if (event.key === 'ArrowRight') {
+      // increments active index (wraps around when at top)
+      event.preventDefault();
+      let temp = week + 1;
+      if (temp > MAX_WEEK) temp = 1;
+      setWeek(temp);
+    } else if (event.key === 'ArrowLeft') {
+      // decrements active index (wraps around when at bottom)
+      event.preventDefault();
+      let temp = week - 1;
+      if (temp <= 0) temp = MAX_WEEK;
+      setWeek(temp);
+    }
+  };
 
   // Adds a listener for user keyboard events. 
   useEffect(() => {
@@ -73,11 +79,28 @@ function Home(this: any) {
     return () => {
       document.removeEventListener('keydown', handleSelection);
     };
-  }, [handleSelection]);
+  }, []);
 
+  async function checkInputTypes(data_type: DataTypes, species: string, label: string) {
+    // check required legend file is available. 
+    var response;
+    if ((data_type !== dataType) || (species !== speciesType)) {
+      response = await fetch(changeLegend(data_type, species));
+      if (!response.ok) {
+        var message = "The file on "+data_type+" of "+species+" is missing.";
+        console.log(message);
+        alert(message);
+        return;
+      }
+    }
+    setDataType(data_type);
+    setSpeciesType(species);
+    setSpeciesName(label);
+    checkForImage(week);
+  };
   // Maps the species from the taxa file provided to a dropdown with options. 
   const taxaOptions = taxa.map((t) => (
-    <Menu.Item key={t.value} onClick={() => setSpeciesType(t.value)}>
+    <Menu.Item key={t.value} onClick={() => checkInputTypes(dataType, t.value, t.label)}>
       {t.label}
     </Menu.Item>
   ));
@@ -86,10 +109,9 @@ function Home(this: any) {
   return (
     <div className="Home">
       {/* Calls the custom timeline component with the current week onChange function as parameters */}
-      <Timeline week={week} onChangeWeek={setWeek} />
+      <Timeline week={week} onChangeWeek={checkForImage} />
       {/* Calls the custom legend component with the data type and species type as parameters. */}
       <Legend dataType={dataType} speciesType={speciesType} />
-      
       {/* Creates a map using the leaflet component */}
       <MapContainer
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -106,7 +128,7 @@ function Home(this: any) {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
-          attribution='Abundance data provided by <a href="https://science.ebird.org/science/status-and-trends">Cornell Lab of Ornithology | eBird</a> | <a href="https://birdflow-science.github.io/"> BirdFlow </a>'
+          attribution='Abundance data provided by <a target="_blank" href="https://science.ebird.org">Cornell Lab of Ornithology - eBird</a> | <a target="_blank" href="https://birdflow-science.github.io/"> BirdFlow </a>'
         />
         {/* Dropdown for data type */}
         <Menu position="left-start" withArrow>
@@ -125,10 +147,10 @@ function Home(this: any) {
           {/* The options for the data type and the corresponsing onClick function call 
            TODO: add influx and outflux */}
           <Menu.Dropdown>
-            <Menu.Item onClick={() => setDataType(DataTypes.ABUNDANCE)}>
-              Abundance
+          <Menu.Item onClick={() => checkInputTypes(DataTypes.ABUNDANCE, speciesType, speciesName)}>
+          Abundance
             </Menu.Item>
-            <Menu.Item onClick={() => setDataType(DataTypes.MOVEMENT)}>
+            <Menu.Item onClick={() => checkInputTypes(DataTypes.MOVEMENT, speciesType, speciesName)}>
               Net Movement
             </Menu.Item>
           </Menu.Dropdown>
@@ -151,7 +173,7 @@ function Home(this: any) {
         </Menu>
         { /* Overlays an image that contains the data to be displayed on top of the map */}
         <ImageOverlay
-          url={url}
+          url={overlayUrl}
           bounds={imageBounds}
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
