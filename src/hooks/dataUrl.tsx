@@ -1,6 +1,6 @@
 
 const baseUrl = 'https://avianinfluenza.s3.us-east-2.amazonaws.com/';
-export enum DataTypes {ABUNDANCE = 'abundance', MOVEMENT = 'netmovement'};// avianinfluenza.s3.us-east-2.amazonaws.com/abundance/mean/scale_abundance_mean.json
+export enum DataTypes {ABUNDANCE = 'abundance', MOVEMENT = 'netmovement'};
 
 /* Determine the url containing data to display the legend scale.
  The function takes in the data type and the species type. */
