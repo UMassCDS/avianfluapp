@@ -2,7 +2,6 @@
 import { useEffect, useState } from 'react';
 import { Grid } from '@mantine/core';
 import { changeLegend, DataTypes} from '../hooks/dataUrl';
-import '../styles/Legend.css';
 
 // Interface for the Legend 
 interface LegendProps {
@@ -17,17 +16,27 @@ function Legend(props: LegendProps) {
   const [lowLabel, setLowLabel] = useState<number>(0);
   const [midLabel, setMidLabel] = useState<number>(50);
   const [highLabel, setHighLabel] = useState<number>(100);
+
   // Fetches the JSON of values from the backend 
   const getJSON = async (url: string) => {
     const response = await fetch(url);
     if (!response.ok) {
-      // TODO PAM how should it handle errors?
       // check if response worked (no 404 errors etc...)
       throw new Error(response.statusText);
     }
-    const d = response.json(); // get JSON from the response
+    const d = response.json(); // get JSON fr:om the response
     return d; // returns a promise, which resolves to this data value
   };
+
+  function getUnits(data_type: DataTypes) {
+    if (data_type === DataTypes.ABUNDANCE) {
+      return "Birds/km^2";
+    } else if (data_type === DataTypes.MOVEMENT) {
+      return "Birds/km/week";
+    }
+    return "";
+  };
+
 
   // Every time the dataType or speciesType is changed by the user, the legend updates
   useEffect(() => {
@@ -43,6 +52,9 @@ function Legend(props: LegendProps) {
         setLowLabel(d[0].value);
         setHighLabel(d[d.length-1].value);
         setMidLabel(Math.floor((d[d.length-1].value-d[0].value)/2));
+      })
+      .catch((error) => {
+        alert(error);
       });
   }, [dataType, speciesType]);
 
@@ -55,7 +67,8 @@ function Legend(props: LegendProps) {
             style={{
               display: 'inline-block',
               width: '14px',
-              height: '200px',
+              height: '180px',
+              margin: '10px',
               background: `linear-gradient( 0deg, ${data} )`,
             }}
           />
@@ -68,6 +81,8 @@ function Legend(props: LegendProps) {
           <div>{lowLabel}</div>
         </Grid.Col>
       </Grid>
+      <div style={{textAlign:"center"}}>{getUnits(dataType)}</div>
+
     </div>
   );
 }
