@@ -147,8 +147,8 @@ function Home(this: any) {
           {/* The options for the data type and the corresponsing onClick function call 
            TODO: add influx and outflux */}
           <Menu.Dropdown>
-          <Menu.Item onClick={() => checkInputTypes(DataTypes.ABUNDANCE, speciesType, speciesName)}>
-          Abundance
+            <Menu.Item onClick={() => checkInputTypes(DataTypes.ABUNDANCE, speciesType, speciesName)}>
+              Abundance
             </Menu.Item>
             <Menu.Item onClick={() => checkInputTypes(DataTypes.MOVEMENT, speciesType, speciesName)}>
               Net Movement
