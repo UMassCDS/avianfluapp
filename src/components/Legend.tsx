@@ -1,7 +1,7 @@
 /* eslint-disable no-template-curly-in-string */
 import { useEffect, useState } from 'react';
 import { Grid } from '@mantine/core';
-import { changeLegend, DataTypes} from '../hooks/dataUrl';
+import { changeLegend, DataTypes, DataInfo} from '../hooks/dataUrl';
 
 // Interface for the Legend 
 interface LegendProps {
@@ -27,16 +27,6 @@ function Legend(props: LegendProps) {
     const d = response.json(); // get JSON from the response
     return d; // returns a promise, which resolves to this data value
   };
-
-  function getUnits(data_type: DataTypes) {
-    if (data_type === DataTypes.ABUNDANCE) {
-      return "Birds/km^2";
-    } else if (data_type === DataTypes.MOVEMENT) {
-      return "Birds/km/week";
-    }
-    return "";
-  };
-
 
   // Every time the dataType or speciesType is changed by the user, the legend updates
   useEffect(() => {
@@ -81,7 +71,7 @@ function Legend(props: LegendProps) {
           <div>{lowLabel}</div>
         </Grid.Col>
       </Grid>
-      <div style={{textAlign:"center"}}>{getUnits(dataType)}</div>
+      <div style={{textAlign:"center"}}>{DataInfo[dataType].units}</div>
 
     </div>
   );

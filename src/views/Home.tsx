@@ -2,7 +2,7 @@ import { Menu, ActionIcon } from '@mantine/core';
 import { MapContainer, TileLayer, ImageOverlay } from 'react-leaflet';
 import { useState, useEffect } from 'react';
 import { IconFileDatabase, IconFeather } from '@tabler/icons-react';
-import { imageURL, changeLegend, DataTypes } from '../hooks/dataUrl';
+import { imageURL, changeLegend, DataTypes, DataInfo} from '../hooks/dataUrl';
 import taxa from '../assets/taxa.json';
 import Timeline from '../components/Timeline';
 import Legend from '../components/Legend';
@@ -98,6 +98,7 @@ function Home(this: any) {
     setSpeciesName(label);
     checkForImage(week);
   };
+
   // Maps the species from the taxa file provided to a dropdown with options. 
   const taxaOptions = taxa.map((t) => (
     <Menu.Item key={t.value} onClick={() => checkInputTypes(dataType, t.value, t.label)}>
@@ -105,6 +106,25 @@ function Home(this: any) {
     </Menu.Item>
   ));
   
+  // Maps the data types (total, migration, flux) to a dropdown with options. 
+  function dataTypeOptions(): object[]
+  {
+    var menuitems = [];
+    for (const d in DataTypes) {
+      let dtype = DataTypes[d];
+      menuitems.push(
+        <Menu.Item onClick={() => checkInputTypes(dtype, speciesType, speciesName)}>
+          {DataInfo[dtype].label}
+        </Menu.Item>
+      )
+    };
+    return menuitems;
+  }
+
+   // PAM this seems to push attribution off the bottom
+   <h1 style={{textAlign:"center"}}>{speciesName} {DataInfo[dataType].label}</h1>
+
+
   // Here is where you list the components and elements that you want rendered. 
   return (
     <div className="Home">
@@ -128,7 +148,7 @@ function Home(this: any) {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
-          attribution='Abundance data provided by <a target="_blank" href="https://science.ebird.org">Cornell Lab of Ornithology - eBird</a> | <a target="_blank" href="https://birdflow-science.github.io/"> BirdFlow </a>'
+          attribution='Abundance data provided by <a target="_blank" href="https://ebird.org/science/status-and-trends ">Cornell Lab of Ornithology - eBird</a> | <a target="_blank" href="https://birdflow-science.github.io/"> BirdFlow </a>'
         />
         {/* Dropdown for data type */}
         <Menu position="left-start" withArrow>
@@ -145,14 +165,12 @@ function Home(this: any) {
             </ActionIcon>
           </Menu.Target>
           {/* The options for the data type and the corresponsing onClick function call 
-           TODO: add influx and outflux */}
+           TODO: add influx and outflux 
+           PAM change this to a DataTypes map with label 
+           (Object.keys(MyEnum) as Array<DataTypes>).map((key) => {})
+          */}
           <Menu.Dropdown>
-            <Menu.Item onClick={() => checkInputTypes(DataTypes.ABUNDANCE, speciesType, speciesName)}>
-              Abundance
-            </Menu.Item>
-            <Menu.Item onClick={() => checkInputTypes(DataTypes.MOVEMENT, speciesType, speciesName)}>
-              Net Movement
-            </Menu.Item>
+            {dataTypeOptions}
           </Menu.Dropdown>
         </Menu>
         {/* The dropdown for the species type */}
