@@ -2,7 +2,7 @@ import { Menu, ActionIcon } from '@mantine/core';
 import { MapContainer, TileLayer, ImageOverlay } from 'react-leaflet';
 import { useState, useEffect } from 'react';
 import { IconFileDatabase, IconFeather } from '@tabler/icons-react';
-import { imageURL, changeLegend, DataTypes, DataInfo} from '../hooks/dataUrl';
+import { imageURL, changeLegend, dataTypeEnum, dataInfo, stupidConversion} from '../hooks/dataUrl';
 import taxa from '../assets/taxa.json';
 import Timeline from '../components/Timeline';
 import Legend from '../components/Legend';
@@ -28,10 +28,10 @@ function Home(this: any) {
   ];
 
   // Sets state for the data type - so far this is abundance or netmovement
-  const [dataType, setDataType] = useState(DataTypes.ABUNDANCE);
+  const [dataType, setDataType] = useState(dataTypeEnum.ABUNDANCE);
   // Sets state for the species type 
   const [speciesType, setSpeciesType] = useState('mean');
-  const [speciesName, setSpeciesName] = useState('mean');
+  const [speciesName, setSpeciesName] = useState('Average');
   const today = new Date()
   const startOfYear = new Date(today.getFullYear(),0,1);
   // convert both dates into msec since 1970 and find the difference
@@ -40,7 +40,7 @@ function Home(this: any) {
   let this_week = Math.floor(diff_dates/WEEK_TO_MSEC); 
   const [week, setWeek] = useState(this_week);
   // default state of the map overlay url for the current data displayed.
-  const [overlayUrl, setOverlayUrl] = useState(imageURL(DataTypes.ABUNDANCE, 'mean', this_week));
+  const [overlayUrl, setOverlayUrl] = useState(imageURL(dataTypeEnum.ABUNDANCE, 'mean', this_week));
 
   async function checkForImage(this_week: number) {
     var image_url = imageURL(dataType, speciesType, this_week);
@@ -81,7 +81,7 @@ function Home(this: any) {
     };
   }, []);
 
-  async function checkInputTypes(data_type: DataTypes, species: string, label: string) {
+  async function checkInputTypes(data_type: dataTypeEnum, species: string, label: string) {
     // check required legend file is available. 
     var response;
     if ((data_type !== dataType) || (species !== speciesType)) {
@@ -99,6 +99,7 @@ function Home(this: any) {
     checkForImage(week);
   };
 
+  // PAM these should only happen once  - this doesn't change
   // Maps the species from the taxa file provided to a dropdown with options. 
   const taxaOptions = taxa.map((t) => (
     <Menu.Item key={t.value} onClick={() => checkInputTypes(dataType, t.value, t.label)}>
@@ -107,27 +108,28 @@ function Home(this: any) {
   ));
   
   // Maps the data types (total, migration, flux) to a dropdown with options. 
-  function dataTypeOptions(): object[]
-  {
+  function dataTypeOptions() {
     var menuitems = [];
-    for (const d in DataTypes) {
-      let dtype = DataTypes[d];
-      menuitems.push(
-        <Menu.Item onClick={() => checkInputTypes(dtype, speciesType, speciesName)}>
-          {DataInfo[dtype].label}
-        </Menu.Item>
-      )
+    for (const d in dataTypeEnum) {
+      if (isNaN(Number(d))) {
+        menuitems.push(
+          <Menu.Item onClick={() => checkInputTypes(stupidConversion(d), speciesType, speciesName)}>
+            {dataInfo[stupidConversion(d)].label}
+          </Menu.Item>
+        )
+      };
     };
+    console.log(menuitems);
     return menuitems;
-  }
-
-   // PAM this seems to push attribution off the bottom
-   <h1 style={{textAlign:"center"}}>{speciesName} {DataInfo[dataType].label}</h1>
-
+  };
 
   // Here is where you list the components and elements that you want rendered. 
   return (
     <div className="Home">
+      <div className="title">
+        <div style={{textAlign:"center", fontSize:80, fontWeight:"bold"}}>BirdFlow</div>
+        <h1 style={{textAlign:"center"}}>{speciesName} {dataInfo[dataType].label}</h1>
+      </div>
       {/* Calls the custom timeline component with the current week onChange function as parameters */}
       <Timeline week={week} onChangeWeek={checkForImage} />
       {/* Calls the custom legend component with the data type and species type as parameters. */}
@@ -164,13 +166,8 @@ function Home(this: any) {
               />
             </ActionIcon>
           </Menu.Target>
-          {/* The options for the data type and the corresponsing onClick function call 
-           TODO: add influx and outflux 
-           PAM change this to a DataTypes map with label 
-           (Object.keys(MyEnum) as Array<DataTypes>).map((key) => {})
-          */}
           <Menu.Dropdown>
-            {dataTypeOptions}
+            {dataTypeOptions()}
           </Menu.Dropdown>
         </Menu>
         {/* The dropdown for the species type */}

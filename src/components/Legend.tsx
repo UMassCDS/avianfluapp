@@ -1,11 +1,11 @@
 /* eslint-disable no-template-curly-in-string */
 import { useEffect, useState } from 'react';
 import { Grid } from '@mantine/core';
-import { changeLegend, DataTypes, DataInfo} from '../hooks/dataUrl';
+import { changeLegend, dataTypeEnum, dataInfo} from '../hooks/dataUrl';
 
 // Interface for the Legend 
 interface LegendProps {
-  dataType: DataTypes;
+  dataType: dataTypeEnum;
   speciesType: string;
 }
 
@@ -71,7 +71,7 @@ function Legend(props: LegendProps) {
           <div>{lowLabel}</div>
         </Grid.Col>
       </Grid>
-      <div style={{textAlign:"center"}}>{DataInfo[dataType].units}</div>
+      <div style={{textAlign:"center"}}>{dataInfo[dataType].units}</div>
 
     </div>
   );
