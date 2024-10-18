@@ -1,7 +1,7 @@
 [
   {
     "value": "mean",
-    "label": "Average"
+    "label": "Total"
   },
   {
     "value": "mallar3",
@@ -24,10 +24,6 @@
     "label": "Green-winged Teal"
   },
   {
-    "value": "cintea",
-    "label": "Cinnamon Teal"
-  },
-  {
     "value": "buwtea",
     "label": "Blue-winged Teal"
   },
@@ -42,9 +38,5 @@
   {
     "value": "wooduc",
     "label": "Wood Duck"
-  },
-  {
-    "value": "lotduc",
-    "label": "Long-tailed Duck"
   }
 ]

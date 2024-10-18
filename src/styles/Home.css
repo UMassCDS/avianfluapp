@@ -6,18 +6,27 @@
         z-index: 0;
     }
 
+    .title {
+        position: fixed;
+        z-index: 200;
+        top: 15px;
+        left: 50%;
+        transform: translate(-50%, 0%);
+        background-color: rgb(227, 243, 250);
+        opacity: 0.6;
+    }
+
     .dataType-button {
         position: absolute;
-        top: 20px;
-        right: 20px;
+        top: 100px;
+        right: 200px;
         z-index: 400;
-
     }
 
     .speciesType-button {
         position: absolute;
-        top: 60px;
-        right: 20px;
+        top: 150px;
+        right: 200px;
         z-index: 400;
     }
 
