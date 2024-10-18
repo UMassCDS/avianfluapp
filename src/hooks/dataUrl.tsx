@@ -15,7 +15,7 @@ export function stupidConversion(input: string): dataTypeEnum {
   return dataTypeEnum.ABUNDANCE;
   // PAM create error
 }
-
+PAM remove dataTypeEnum - not // needed - can just do index, dataInfo becomes an array of dataObj, dataInterface can go away too
 type dataObj = {
   filename: string,
   label: string,

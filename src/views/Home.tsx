@@ -1,4 +1,5 @@
 import { Menu, ActionIcon } from '@mantine/core';
+import { Combobox, Input, InputBase, useCombobox } from '@mantine/core';
 import { MapContainer, TileLayer, ImageOverlay } from 'react-leaflet';
 import { useState, useEffect } from 'react';
 import { IconFileDatabase, IconFeather } from '@tabler/icons-react';
@@ -30,8 +31,8 @@ function Home(this: any) {
   // Sets state for the data type - so far this is abundance or netmovement
   const [dataType, setDataType] = useState(dataTypeEnum.ABUNDANCE);
   // Sets state for the species type 
-  const [speciesType, setSpeciesType] = useState('mean');
-  const [speciesName, setSpeciesName] = useState('Average');
+  const [speciesType, setSpeciesType] = useState(taxa[0].value);
+  const [speciesName, setSpeciesName] = useState(taxa[0].label);
   const today = new Date()
   const startOfYear = new Date(today.getFullYear(),0,1);
   // convert both dates into msec since 1970 and find the difference
@@ -40,14 +41,16 @@ function Home(this: any) {
   let this_week = Math.floor(diff_dates/WEEK_TO_MSEC); 
   const [week, setWeek] = useState(this_week);
   // default state of the map overlay url for the current data displayed.
-  const [overlayUrl, setOverlayUrl] = useState(imageURL(dataTypeEnum.ABUNDANCE, 'mean', this_week));
+  const [overlayUrl, setOverlayUrl] = useState(imageURL(dataTypeEnum.ABUNDANCE, taxa[0].value, this_week));
+  const typeCombo = useCombobox();
+  // const speciesCombo = useCombobox();
 
   async function checkForImage(this_week: number) {
     var image_url = imageURL(dataType, speciesType, this_week);
     var response = await fetch(image_url);
     if (!response.ok) {
-      var message = "The file for week "+this_week+" on "+dataType+" of "+speciesType+" is missing.";
-      console.log(message);
+      console.debug(response);
+      var message = "The .png for week "+this_week+" on "+dataInfo[dataType].label+" of "+speciesName+" is missing.";
       alert(message);
       return;
     }
@@ -81,14 +84,18 @@ function Home(this: any) {
     };
   }, []);
 
+  useEffect(() => {
+    checkForImage(week);
+  }, [dataType, speciesType]);
+
   async function checkInputTypes(data_type: dataTypeEnum, species: string, label: string) {
     // check required legend file is available. 
     var response;
     if ((data_type !== dataType) || (species !== speciesType)) {
       response = await fetch(changeLegend(data_type, species));
       if (!response.ok) {
-        var message = "The file on "+data_type+" of "+species+" is missing.";
-        console.log(message);
+        console.debug(response);
+        var message = "The scale file for "+dataInfo[data_type].label+" of "+label+" is missing.";
         alert(message);
         return;
       }
@@ -96,9 +103,11 @@ function Home(this: any) {
     setDataType(data_type);
     setSpeciesType(species);
     setSpeciesName(label);
-    checkForImage(week);
   };
 
+
+  PAM rethink this.  should we do a load up front for scale data? then create all of hte legends upfront
+  Can use whether legend exists to check if we can do this Combo. No await. MAybe 
   // PAM these should only happen once  - this doesn't change
   // Maps the species from the taxa file provided to a dropdown with options. 
   const taxaOptions = taxa.map((t) => (
@@ -107,28 +116,55 @@ function Home(this: any) {
     </Menu.Item>
   ));
   
+  async function checkDataType(data_type: dataTypeEnum) {
+    // check required legend file is available. 
+    var response = await fetch(changeLegend(data_type, speciesType));
+    if (!response.ok) {
+      console.debug(response);
+      var message = "The scale file for "+dataInfo[data_type].label+" of "+speciesName+" is missing.";
+      alert(message);
+      return false;
+    }
+    return true;
+  };
+
   // Maps the data types (total, migration, flux) to a dropdown with options. 
   function dataTypeOptions() {
-    var menuitems = [];
+    var comboitems = [];
+    // PAM should be able to go through the dataInfo dict more easily than this
     for (const d in dataTypeEnum) {
       if (isNaN(Number(d))) {
-        menuitems.push(
-          <Menu.Item onClick={() => checkInputTypes(stupidConversion(d), speciesType, speciesName)}>
+        comboitems.push(
+          <Combobox.Option value={d} key={stupidConversion(d)}>
             {dataInfo[stupidConversion(d)].label}
-          </Menu.Item>
+          </Combobox.Option>
         )
       };
     };
-    console.log(menuitems);
-    return menuitems;
-  };
+    return comboitems;
+  }; 
+
+  const groceries = [
+    'Apples',
+    'Bananas',
+    'Broccoli',
+    'Carrots',
+    'Chocolate',
+    'Grapes',
+  ];
+
+  const options = groceries.map((item) => (
+    <Combobox.Option value={item} key={item}>
+      {item}
+    </Combobox.Option>
+  ));
 
   // Here is where you list the components and elements that you want rendered. 
   return (
     <div className="Home">
       <div className="title">
-        <div style={{textAlign:"center", fontSize:80, fontWeight:"bold"}}>BirdFlow</div>
-        <h1 style={{textAlign:"center"}}>{speciesName} {dataInfo[dataType].label}</h1>
+        <div style={{textAlign:"center", fontSize:60, fontWeight:"bold"}}>Avian Influenza</div>
+        <div style={{textAlign:"center", fontSize:30, fontWeight:"bold"}}>{dataInfo[dataType].label} of the {speciesName}</div>
       </div>
       {/* Calls the custom timeline component with the current week onChange function as parameters */}
       <Timeline week={week} onChangeWeek={checkForImage} />
@@ -153,35 +189,44 @@ function Home(this: any) {
           attribution='Abundance data provided by <a target="_blank" href="https://ebird.org/science/status-and-trends ">Cornell Lab of Ornithology - eBird</a> | <a target="_blank" href="https://birdflow-science.github.io/"> BirdFlow </a>'
         />
         {/* Dropdown for data type */}
-        <Menu position="left-start" withArrow>
-          <Menu.Target>
-            <ActionIcon
-              className="dataType-button"
-              variant="filled"
-              aria-label="Data Type"
+        <Combobox
+          store={typeCombo}
+          onOptionSubmit={(data_indx) => {
+            console.log("Yipppeee"+data_indx);
+            var data_type = stupidConversion(data_indx)
+            if (await checkDataType(data_type)) {
+              setDataType(data_type);
+            }
+            typeCombo.closeDropdown();
+          }}
+        >
+          <Combobox.Target>
+            <InputBase
+             className="dataType-button"
+              component="button"
+              type="button"
+              pointer
+              rightSection={<Combobox.Chevron />}
+              onClick={() => typeCombo.toggleDropdown()}
+              rightSectionPointerEvents="none"
             >
-              <IconFileDatabase
-                style={{ width: '70%', height: '70%' }}
-                stroke={1.5}
-              />
-            </ActionIcon>
-          </Menu.Target>
-          <Menu.Dropdown>
-            {dataTypeOptions()}
-          </Menu.Dropdown>
-        </Menu>
+              {dataType || <Input.Placeholder>Pick value</Input.Placeholder>}
+            </InputBase>
+          </Combobox.Target>
+
+          <Combobox.Dropdown>
+            <Combobox.Options>{dataTypeOptions()}</Combobox.Options>
+          </Combobox.Dropdown>
+        </Combobox>        
         {/* The dropdown for the species type */}
-        <Menu position="left-start" withArrow>
+        <Menu position="right-start" withArrow>
           <Menu.Target>
             <ActionIcon
               className="speciesType-button"
               variant="filled"
               aria-label="Data Type"
             >
-              <IconFeather
-                style={{ width: '70%', height: '70%' }}
-                stroke={1.5}
-              />
+              <IconFeather stroke={1.5}/>
             </ActionIcon>
           </Menu.Target>
           <Menu.Dropdown>{taxaOptions}</Menu.Dropdown>
