@@ -1,65 +1,45 @@
 
 const baseUrl = 'https://avianinfluenza.s3.us-east-2.amazonaws.com/';
-// use constant keys to help w/ typos.  The values match file naming convention.
-export enum dataTypeEnum {
-  ABUNDANCE, MOVEMENT
-}
+import taxa from '../assets/taxa.json';
 
-export function stupidConversion(input: string): dataTypeEnum {
-  if (input === "ABUNDANCE") {
-    return dataTypeEnum.ABUNDANCE;
-  }
-  if (input === "MOVEMENT") {
-    return dataTypeEnum.MOVEMENT;
-  }
-  return dataTypeEnum.ABUNDANCE;
-  // PAM create error
-}
-PAM remove dataTypeEnum - not // needed - can just do index, dataInfo becomes an array of dataObj, dataInterface can go away too
-type dataObj = {
-  filename: string,
+export var dataInfo: {
+  datatype: string,
   label: string,
   units: string
- };
-
-export type dataInterface = {
-  [key in dataTypeEnum]: dataObj;
-};
-
-export var dataInfo:{[key in dataTypeEnum]: dataObj;} = {
-  [dataTypeEnum.ABUNDANCE] : {
-    filename:'abundance', 
+ } [] = [
+  {
+    datatype:'abundance', 
     label:'Abundance',
     units: 'Birds/km^2',
   },
-  [dataTypeEnum.MOVEMENT] : {
-    filename: 'netmovement', 
+  {
+    datatype: 'netmovement', 
     label:'Migration',
     units: 'Birds/km/week',
   },
-};
+];
 
 
 /* Determine the url containing data to display the legend scale.
- The function takes in the data type and the species type. */
-export function changeLegend(dataType: dataTypeEnum, speciesType: string): string {
-  let name = dataInfo[dataType].filename;
+ The function takes in the data type index and the species type. */
+export function getScalingFilename(data_index: number, taxa_index: number): string {
+  const name = dataInfo[data_index].datatype;
   const finalUrl = `${
     baseUrl + name
-  }/${speciesType}/scale_${name}_${speciesType}.json`;
+  }/${taxa[taxa_index].value}/scale_${name}_${taxa[taxa_index].value}.json`;
   return finalUrl;
 }
 
 /* Determine the url containing the image data. 
-   The function takes in the data type, the species type, and the week number. */
+   The function takes in the data type index, the species type, and the week number. */
 export function imageURL(
-  dataType: dataTypeEnum,
-  speciesType: string,
+  data_index: number,
+  taxa_index: number,
   week: number,
 ): string {
-  let name = dataInfo[dataType].filename;
+  const name = dataInfo[data_index].datatype;
   const finalUrl = `${
     baseUrl + name
-  }/${speciesType}/${name}_${speciesType}_${week}.png`;
+  }/${taxa[taxa_index].value}/${name}_${taxa[taxa_index].value}_${week}.png`;
   return finalUrl;
 }

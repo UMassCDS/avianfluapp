@@ -16,17 +16,18 @@
         opacity: 0.6;
     }
 
-    .dataType-button {
+    .dataIndex-button {
         position: absolute;
         top: 100px;
-        right: 200px;
+        right: 250px;
         z-index: 400;
     }
 
     .speciesType-button {
         position: absolute;
-        top: 150px;
-        right: 200px;
+        top: 100px;
+        right: 100px;
+        width: 140;
         z-index: 400;
     }
 
