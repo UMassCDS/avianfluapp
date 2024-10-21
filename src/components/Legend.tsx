@@ -1,6 +1,6 @@
 /* eslint-disable no-template-curly-in-string */
 import { useEffect, useState } from 'react';
-import { Grid } from '@mantine/core';
+import { Grid, Tooltip } from '@mantine/core';
 import { getScalingFilename, dataInfo} from '../hooks/dataUrl';
 
 // Interface for the Legend 
@@ -65,14 +65,15 @@ function Legend(props: LegendProps) {
         </Grid.Col>
         <Grid.Col span={8} >
           {/* PAM - this is a little hacky, couldn't get lowLabel to align "bottom"
-             so made it so the midLabel would push it to the right place. */ }
+            so made it so the midLabel would push it to the right place. */ }
           <div style={{alignContent:"top"}}>{highLabel}</div>
           <div style={{height:'75%', alignContent:"center"}}>{midLabel}</div>
           <div>{lowLabel}</div>
         </Grid.Col>
       </Grid>
-      <div style={{textAlign:"center"}}>{dataInfo[dataTypeIndex].units}</div>
-
+      <Tooltip label='Text to explain scaling'>
+        <div style={{textAlign:"center"}}>{dataInfo[dataTypeIndex].units}</div>
+      </Tooltip>
     </div>
   );
 }
