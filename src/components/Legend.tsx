@@ -1,17 +1,17 @@
 /* eslint-disable no-template-curly-in-string */
 import { useEffect, useState } from 'react';
 import { Grid } from '@mantine/core';
-import { changeLegend, DataTypes} from '../hooks/dataUrl';
+import { getScalingFilename, dataInfo} from '../hooks/dataUrl';
 
 // Interface for the Legend 
 interface LegendProps {
-  dataType: DataTypes;
-  speciesType: string;
+  dataTypeIndex: number;
+  speciesIndex: number;
 }
 
 /* Creates a custom legend component based on the species scale values. */
 function Legend(props: LegendProps) {
-  const { dataType, speciesType } = props;
+  const { dataTypeIndex, speciesIndex } = props;
   const [data, setData] = useState<string>();
   const [lowLabel, setLowLabel] = useState<number>(0);
   const [midLabel, setMidLabel] = useState<number>(50);
@@ -28,19 +28,9 @@ function Legend(props: LegendProps) {
     return d; // returns a promise, which resolves to this data value
   };
 
-  function getUnits(data_type: DataTypes) {
-    if (data_type === DataTypes.ABUNDANCE) {
-      return "Birds/km^2";
-    } else if (data_type === DataTypes.MOVEMENT) {
-      return "Birds/km/week";
-    }
-    return "";
-  };
-
-
-  // Every time the dataType or speciesType is changed by the user, the legend updates
+  // Every time the dataTypeIndex or speciesIndex is changed by the user, the legend updates
   useEffect(() => {
-    const u = changeLegend(dataType, speciesType);
+    const u = getScalingFilename(dataTypeIndex, speciesIndex);
     getJSON(u)
       .then((d) => {
         const pushed: any[] = [];
@@ -56,7 +46,7 @@ function Legend(props: LegendProps) {
       .catch((error) => {
         alert(error);
       });
-  }, [dataType, speciesType]);
+  }, [dataTypeIndex, speciesIndex]);
 
   return (
     <div className="Legend">
@@ -81,7 +71,7 @@ function Legend(props: LegendProps) {
           <div>{lowLabel}</div>
         </Grid.Col>
       </Grid>
-      <div style={{textAlign:"center"}}>{getUnits(dataType)}</div>
+      <div style={{textAlign:"center"}}>{dataInfo[dataTypeIndex].units}</div>
 
     </div>
   );

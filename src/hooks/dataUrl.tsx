@@ -1,25 +1,45 @@
 
 const baseUrl = 'https://avianinfluenza.s3.us-east-2.amazonaws.com/';
-export enum DataTypes {ABUNDANCE = 'abundance', MOVEMENT = 'netmovement'};
+import taxa from '../assets/taxa.json';
+
+export var dataInfo: {
+  datatype: string,
+  label: string,
+  units: string
+ } [] = [
+  {
+    datatype:'abundance', 
+    label:'Abundance',
+    units: 'Birds/km^2',
+  },
+  {
+    datatype: 'netmovement', 
+    label:'Migration',
+    units: 'Birds/km/week',
+  },
+];
+
 
 /* Determine the url containing data to display the legend scale.
- The function takes in the data type and the species type. */
-export function changeLegend(dataType: DataTypes, speciesType: string): string {
+ The function takes in the data type index and the species type. */
+export function getScalingFilename(data_index: number, taxa_index: number): string {
+  const name = dataInfo[data_index].datatype;
   const finalUrl = `${
-    baseUrl + dataType
-  }/${speciesType}/scale_${dataType}_${speciesType}.json`;
+    baseUrl + name
+  }/${taxa[taxa_index].value}/scale_${name}_${taxa[taxa_index].value}.json`;
   return finalUrl;
 }
 
 /* Determine the url containing the image data. 
-   The function takes in the data type, the species type, and the week number. */
+   The function takes in the data type index, the species type, and the week number. */
 export function imageURL(
-  dataType: DataTypes,
-  speciesType: string,
+  data_index: number,
+  taxa_index: number,
   week: number,
 ): string {
+  const name = dataInfo[data_index].datatype;
   const finalUrl = `${
-    baseUrl + dataType
-  }/${speciesType}/${dataType}_${speciesType}_${week}.png`;
+    baseUrl + name
+  }/${taxa[taxa_index].value}/${name}_${taxa[taxa_index].value}_${week}.png`;
   return finalUrl;
 }
