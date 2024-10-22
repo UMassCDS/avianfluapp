@@ -1,4 +1,4 @@
-import { Combobox, ComboboxStore, Input, InputBase, Tooltip, useCombobox } from '@mantine/core';
+import { Combobox, ComboboxStore, Grid, Input, InputBase, Tooltip, useCombobox } from '@mantine/core';
 import { MapContainer, TileLayer, ImageOverlay } from 'react-leaflet';
 import { forwardRef, useState, useEffect } from 'react';
 import { imageURL, getScalingFilename, dataInfo} from '../hooks/dataUrl';
@@ -170,14 +170,6 @@ function Home(this: any) {
   // Here is where you list the components and elements that you want rendered. 
   return (
     <div className="Home">
-      <div className="title">
-        <div style={{textAlign:"center", fontSize:60, fontWeight:"bold"}}>Avian Influenza</div>
-        <div style={{textAlign:"center", fontSize:30, fontWeight:"bold"}}>{dataInfo[dataIndex].label} of the {taxa[speciesIndex].label}</div>
-      </div>
-      {/* Calls the custom timeline component with the current week onChange function as parameters */}
-      <Timeline week={week} onChangeWeek={checkImageAndUpdate} />
-      {/* Calls the custom legend component with the data type and species type as parameters. */}
-      <Legend dataTypeIndex={dataIndex} speciesIndex={speciesIndex} />
       {/* Creates a map using the leaflet component */}
       <MapContainer
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -196,16 +188,6 @@ function Home(this: any) {
           // @ts-ignore
           attribution='Abundance data provided by <a target="_blank" href="https://ebird.org/science/status-and-trends ">Cornell Lab of Ornithology - eBird</a> | <a target="_blank" href="https://birdflow-science.github.io/"> BirdFlow </a>'
         />
-        {/* Dropdown for data type */}
-        <Tooltip className="dataIndex-button" label='Types of data sets'>
-          <MyDataTypeComponent />
-        </Tooltip>
-           
-
-        {/* The dropdown for the species type */}
-        <Tooltip className="speciesType-button" label='These Species were chosen because'>
-          <MyComponent />
-        </Tooltip>
         { /* Overlays an image that contains the data to be displayed on top of the map */}
         <ImageOverlay
           url={overlayUrl}
@@ -215,6 +197,38 @@ function Home(this: any) {
           opacity={0.7}
         />
       </MapContainer>
+      <div className="widgets">
+        <Grid align='stretch'>
+          <Grid.Col span={12}>
+            <div style={{textAlign:"center", fontSize:60, fontWeight:"bold"}}>Avian Influenza</div>
+          </Grid.Col>
+          <Grid.Col span={2}>
+            {/* Dropdown for data type */}
+            <Tooltip label='Types of data sets'>
+              <MyDataTypeComponent />
+            </Tooltip>
+          </Grid.Col>
+          <Grid.Col span={2}>
+            {/* The dropdown for the species type */}
+            <Tooltip label='These Species were chosen because'>
+              <MyComponent />
+            </Tooltip>
+          </Grid.Col>
+          <Grid.Col span={4}>
+            <div style={{textAlign:"center", fontSize:30, fontWeight:"bold"}}>{dataInfo[dataIndex].label} of the {taxa[speciesIndex].label}</div>
+          </Grid.Col>
+          <Grid.Col span={4}></Grid.Col>
+          <Grid.Col span={1}></Grid.Col>
+            {/* Calls the custom legend component with the data type and species type as parameters. */}
+            <Legend dataTypeIndex={dataIndex} speciesIndex={speciesIndex} />
+          <Grid.Col span={11}></Grid.Col>
+
+        </Grid>
+        {/* Calls the custom timeline component with the current week onChange function as parameters */}
+        <Timeline week={week} onChangeWeek={checkImageAndUpdate} />
+        
+
+      </div>
     </div>
   );
 }

@@ -49,11 +49,10 @@ function Legend(props: LegendProps) {
   }, [dataTypeIndex, speciesIndex]);
 
   return (
-    <div className="Legend">
+    <div style={{background:"lightgrey", padding:10, borderRadius:10}}>
       <Grid align='stretch'>
         <Grid.Col span={4}>
           <div
-            className="Legend-innerGradient"
             style={{
               display: 'inline-block',
               width: '14px',
