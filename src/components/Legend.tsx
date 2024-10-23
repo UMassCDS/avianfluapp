@@ -1,6 +1,6 @@
 /* eslint-disable no-template-curly-in-string */
 import { useEffect, useState } from 'react';
-import { Grid } from '@mantine/core';
+import { Grid, Stack, Tooltip } from '@mantine/core';
 import { getScalingFilename, dataInfo} from '../hooks/dataUrl';
 
 // Interface for the Legend 
@@ -49,11 +49,10 @@ function Legend(props: LegendProps) {
   }, [dataTypeIndex, speciesIndex]);
 
   return (
-    <div className="Legend">
+    <div style={{background:"lightgrey", width: '100px', padding:10, borderRadius:10}}>
       <Grid align='stretch'>
         <Grid.Col span={4}>
           <div
-            className="Legend-innerGradient"
             style={{
               display: 'inline-block',
               width: '14px',
@@ -64,15 +63,16 @@ function Legend(props: LegendProps) {
           />
         </Grid.Col>
         <Grid.Col span={8} >
-          {/* PAM - this is a little hacky, couldn't get lowLabel to align "bottom"
-             so made it so the midLabel would push it to the right place. */ }
-          <div style={{alignContent:"top"}}>{highLabel}</div>
-          <div style={{height:'75%', alignContent:"center"}}>{midLabel}</div>
-          <div>{lowLabel}</div>
+          <Stack h={200} align='flex-start'  justify='space-between' gap='xl'>
+            <div>{highLabel}</div>
+            <div>{midLabel}</div>
+            <div>{lowLabel}</div>
+          </Stack>
         </Grid.Col>
       </Grid>
-      <div style={{textAlign:"center"}}>{dataInfo[dataTypeIndex].units}</div>
-
+      <Tooltip label='Text to explain scaling'>
+        <div style={{textAlign:"center"}}>{dataInfo[dataTypeIndex].units}</div>
+      </Tooltip>
     </div>
   );
 }
