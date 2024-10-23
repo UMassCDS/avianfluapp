@@ -1,6 +1,7 @@
-import { Combobox, ComboboxStore, Grid, Input, InputBase, Tooltip, useCombobox } from '@mantine/core';
+import { Button, Combobox, ComboboxStore, Grid, Input, InputBase, Tooltip, useCombobox } from '@mantine/core';
 import { MapContainer, TileLayer, ImageOverlay } from 'react-leaflet';
 import { forwardRef, useState, useEffect } from 'react';
+import { IconInfoCircle } from '@tabler/icons-react';
 import { imageURL, getScalingFilename, dataInfo} from '../hooks/dataUrl';
 import taxa from '../assets/taxa.json';
 import Timeline from '../components/Timeline';
@@ -207,6 +208,8 @@ function Home(this: any) {
             <Tooltip label='Types of data sets'>
               <MyDataTypeComponent />
             </Tooltip>
+            <Button leftSection={<IconInfoCircle/>} variant='default' >
+            </Button>
           </Grid.Col>
           <Grid.Col span={2}>
             {/* The dropdown for the species type */}
@@ -218,10 +221,11 @@ function Home(this: any) {
             <div style={{textAlign:"center", fontSize:30, fontWeight:"bold"}}>{dataInfo[dataIndex].label} of the {taxa[speciesIndex].label}</div>
           </Grid.Col>
           <Grid.Col span={4}></Grid.Col>
-          <Grid.Col span={1}></Grid.Col>
+          <Grid.Col span={2}>
             {/* Calls the custom legend component with the data type and species type as parameters. */}
             <Legend dataTypeIndex={dataIndex} speciesIndex={speciesIndex} />
-          <Grid.Col span={11}></Grid.Col>
+          </Grid.Col>
+          <Grid.Col span={10}></Grid.Col>
 
         </Grid>
         {/* Calls the custom timeline component with the current week onChange function as parameters */}
