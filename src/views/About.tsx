@@ -44,7 +44,23 @@ function About(this: any) {
     const MoreInformation = (
         <div>
             <h2>More Information</h2>
-            <p></p>
+            <p><a href="https://birdflow-science.github.io/" target="_blank">BirdFlow</a>
+                &nbsp; is a joint project between the
+                &nbsp;<a href="https://www.cics.umass.edu/" target="_blank">University of Massachusetts Amherst</a>
+                &nbsp;and the 
+                &nbsp;<a href="https://www.birds.cornell.edu/home" target="_blank">Cornell Lab of Ornithology</a> funded by the 
+                &nbsp;<a href="https://www.nsf.gov" target="_blank">US National Science Foundation</a>.
+            </p>
+            <p> <a href="https://birdflow-science.github.io/BirdFlowR/" target="_blank">BirdFlowR</a>
+                &nbsp;package was used to develop movement data and can be used to make predictions 
+                programmatically from BirdFlow models. Its documentation includes a page giving an &nbsp;
+                <a href="https://birdflow-science.github.io/BirdFlowR/articles/BirdFlowOverview.html" target="_blank">
+                Overview of the Uses and Limititations of BirdFlow models</a>.
+            </p>
+            <p>
+                <a href="https://birdflow-science.s3.amazonaws.com/avian_flu/index.html" target="_blank">
+                The Avian Influenza BirdFlow Model Collection</a> distributes the models used by this application. 
+            </p>
         </div>
     );
 
