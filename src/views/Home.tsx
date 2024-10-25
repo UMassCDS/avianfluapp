@@ -1,6 +1,7 @@
-import { Combobox, Input, InputBase, useCombobox } from '@mantine/core';
+import { Button, Combobox, ComboboxStore, Grid, Input, InputBase, Tooltip, useCombobox } from '@mantine/core';
 import { MapContainer, TileLayer, ImageOverlay } from 'react-leaflet';
-import { useState, useEffect } from 'react';
+import { forwardRef, useState, useEffect } from 'react';
+import { IconInfoCircle } from '@tabler/icons-react';
 import { imageURL, getScalingFilename, dataInfo} from '../hooks/dataUrl';
 import taxa from '../assets/taxa.json';
 import Timeline from '../components/Timeline';
@@ -114,19 +115,62 @@ function Home(this: any) {
       {dt.label}
     </Combobox.Option>
   ));
-  
+
+  function checkDataType(val: string, ref_combo: ComboboxStore) {
+    let index = Number.parseInt(val); 
+    checkInputTypes(index, speciesIndex);
+    ref_combo.closeDropdown();
+  }
+
+  function checkSpecies(val: string, ref_combo: ComboboxStore) {
+    let index = Number.parseInt(val); 
+    checkInputTypes(dataIndex, index);
+    ref_combo.closeDropdown();
+  }
+
+  function genericCombo(ref_combo: ComboboxStore, onSubmit: Function, label: string, options: JSX.Element[]) {
+    return (
+      <Combobox
+        store={ref_combo}
+        onOptionSubmit={(val) => {
+          onSubmit(val); 
+        }}
+      >
+        <Combobox.Target>
+          <InputBase
+            component="button"
+            type="button"
+            pointer
+            leftSection={<Combobox.Chevron />}
+            onClick={() => ref_combo.toggleDropdown()}
+            leftSectionPointerEvents="none"
+          >
+            {label || <Input.Placeholder>Pick value</Input.Placeholder>}
+          </InputBase>
+        </Combobox.Target>
+        <Combobox.Dropdown>
+          <Combobox.Options>{options}</Combobox.Options>
+        </Combobox.Dropdown>
+      </Combobox>      
+    );
+  }
+
+  const MyDataTypeComponent = forwardRef<HTMLDivElement>((props, ref) => (
+    <div ref={ref} {...props}>
+      {genericCombo(typeCombo, checkDataType, dataInfo[dataIndex].label,dataTypeOptions)}
+    </div>
+  ));
+
+  const MyComponent = forwardRef<HTMLDivElement>((props, ref) => (
+    <div ref={ref} {...props}>
+      {genericCombo(speciesCombo, checkSpecies, taxa[speciesIndex].label, speciesOptions)}
+    </div>
+  ));
+
   // PAM could consolidate a bunch of the combo box after positioning is right
   // Here is where you list the components and elements that you want rendered. 
   return (
     <div className="Home">
-      <div className="title">
-        <div style={{textAlign:"center", fontSize:60, fontWeight:"bold"}}>Avian Influenza</div>
-        <div style={{textAlign:"center", fontSize:30, fontWeight:"bold"}}>{dataInfo[dataIndex].label} of the {taxa[speciesIndex].label}</div>
-      </div>
-      {/* Calls the custom timeline component with the current week onChange function as parameters */}
-      <Timeline week={week} onChangeWeek={checkImageAndUpdate} />
-      {/* Calls the custom legend component with the data type and species type as parameters. */}
-      <Legend dataTypeIndex={dataIndex} speciesIndex={speciesIndex} />
       {/* Creates a map using the leaflet component */}
       <MapContainer
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -145,62 +189,6 @@ function Home(this: any) {
           // @ts-ignore
           attribution='Abundance data provided by <a target="_blank" href="https://ebird.org/science/status-and-trends ">Cornell Lab of Ornithology - eBird</a> | <a target="_blank" href="https://birdflow-science.github.io/"> BirdFlow </a>'
         />
-        {/* Dropdown for data type */}
-        <Combobox
-          store={typeCombo}
-          onOptionSubmit={(val) => {
-            let di = Number.parseInt(val);
-            checkInputTypes(di, speciesIndex);
-            typeCombo.closeDropdown();
-          }}
-        >
-          <Combobox.Target>
-            <InputBase
-             className="dataIndex-button"
-              component="button"
-              type="button"
-              pointer
-              leftSection={<Combobox.Chevron />}
-              onClick={() => typeCombo.toggleDropdown()}
-              leftSectionPointerEvents="none"
-            >
-              {dataInfo[dataIndex].label || <Input.Placeholder>Pick value</Input.Placeholder>}
-            </InputBase>
-          </Combobox.Target>
-
-          <Combobox.Dropdown>
-            <Combobox.Options>{dataTypeOptions}</Combobox.Options>
-          </Combobox.Dropdown>
-        </Combobox>      
-
-        {/* The dropdown for the species type */}
-        <Combobox
-          store={speciesCombo}
-          onOptionSubmit={(val) => {
-            let si = Number.parseInt(val); 
-            checkInputTypes(dataIndex, si) 
-            speciesCombo.closeDropdown();
-          }}
-        >
-          <Combobox.Target>
-            <InputBase
-             className="speciesType-button"
-              component="button"
-              type="button"
-              pointer
-              leftSection={<Combobox.Chevron />}
-              onClick={() => speciesCombo.toggleDropdown()}
-              leftSectionPointerEvents="none"
-            >
-              {taxa[speciesIndex].label || <Input.Placeholder>Pick value</Input.Placeholder>}
-            </InputBase>
-          </Combobox.Target>
-
-          <Combobox.Dropdown>
-            <Combobox.Options>{speciesOptions}</Combobox.Options>
-          </Combobox.Dropdown>
-        </Combobox>      
-
         { /* Overlays an image that contains the data to be displayed on top of the map */}
         <ImageOverlay
           url={overlayUrl}
@@ -210,6 +198,41 @@ function Home(this: any) {
           opacity={0.7}
         />
       </MapContainer>
+      <div className="widgets">
+        <Grid align='stretch'>
+          <Grid.Col span={12}>
+            <div style={{textAlign:"center", fontSize:60, fontWeight:"bold"}}>Avian Influenza</div>
+          </Grid.Col>
+          <Grid.Col span={2}>
+            {/* Dropdown for data type */}
+            <Tooltip label='Types of data sets'>
+              <MyDataTypeComponent />
+            </Tooltip>
+            <Button leftSection={<IconInfoCircle/>} variant='default' >
+            </Button>
+          </Grid.Col>
+          <Grid.Col span={2}>
+            {/* The dropdown for the species type */}
+            <Tooltip label='These Species were chosen because'>
+              <MyComponent />
+            </Tooltip>
+          </Grid.Col>
+          <Grid.Col span={4}>
+            <div style={{textAlign:"center", fontSize:30, fontWeight:"bold"}}>{dataInfo[dataIndex].label} of the {taxa[speciesIndex].label}</div>
+          </Grid.Col>
+          <Grid.Col span={4}></Grid.Col>
+          <Grid.Col span={2}>
+            {/* Calls the custom legend component with the data type and species type as parameters. */}
+            <Legend dataTypeIndex={dataIndex} speciesIndex={speciesIndex} />
+          </Grid.Col>
+          <Grid.Col span={10}></Grid.Col>
+
+        </Grid>
+        {/* Calls the custom timeline component with the current week onChange function as parameters */}
+        <Timeline week={week} onChangeWeek={checkImageAndUpdate} />
+        
+
+      </div>
     </div>
   );
 }
