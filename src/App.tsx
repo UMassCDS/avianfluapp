@@ -1,8 +1,8 @@
  import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { MantineProvider } from '@mantine/core';
 import Home from './views/Home';
+import About from './views/About';
 import NotFound from './views/NotFound';
-import Theme from './utils/theme';
 import '@mantine/core/styles.css';
 import '@mantine/dates/styles.css';
 
@@ -13,6 +13,7 @@ export function App() {
     <div className="App">
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </div>

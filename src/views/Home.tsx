@@ -1,6 +1,7 @@
 import { Button, Combobox, ComboboxStore, Grid, Input, InputBase, Tooltip, useCombobox } from '@mantine/core';
 import { MapContainer, TileLayer, ImageOverlay } from 'react-leaflet';
 import { forwardRef, useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { IconInfoCircle } from '@tabler/icons-react';
 import { imageURL, getScalingFilename, dataInfo} from '../hooks/dataUrl';
 import taxa from '../assets/taxa.json';
@@ -167,7 +168,6 @@ function Home(this: any) {
     </div>
   ));
 
-  // PAM could consolidate a bunch of the combo box after positioning is right
   // Here is where you list the components and elements that you want rendered. 
   return (
     <div className="Home">
@@ -200,9 +200,11 @@ function Home(this: any) {
       </MapContainer>
       <div className="widgets">
         <Grid align='stretch'>
-          <Grid.Col span={12}>
+          <Grid.Col span={1}></Grid.Col>
+          <Grid.Col span={10}>
             <div style={{textAlign:"center", fontSize:60, fontWeight:"bold"}}>Avian Influenza</div>
           </Grid.Col>
+          <Grid.Col span={1}><Link to="/about"> About </Link></Grid.Col>
           <Grid.Col span={2}>
             {/* Dropdown for data type */}
             <Tooltip label='Types of data sets'>
