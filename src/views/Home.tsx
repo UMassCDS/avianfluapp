@@ -8,9 +8,9 @@ import { imageURL, getScalingFilename, dataInfo} from '../hooks/dataUrl';
 import taxa from '../assets/taxa.json';
 import Timeline from '../components/Timeline';
 import Legend from '../components/Legend';
+import {OutbreakData} from '../components/OutbreakPoints'
 import '../styles/Home.css';
 import 'leaflet/dist/leaflet.css';
-
 const MAX_WEEK = 52;  // number of weeks in a year
 const WEEK_TO_MSEC = 7*24*60*60*1000;
 // the lat/long bounds of the data image provided by the backend
@@ -234,8 +234,8 @@ function Home(this: any) {
             {/* Calls the custom legend component with the data type and species type as parameters. */}
             <Legend dataTypeIndex={dataIndex} speciesIndex={speciesIndex} />
           </Grid.Col>
-          <Grid.Col span={10}></Grid.Col>
-
+          <Grid.Col span={6}></Grid.Col>
+          <Grid.Col span={4}> <OutbreakData></OutbreakData> </Grid.Col>
         </Grid>
         {/* Calls the custom timeline component with the current week onChange function as parameters */}
         <Timeline week={week} onChangeWeek={checkImageAndUpdate} />
