@@ -19,7 +19,6 @@ const imageBounds = [
   [79.98956, -49.783429],
 ];
 const buttonFontSize = 16;
-const widgetTextSize = 16;
 
 /* This is the main page and only page of the application. 
    Here, the map renders as well as all the AvianFluApp feature controls */
