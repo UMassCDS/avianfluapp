@@ -12,7 +12,7 @@ interface LegendProps {
 /* Creates a custom legend component based on the species scale values. */
 function Legend(props: LegendProps) {
   const { dataTypeIndex, speciesIndex } = props;
-  const [data, setData] = useState<string>();
+  const [colorScale, setColorScale] = useState<string>();
   const [lowLabel, setLowLabel] = useState<number>(0);
   const [midLabel, setMidLabel] = useState<number>(50);
   const [highLabel, setHighLabel] = useState<number>(100);
@@ -37,7 +37,7 @@ function Legend(props: LegendProps) {
         // transforms the JSON into a string and basically CSS code that can be inserted into the styles 
         d.map((i: any) => pushed.push(`${i.color} ${i.position}%`));
         const x = pushed.join(', ');
-        setData(x);
+        setColorScale(x);
         // grab top and bottom values
         setLowLabel(d[0].value);
         setHighLabel(d[d.length-1].value);
@@ -58,7 +58,7 @@ function Legend(props: LegendProps) {
               width: '14px',
               height: '180px',
               margin: '10px',
-              background: `linear-gradient( 0deg, ${data} )`,
+              background: `linear-gradient( 0deg, ${colorScale} )`,
             }}
           />
         </Grid.Col>

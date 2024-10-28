@@ -1,6 +1,8 @@
-import { Button, Combobox, ComboboxStore, Grid, Input, InputBase, Tooltip, useCombobox } from '@mantine/core';
+import { Button, Combobox, ComboboxStore, Grid, Input, InputBase, useCombobox } from '@mantine/core';
+import { CheckIcon, Radio, Stack, Tooltip } from '@mantine/core';
 import { MapContainer, TileLayer, ImageOverlay } from 'react-leaflet';
 import { forwardRef, useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { IconInfoCircle } from '@tabler/icons-react';
 import { imageURL, getScalingFilename, dataInfo} from '../hooks/dataUrl';
 import taxa from '../assets/taxa.json';
@@ -16,6 +18,7 @@ const imageBounds = [
   [9.622994, -170.291626],
   [79.98956, -49.783429],
 ];
+const buttonFontSize = 16;
 
 /* This is the main page and only page of the application. 
    Here, the map renders as well as all the AvianFluApp feature controls */
@@ -38,7 +41,6 @@ function Home(this: any) {
   const [week, setWeek] = useState(this_week);
   // default state of the map overlay url for the current data displayed.
   const [overlayUrl, setOverlayUrl] = useState(imageURL(0, 0, this_week));
-  const typeCombo = useCombobox();
   const speciesCombo = useCombobox();
 
   /* Allows the user to use the front and back arrow keys to control the week number 
@@ -96,45 +98,35 @@ function Home(this: any) {
         return;
       }
     }
-    typeCombo.selectedOptionIndex = d_index;
     speciesCombo.selectedOptionIndex = s_index;
     setDataIndex(d_index);
     setSpeciesIndex(s_index);
   };
 
-  // Maps the species from the taxa file provided to a dropdown with options. 
-  const speciesOptions = taxa.map((t, index) => (
-    <Combobox.Option value={index.toString()} key={t.value}>
-      {t.label}
-    </Combobox.Option>
+  // maps data types (abundance, movement etc) to radio buttons
+  const dataTypeRadio = dataInfo.map((dt, index) => (
+    <Radio icon={CheckIcon} checked={dataIndex===index} onChange={() => {
+      checkInputTypes(index, speciesIndex)}
+    } size="md" label={dt.label} />
   ));
-
-  // maps data types (abundance, movement etc) to dropdown
-  const dataTypeOptions = dataInfo.map((dt, index) => (
-    <Combobox.Option value={index.toString()} key={index}>
-      {dt.label}
-    </Combobox.Option>
+  
+  // creates component surrounding the data type widgets to add tool tip
+  const DataTypeComponent = forwardRef<HTMLDivElement>((props, ref) => (
+    <div ref={ref} {...props}>
+      <Stack>
+        {dataTypeRadio}
+      </Stack>
+    </div>
   ));
-
-  function checkDataType(val: string, ref_combo: ComboboxStore) {
-    let index = Number.parseInt(val); 
-    checkInputTypes(index, speciesIndex);
-    ref_combo.closeDropdown();
-  }
-
-  function checkSpecies(val: string, ref_combo: ComboboxStore) {
-    let index = Number.parseInt(val); 
-    checkInputTypes(dataIndex, index);
-    ref_combo.closeDropdown();
-  }
 
   function genericCombo(ref_combo: ComboboxStore, onSubmit: Function, label: string, options: JSX.Element[]) {
     return (
       <Combobox
         store={ref_combo}
         onOptionSubmit={(val) => {
-          onSubmit(val); 
+          onSubmit(val, ref_combo); 
         }}
+        size="md"
       >
         <Combobox.Target>
           <InputBase
@@ -155,19 +147,25 @@ function Home(this: any) {
     );
   }
 
-  const MyDataTypeComponent = forwardRef<HTMLDivElement>((props, ref) => (
-    <div ref={ref} {...props}>
-      {genericCombo(typeCombo, checkDataType, dataInfo[dataIndex].label,dataTypeOptions)}
-    </div>
+  // Maps the species from the taxa file provided to a dropdown with options. 
+  const speciesOptions = taxa.map((t, index) => (
+    <Combobox.Option value={index.toString()} key={t.value} style={{fontSize:14}}>
+      {t.label}
+    </Combobox.Option>
   ));
 
-  const MyComponent = forwardRef<HTMLDivElement>((props, ref) => (
+  function checkSpecies(val: string, ref_combo: ComboboxStore) {
+    let index = Number.parseInt(val); 
+    checkInputTypes(dataIndex, index);
+    ref_combo.closeDropdown();
+  }
+
+  const SpeciesComponent = forwardRef<HTMLDivElement>((props, ref) => (
     <div ref={ref} {...props}>
       {genericCombo(speciesCombo, checkSpecies, taxa[speciesIndex].label, speciesOptions)}
     </div>
   ));
 
-  // PAM could consolidate a bunch of the combo box after positioning is right
   // Here is where you list the components and elements that you want rendered. 
   return (
     <div className="Home">
@@ -200,27 +198,38 @@ function Home(this: any) {
       </MapContainer>
       <div className="widgets">
         <Grid align='stretch'>
-          <Grid.Col span={12}>
-            <div style={{textAlign:"center", fontSize:60, fontWeight:"bold"}}>Avian Influenza</div>
+          <Grid.Col span={1}>
           </Grid.Col>
-          <Grid.Col span={2}>
+          <Grid.Col span={1}>
             {/* Dropdown for data type */}
             <Tooltip label='Types of data sets'>
-              <MyDataTypeComponent />
+              <DataTypeComponent />
             </Tooltip>
+          </Grid.Col>
+          <Grid.Col span={8}>
+            <div style={{textAlign:"center", fontSize:60, fontWeight:"bold"}}>Avian Influenza</div>
+          </Grid.Col>
+          <Grid.Col span={1}>
+          </Grid.Col>
+          <Grid.Col span={1}>
             <Button leftSection={<IconInfoCircle/>} variant='default' >
+              <Link style={{fontSize:buttonFontSize}} to="/about"> About </Link>
             </Button>
+          </Grid.Col>
+          { /* next row */ }
+          <Grid.Col span={1}>
           </Grid.Col>
           <Grid.Col span={2}>
             {/* The dropdown for the species type */}
             <Tooltip label='These Species were chosen because'>
-              <MyComponent />
+              <SpeciesComponent />
             </Tooltip>
           </Grid.Col>
-          <Grid.Col span={4}>
+          <Grid.Col span={6}>
             <div style={{textAlign:"center", fontSize:30, fontWeight:"bold"}}>{dataInfo[dataIndex].label} of the {taxa[speciesIndex].label}</div>
           </Grid.Col>
-          <Grid.Col span={4}></Grid.Col>
+          <Grid.Col span={3}></Grid.Col>
+          { /* next row */ }
           <Grid.Col span={2}>
             {/* Calls the custom legend component with the data type and species type as parameters. */}
             <Legend dataTypeIndex={dataIndex} speciesIndex={speciesIndex} />
@@ -230,8 +239,6 @@ function Home(this: any) {
         </Grid>
         {/* Calls the custom timeline component with the current week onChange function as parameters */}
         <Timeline week={week} onChangeWeek={checkImageAndUpdate} />
-        
-
       </div>
     </div>
   );
