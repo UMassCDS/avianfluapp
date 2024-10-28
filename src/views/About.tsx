@@ -8,7 +8,22 @@ function About(this: any) {
     const HowTo = (
         <div>
             <h2>How To Use This Site</h2>
-            <p></p>
+            <p>When the application is first brought up it displays North America. 
+                The geographic limitations are defined by the collection area from eBird. 
+                The overlay shows the abundance of all of the species that are tracked. 
+                The legend on the left indicates the maximum for this combination of data type and species. 
+                In other words, the purple will represent the same amount over the course of the year, 
+                but can change when other species or types are chosen. 
+            </p><p>
+                The radio buttons on the top represent the type of data - abundance or migration. 
+                See below for the full explanation.
+            </p><p> 
+                The drop-down lets the user select one species or all of the species of birds.
+            </p><p>
+                On the bottom is a timeline displaying a year. The data is calculated on a weekly basis 
+                and uses information from the last decade. It does not update with current data.  
+                The user can click on a particular week or scroll backward or forward in time using the arrow keys. 
+            </p>
         </div>
     );
 
@@ -34,7 +49,7 @@ function About(this: any) {
     const Species = (
         <div>
             <h2>Species</h2>
-            <p>The species shown in this model were selected by Ryan Milller (2024) as being potentially important for the 
+            <p>The species shown in this model were selected by Ryan Miller (2024) as being potentially important for the 
                 transmission of Avian Influenza from wild birds into poultry. Four species he had selected were excluded. 
                 Mottled Duck and Mexican Duck were excluded because they were non-migratory and Cinnamon Teal and 
                 Long-tailed Duck were excluded because of poor model performance.</p>
