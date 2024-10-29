@@ -26,11 +26,7 @@
     }
 
     .Timeline {
-        background-color: white;
-        height: 55px;
-        width: 70%;
-        border-radius: 5px;
-        padding: 10px;
+        width: 90%;
         position: fixed;
         top: 90%;
         left: 50%;
