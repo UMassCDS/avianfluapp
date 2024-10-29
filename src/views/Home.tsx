@@ -198,9 +198,7 @@ function Home(this: any) {
       </MapContainer>
       <div className="widgets">
         <Grid align='stretch'>
-          <Grid.Col span={1}>
-          </Grid.Col>
-          <Grid.Col span={1}>
+          <Grid.Col span={2}>
             {/* Dropdown for data type */}
             <Tooltip label='Types of data sets'>
               <DataTypeComponent />
@@ -217,9 +215,7 @@ function Home(this: any) {
             </Button>
           </Grid.Col>
           { /* next row */ }
-          <Grid.Col span={1}>
-          </Grid.Col>
-          <Grid.Col span={2}>
+          <Grid.Col span={3}>
             {/* The dropdown for the species type */}
             <Tooltip label='These Species were chosen because'>
               <SpeciesComponent />
@@ -229,17 +225,12 @@ function Home(this: any) {
             <div style={{textAlign:"center", fontSize:30, fontWeight:"bold"}}>{dataInfo[dataIndex].label} of the {taxa[speciesIndex].label}</div>
           </Grid.Col>
           <Grid.Col span={3}></Grid.Col>
-          { /* next row */ }
-          <Grid.Col span={2}>
-            {/* Calls the custom legend component with the data type and species type as parameters. */}
-            <Legend dataTypeIndex={dataIndex} speciesIndex={speciesIndex} />
-          </Grid.Col>
-          <Grid.Col span={10}></Grid.Col>
-
         </Grid>
-        {/* Calls the custom timeline component with the current week onChange function as parameters */}
-        <Timeline week={week} onChangeWeek={checkImageAndUpdate} />
       </div>
+      {/* Calls the custom legend component with the data type and species type as parameters. */}
+      <Legend dataTypeIndex={dataIndex} speciesIndex={speciesIndex} />
+      {/* Calls the custom timeline component with the current week onChange function as parameters */}
+      <Timeline week={week} onChangeWeek={checkImageAndUpdate} />
     </div>
   );
 }

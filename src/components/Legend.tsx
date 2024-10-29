@@ -49,7 +49,7 @@ function Legend(props: LegendProps) {
   }, [dataTypeIndex, speciesIndex]);
 
   return (
-    <div style={{background:"lightgrey", width: '100px', padding:10, borderRadius:10}}>
+    <div className="Legend" style={{background:"lightgrey", borderRadius:10}}>
       <Grid align='stretch'>
         <Grid.Col span={4}>
           <div
