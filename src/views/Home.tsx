@@ -1,13 +1,14 @@
-import { Button, Combobox, ComboboxStore, Grid, Input, InputBase, useCombobox } from '@mantine/core';
+import { ActionIcon, Button, Combobox, ComboboxStore, Grid, Input, InputBase, useCombobox } from '@mantine/core';
 import { CheckIcon, Radio, Stack, Tooltip } from '@mantine/core';
 import { MapContainer, TileLayer, ImageOverlay } from 'react-leaflet';
 import { forwardRef, useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { IconInfoCircle } from '@tabler/icons-react';
 import { imageURL, getScalingFilename, dataInfo} from '../hooks/dataUrl';
 import taxa from '../assets/taxa.json';
 import Timeline from '../components/Timeline';
 import Legend from '../components/Legend';
+import { isMobile } from '../utils/mobile';
 import '../styles/Home.css';
 import 'leaflet/dist/leaflet.css';
 
@@ -42,7 +43,9 @@ function Home(this: any) {
   // default state of the map overlay url for the current data displayed.
   const [overlayUrl, setOverlayUrl] = useState(imageURL(0, 0, this_week));
   const speciesCombo = useCombobox();
-
+  const navigate = useNavigate();
+  const textSize = isMobile()?"xs":"md";
+  const textEm:string|number = isMobile()?10:14;
   /* Allows the user to use the front and back arrow keys to control the week number 
      and which image files are being displayed. */ 
   const handleSelection = (event: KeyboardEvent) => {
@@ -107,7 +110,7 @@ function Home(this: any) {
   const dataTypeRadio = dataInfo.map((dt, index) => (
     <Radio icon={CheckIcon} checked={dataIndex===index} onChange={() => {
       checkInputTypes(index, speciesIndex)}
-    } size="md" label={dt.label} />
+    } size={textSize} label={dt.label} />
   ));
   
   // creates component surrounding the data type widgets to add tool tip
@@ -126,7 +129,7 @@ function Home(this: any) {
         onOptionSubmit={(val) => {
           onSubmit(val, ref_combo); 
         }}
-        size="md"
+        size={textSize}
       >
         <Combobox.Target>
           <InputBase
@@ -136,6 +139,7 @@ function Home(this: any) {
             leftSection={<Combobox.Chevron />}
             onClick={() => ref_combo.toggleDropdown()}
             leftSectionPointerEvents="none"
+            size={textSize}
           >
             {label || <Input.Placeholder>Pick value</Input.Placeholder>}
           </InputBase>
@@ -149,20 +153,82 @@ function Home(this: any) {
 
   // Maps the species from the taxa file provided to a dropdown with options. 
   const speciesOptions = taxa.map((t, index) => (
-    <Combobox.Option value={index.toString()} key={t.value} style={{fontSize:14}}>
+    <Combobox.Option value={index.toString()} key={t.value} style={{fontSize:{textEm}}}>
       {t.label}
     </Combobox.Option>
   ));
 
+  // checks the scaling file for the species and data type exists
   function checkSpecies(val: string, ref_combo: ComboboxStore) {
     let index = Number.parseInt(val); 
     checkInputTypes(dataIndex, index);
     ref_combo.closeDropdown();
   }
 
+  // Species combo box
   const SpeciesComponent = forwardRef<HTMLDivElement>((props, ref) => (
     <div ref={ref} {...props}>
       {genericCombo(speciesCombo, checkSpecies, taxa[speciesIndex].label, speciesOptions)}
+    </div>
+  ));
+
+  // species selection, type selection and about button
+  const ControlBar = forwardRef<HTMLDivElement>((props, ref) => (
+    <div ref={ref} {...props}>
+      <Grid align='stretch'>
+        <Grid.Col span={2}>
+          {/* Dropdown for data type */}
+          <Tooltip label='Types of data sets'>
+            <DataTypeComponent />
+          </Tooltip>
+        </Grid.Col>
+        <Grid.Col span={8}>
+          <div style={{textAlign:"center", fontSize:60, fontWeight:"bold"}}>Avian Influenza</div>
+        </Grid.Col>
+        <Grid.Col span={1}>
+        </Grid.Col>
+        <Grid.Col span={1}>
+          <Button leftSection={<IconInfoCircle/>} variant='default' >
+            <Link style={{fontSize:buttonFontSize}} to="/about"> About </Link>
+          </Button>
+        </Grid.Col>
+        { /* next row */ }
+        <Grid.Col span={3}>
+          {/* The dropdown for the species type */}
+          <Tooltip label='These Species were chosen because'>
+            <SpeciesComponent />
+          </Tooltip>
+        </Grid.Col>
+        <Grid.Col span={6}>
+          <div style={{textAlign:"center", fontSize:30, fontWeight:"bold"}}>{dataInfo[dataIndex].label} of the {taxa[speciesIndex].label}</div>
+        </Grid.Col>
+        <Grid.Col span={3}></Grid.Col>
+      </Grid>
+    </div>
+  ));
+
+  // same as ControlBar, but smaller
+  const ControlBarMobile = forwardRef<HTMLDivElement>((props, ref) => (
+    <div ref={ref} {...props} style={{fontSize:{textEm}}}>
+      <Grid align='stretch'>
+        <Grid.Col span={4}>
+          {/* Dropdown for data type */}
+          <Tooltip label='Types of data sets'>
+            <DataTypeComponent />
+          </Tooltip>
+        </Grid.Col>
+        <Grid.Col span={6}>
+          {/* The dropdown for the species type */}
+          <Tooltip label='These Species were chosen because'>
+            <SpeciesComponent />
+          </Tooltip>
+        </Grid.Col>
+        <Grid.Col span={2}>
+          <ActionIcon onClick={() => { navigate("/about")}}>
+            <IconInfoCircle/>
+          </ActionIcon>
+        </Grid.Col>
+      </Grid>
     </div>
   ));
 
@@ -196,36 +262,10 @@ function Home(this: any) {
           opacity={0.7}
         />
       </MapContainer>
-      <div className="widgets">
-        <Grid align='stretch'>
-          <Grid.Col span={2}>
-            {/* Dropdown for data type */}
-            <Tooltip label='Types of data sets'>
-              <DataTypeComponent />
-            </Tooltip>
-          </Grid.Col>
-          <Grid.Col span={8}>
-            <div style={{textAlign:"center", fontSize:60, fontWeight:"bold"}}>Avian Influenza</div>
-          </Grid.Col>
-          <Grid.Col span={1}>
-          </Grid.Col>
-          <Grid.Col span={1}>
-            <Button leftSection={<IconInfoCircle/>} variant='default' >
-              <Link style={{fontSize:buttonFontSize}} to="/about"> About </Link>
-            </Button>
-          </Grid.Col>
-          { /* next row */ }
-          <Grid.Col span={3}>
-            {/* The dropdown for the species type */}
-            <Tooltip label='These Species were chosen because'>
-              <SpeciesComponent />
-            </Tooltip>
-          </Grid.Col>
-          <Grid.Col span={6}>
-            <div style={{textAlign:"center", fontSize:30, fontWeight:"bold"}}>{dataInfo[dataIndex].label} of the {taxa[speciesIndex].label}</div>
-          </Grid.Col>
-          <Grid.Col span={3}></Grid.Col>
-        </Grid>
+      <div className="widgets"> 
+        {isMobile()?
+          <ControlBarMobile /> : <ControlBar/>
+        }
       </div>
       {/* Calls the custom legend component with the data type and species type as parameters. */}
       <Legend dataTypeIndex={dataIndex} speciesIndex={speciesIndex} />

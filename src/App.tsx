@@ -20,8 +20,8 @@ export function App() {
   );
 }
 
-/*The Raect app exists inside two wrappers. MantineProvider allows the app to use Mantine as a component library. BrowserRouter helps control the Routng in the application.*/
-
+/*The React app exists inside two wrappers. MantineProvider allows the app to use Mantine as a component library. 
+BrowserRouter helps control the Routng in the application.*/
 export function WrappedApp() {
   return (
     <BrowserRouter>
