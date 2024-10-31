@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Slider } from '@mantine/core';
 import { isMobile } from '../utils/mobile';
 
@@ -29,7 +29,7 @@ const dateLabels = ['Jan 1', 'Jan 8', 'Jan 15', 'Jan 22', 'Jan 29',
 'Sep 1', 'Sep 8', 'Sep 15', 'Sep 22', 'Sep 29',
 'Oct 6', 'Oct 13', 'Oct 20', 'Oct 27',
 'Nov 3', 'Nov 10', 'Nov 17', 'Nov 24', 
-'Dec 1', 'Dec 8', 'Dec 15', 'Dec 22', 'Dec 29',
+'Dec 1', 'Dec 8', 'Dec 15', 'Dec 22'
 ];
  
 
@@ -44,13 +44,12 @@ function Timeline(props: TimelineProps) {
   const { week, onChangeWeek } = props;
   const [weekLabel, setWeekLabel] = useState<string>('');
 
-  function changeWeekLabel(val: number) {
-    setWeekLabel(dateLabels[val]);
-    onChangeWeek(val);
-  }
+  useEffect(() => {
+    // update the label WHEN the check for overlay is complete
+    setWeekLabel(dateLabels[week-1]);
+  }, [week]);
 
   return (
-
     <div className="Timeline">
       {isMobile()?
       <Slider
@@ -63,7 +62,7 @@ function Timeline(props: TimelineProps) {
         size='sm'
         step={1}
         thumbSize={12}
-        onChange={(v) => changeWeekLabel(v)}
+        onChange={(v) => { onChangeWeek(v)}}
       />
       : 
       <Slider
@@ -76,7 +75,7 @@ function Timeline(props: TimelineProps) {
         labelAlwaysOn
         step={1}
         thumbSize={20}
-        onChange={(v) => changeWeekLabel(v)}
+        onChange={(v) => onChangeWeek(v)}
       />}
     </div>
   );

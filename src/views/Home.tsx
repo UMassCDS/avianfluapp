@@ -12,6 +12,7 @@ import { isMobile } from '../utils/mobile';
 import '../styles/Home.css';
 import 'leaflet/dist/leaflet.css';
 
+const MIN_WEEK = 1;   // week indexing in files
 const MAX_WEEK = 52;  // number of weeks in a year
 const WEEK_TO_MSEC = 7*24*60*60*1000;
 // the lat/long bounds of the data image provided by the backend
@@ -23,7 +24,7 @@ const buttonFontSize = 16;
 
 /* This is the main page and only page of the application. 
    Here, the map renders as well as all the AvianFluApp feature controls */
-function Home(this: any) {
+const HomePage = () => {  
   // Sets the default position for the map.
   const position = {
     lat: 45,
@@ -33,39 +34,54 @@ function Home(this: any) {
   const [dataIndex, setDataIndex] = useState(0);
   // Sets state for the species type 
   const [speciesIndex, setSpeciesIndex] = useState(0);
-  // determine current week - find msec between today and beginning fo the year
-  const today = new Date()
-  const startOfYear = new Date(today.getFullYear(),0,1);
-  const diff_dates = today.valueOf()-startOfYear.valueOf()
-  // Sets state for the week number
-  let this_week = Math.floor(diff_dates/WEEK_TO_MSEC); 
-  const [week, setWeek] = useState(this_week);
+  const [week, setWeek] = useState(0);
+  const [adjustWeek, setAdjustWeek] = useState(0);
   // default state of the map overlay url for the current data displayed.
-  const [overlayUrl, setOverlayUrl] = useState(imageURL(0, 0, this_week));
+  const [overlayUrl, setOverlayUrl] = useState("");
   const speciesCombo = useCombobox();
   const navigate = useNavigate();
   const textSize = isMobile()?"xs":"md";
-  const textEm:string|number = isMobile()?10:14;
+  const textEm:string|number = isMobile()?10:14;  // font sizes
+
   /* Allows the user to use the front and back arrow keys to control the week number 
-     and which image files are being displayed. */ 
+     and which image files are being displayed. It is set with the values at the time 
+     of addListener and does not get updated state variables. */ 
   const handleSelection = (event: KeyboardEvent) => {
     if (event.key === 'ArrowRight') {
-      // increments active index (wraps around when at top)
       event.preventDefault();
-      let temp = week + 1;
-      if (temp > MAX_WEEK) temp = 1;
-      setWeek(temp);
+      setAdjustWeek(1);
     } else if (event.key === 'ArrowLeft') {
-      // decrements active index (wraps around when at bottom)
       event.preventDefault();
-      let temp = week - 1;
-      if (temp <= 0) temp = MAX_WEEK;
-      setWeek(temp);
+      setAdjustWeek(-1);
     }
-  };
+  }
+
+  useEffect(() => {
+    if (adjustWeek === 0) {
+      return;
+    }
+    if (adjustWeek > 0) {
+      // increments active index (wraps around when at top)
+      let temp = week + MIN_WEEK;
+      if (temp > MAX_WEEK) temp = MIN_WEEK;
+      checkImageAndUpdate(temp);
+    } else {
+      // decrements active index (wraps around when at bottom)
+      let temp = week - 1;
+      if (temp < 1) temp = MAX_WEEK;
+      checkImageAndUpdate(temp);
+    }
+    setAdjustWeek(0);
+  }, [adjustWeek]);
 
   // Called once on startup. Adds a listener for user keyboard events. 
   useEffect(() => {
+    // determine current week - find msec between today and beginning fo the year
+    const today = new Date()
+    const startOfYear = new Date(today.getFullYear(),0,1);
+    const diff_dates = today.valueOf()-startOfYear.valueOf()
+    const new_week = Math.floor(diff_dates/WEEK_TO_MSEC);
+    checkImageAndUpdate(new_week);
     document.addEventListener('keydown', handleSelection);
     return () => {
       document.removeEventListener('keydown', handleSelection);
@@ -73,6 +89,10 @@ function Home(this: any) {
   }, []);
 
   async function checkImageAndUpdate(this_week: number) {
+    if (this_week <= 0) {
+      // the week is not initialized yet
+      return;
+    }
     var image_url = imageURL(dataIndex, speciesIndex, this_week);
     var response = await fetch(image_url);
     if (!response.ok) {
@@ -84,6 +104,11 @@ function Home(this: any) {
     setWeek(this_week);
     setOverlayUrl(image_url);
   }
+
+  useEffect(() => {
+    console.log("WEEK is now %d", week);
+    console.log("SPECIES is now %d", speciesIndex);
+  }, [week]);
 
   useEffect(() => {
     checkImageAndUpdate(week);
@@ -275,4 +300,4 @@ function Home(this: any) {
   );
 }
 
-export default Home;
+export default HomePage;

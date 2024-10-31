@@ -50,10 +50,7 @@ function Legend(props: LegendProps) {
 
   function stackedUnits() {
     let units: string[] = dataInfo[dataTypeIndex].units.split('/');
-    console.log(units);
-    console.log(units.join('/\n'));
     return units.join('/\n')
-
   }
 
   return (
@@ -70,7 +67,7 @@ function Legend(props: LegendProps) {
           }}
         />
         <div style={{textAlign:"center", fontSize:12}}>{lowLabel}</div>
-        <Tooltip label='Text to explain scaling'>
+        <Tooltip label='Average of 10 years of data.'>
           <div style={{textAlign:"center", fontSize:12}}>{stackedUnits()}</div>
         </Tooltip>
       </div>
@@ -96,7 +93,7 @@ function Legend(props: LegendProps) {
               </Stack>
             </Grid.Col>
           </Grid>
-          <Tooltip label='Text to explain scaling'>
+          <Tooltip label='Average of 10 years of data.'>
             <div style={{textAlign:"center"}}>{dataInfo[dataTypeIndex].units}</div>
           </Tooltip>
       </div>
