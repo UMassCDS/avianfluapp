@@ -8,8 +8,7 @@
         z-index: 10;
         position: fixed;
         top: 2%;
-        left: 5%;
-        right: 5%;
+        left: 50px;
     }
 
     .test {
@@ -21,16 +20,13 @@
     .Legend {
         position: absolute;
         bottom: 150px;
-        left: 20px;
+        left: 10px;
         z-index: 10;
+        white-space: pre-line;
     }
 
     .Timeline {
-        background-color: white;
-        height: 55px;
-        width: 70%;
-        border-radius: 5px;
-        padding: 10px;
+        width: 90%;
         position: fixed;
         top: 90%;
         left: 50%;

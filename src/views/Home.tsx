@@ -1,16 +1,18 @@
-import { Button, Combobox, ComboboxStore, Grid, Input, InputBase, useCombobox } from '@mantine/core';
+import { ActionIcon, Button, Combobox, ComboboxStore, Grid, Input, InputBase, useCombobox } from '@mantine/core';
 import { CheckIcon, Radio, Stack, Tooltip } from '@mantine/core';
 import { MapContainer, TileLayer, ImageOverlay } from 'react-leaflet';
 import { forwardRef, useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { IconInfoCircle } from '@tabler/icons-react';
 import { imageURL, getScalingFilename, dataInfo} from '../hooks/dataUrl';
 import taxa from '../assets/taxa.json';
 import Timeline from '../components/Timeline';
 import Legend from '../components/Legend';
+import { isMobile } from '../utils/mobile';
 import '../styles/Home.css';
 import 'leaflet/dist/leaflet.css';
 
+const MIN_WEEK = 1;   // week indexing in files
 const MAX_WEEK = 52;  // number of weeks in a year
 const WEEK_TO_MSEC = 7*24*60*60*1000;
 // the lat/long bounds of the data image provided by the backend
@@ -22,7 +24,7 @@ const buttonFontSize = 16;
 
 /* This is the main page and only page of the application. 
    Here, the map renders as well as all the AvianFluApp feature controls */
-function Home(this: any) {
+const HomePage = () => {  
   // Sets the default position for the map.
   const position = {
     lat: 45,
@@ -32,37 +34,54 @@ function Home(this: any) {
   const [dataIndex, setDataIndex] = useState(0);
   // Sets state for the species type 
   const [speciesIndex, setSpeciesIndex] = useState(0);
-  // determine current week - find msec between today and beginning fo the year
-  const today = new Date()
-  const startOfYear = new Date(today.getFullYear(),0,1);
-  const diff_dates = today.valueOf()-startOfYear.valueOf()
-  // Sets state for the week number
-  let this_week = Math.floor(diff_dates/WEEK_TO_MSEC); 
-  const [week, setWeek] = useState(this_week);
+  const [week, setWeek] = useState(0);
+  const [adjustWeek, setAdjustWeek] = useState(0);
   // default state of the map overlay url for the current data displayed.
-  const [overlayUrl, setOverlayUrl] = useState(imageURL(0, 0, this_week));
+  const [overlayUrl, setOverlayUrl] = useState("");
   const speciesCombo = useCombobox();
+  const navigate = useNavigate();
+  const textSize = isMobile()?"xs":"md";
+  const textEm:string|number = isMobile()?10:14;  // font sizes
 
   /* Allows the user to use the front and back arrow keys to control the week number 
-     and which image files are being displayed. */ 
+     and which image files are being displayed. It is set with the values at the time 
+     of addListener and does not get updated state variables. */ 
   const handleSelection = (event: KeyboardEvent) => {
     if (event.key === 'ArrowRight') {
-      // increments active index (wraps around when at top)
       event.preventDefault();
-      let temp = week + 1;
-      if (temp > MAX_WEEK) temp = 1;
-      setWeek(temp);
+      setAdjustWeek(1);
     } else if (event.key === 'ArrowLeft') {
-      // decrements active index (wraps around when at bottom)
       event.preventDefault();
-      let temp = week - 1;
-      if (temp <= 0) temp = MAX_WEEK;
-      setWeek(temp);
+      setAdjustWeek(-1);
     }
-  };
+  }
+
+  useEffect(() => {
+    if (adjustWeek === 0) {
+      return;
+    }
+    if (adjustWeek > 0) {
+      // increments active index (wraps around when at top)
+      let temp = week + MIN_WEEK;
+      if (temp > MAX_WEEK) temp = MIN_WEEK;
+      checkImageAndUpdate(temp);
+    } else {
+      // decrements active index (wraps around when at bottom)
+      let temp = week - 1;
+      if (temp < 1) temp = MAX_WEEK;
+      checkImageAndUpdate(temp);
+    }
+    setAdjustWeek(0);
+  }, [adjustWeek]);
 
   // Called once on startup. Adds a listener for user keyboard events. 
   useEffect(() => {
+    // determine current week - find msec between today and beginning fo the year
+    const today = new Date()
+    const startOfYear = new Date(today.getFullYear(),0,1);
+    const diff_dates = today.valueOf()-startOfYear.valueOf()
+    const new_week = Math.floor(diff_dates/WEEK_TO_MSEC);
+    checkImageAndUpdate(new_week);
     document.addEventListener('keydown', handleSelection);
     return () => {
       document.removeEventListener('keydown', handleSelection);
@@ -70,6 +89,10 @@ function Home(this: any) {
   }, []);
 
   async function checkImageAndUpdate(this_week: number) {
+    if (this_week <= 0) {
+      // the week is not initialized yet
+      return;
+    }
     var image_url = imageURL(dataIndex, speciesIndex, this_week);
     var response = await fetch(image_url);
     if (!response.ok) {
@@ -81,6 +104,11 @@ function Home(this: any) {
     setWeek(this_week);
     setOverlayUrl(image_url);
   }
+
+  useEffect(() => {
+    console.log("WEEK is now %d", week);
+    console.log("SPECIES is now %d", speciesIndex);
+  }, [week]);
 
   useEffect(() => {
     checkImageAndUpdate(week);
@@ -107,7 +135,7 @@ function Home(this: any) {
   const dataTypeRadio = dataInfo.map((dt, index) => (
     <Radio icon={CheckIcon} checked={dataIndex===index} onChange={() => {
       checkInputTypes(index, speciesIndex)}
-    } size="md" label={dt.label} />
+    } size={textSize} label={dt.label} />
   ));
   
   // creates component surrounding the data type widgets to add tool tip
@@ -126,7 +154,7 @@ function Home(this: any) {
         onOptionSubmit={(val) => {
           onSubmit(val, ref_combo); 
         }}
-        size="md"
+        size={textSize}
       >
         <Combobox.Target>
           <InputBase
@@ -136,6 +164,7 @@ function Home(this: any) {
             leftSection={<Combobox.Chevron />}
             onClick={() => ref_combo.toggleDropdown()}
             leftSectionPointerEvents="none"
+            size={textSize}
           >
             {label || <Input.Placeholder>Pick value</Input.Placeholder>}
           </InputBase>
@@ -149,20 +178,82 @@ function Home(this: any) {
 
   // Maps the species from the taxa file provided to a dropdown with options. 
   const speciesOptions = taxa.map((t, index) => (
-    <Combobox.Option value={index.toString()} key={t.value} style={{fontSize:14}}>
+    <Combobox.Option value={index.toString()} key={t.value} style={{fontSize:{textEm}}}>
       {t.label}
     </Combobox.Option>
   ));
 
+  // checks the scaling file for the species and data type exists
   function checkSpecies(val: string, ref_combo: ComboboxStore) {
     let index = Number.parseInt(val); 
     checkInputTypes(dataIndex, index);
     ref_combo.closeDropdown();
   }
 
+  // Species combo box
   const SpeciesComponent = forwardRef<HTMLDivElement>((props, ref) => (
     <div ref={ref} {...props}>
       {genericCombo(speciesCombo, checkSpecies, taxa[speciesIndex].label, speciesOptions)}
+    </div>
+  ));
+
+  // species selection, type selection and about button
+  const ControlBar = forwardRef<HTMLDivElement>((props, ref) => (
+    <div ref={ref} {...props}>
+      <Grid align='stretch'>
+        <Grid.Col span={2}>
+          {/* Dropdown for data type */}
+          <Tooltip label='Types of data sets'>
+            <DataTypeComponent />
+          </Tooltip>
+        </Grid.Col>
+        <Grid.Col span={8}>
+          <div style={{textAlign:"center", fontSize:60, fontWeight:"bold"}}>Avian Influenza</div>
+        </Grid.Col>
+        <Grid.Col span={1}>
+        </Grid.Col>
+        <Grid.Col span={1}>
+          <Button leftSection={<IconInfoCircle/>} variant='default' >
+            <Link style={{fontSize:buttonFontSize}} to="/about"> About </Link>
+          </Button>
+        </Grid.Col>
+        { /* next row */ }
+        <Grid.Col span={3}>
+          {/* The dropdown for the species type */}
+          <Tooltip label='These Species were chosen because'>
+            <SpeciesComponent />
+          </Tooltip>
+        </Grid.Col>
+        <Grid.Col span={6}>
+          <div style={{textAlign:"center", fontSize:30, fontWeight:"bold"}}>{dataInfo[dataIndex].label} of the {taxa[speciesIndex].label}</div>
+        </Grid.Col>
+        <Grid.Col span={3}></Grid.Col>
+      </Grid>
+    </div>
+  ));
+
+  // same as ControlBar, but smaller
+  const ControlBarMobile = forwardRef<HTMLDivElement>((props, ref) => (
+    <div ref={ref} {...props} style={{fontSize:{textEm}}}>
+      <Grid align='stretch'>
+        <Grid.Col span={4}>
+          {/* Dropdown for data type */}
+          <Tooltip label='Types of data sets'>
+            <DataTypeComponent />
+          </Tooltip>
+        </Grid.Col>
+        <Grid.Col span={6}>
+          {/* The dropdown for the species type */}
+          <Tooltip label='These Species were chosen because'>
+            <SpeciesComponent />
+          </Tooltip>
+        </Grid.Col>
+        <Grid.Col span={2}>
+          <ActionIcon onClick={() => { navigate("/about")}}>
+            <IconInfoCircle/>
+          </ActionIcon>
+        </Grid.Col>
+      </Grid>
     </div>
   ));
 
@@ -196,36 +287,10 @@ function Home(this: any) {
           opacity={0.7}
         />
       </MapContainer>
-      <div className="widgets">
-        <Grid align='stretch'>
-          <Grid.Col span={2}>
-            {/* Dropdown for data type */}
-            <Tooltip label='Types of data sets'>
-              <DataTypeComponent />
-            </Tooltip>
-          </Grid.Col>
-          <Grid.Col span={8}>
-            <div style={{textAlign:"center", fontSize:60, fontWeight:"bold"}}>Avian Influenza</div>
-          </Grid.Col>
-          <Grid.Col span={1}>
-          </Grid.Col>
-          <Grid.Col span={1}>
-            <Button leftSection={<IconInfoCircle/>} variant='default' >
-              <Link style={{fontSize:buttonFontSize}} to="/about"> About </Link>
-            </Button>
-          </Grid.Col>
-          { /* next row */ }
-          <Grid.Col span={3}>
-            {/* The dropdown for the species type */}
-            <Tooltip label='These Species were chosen because'>
-              <SpeciesComponent />
-            </Tooltip>
-          </Grid.Col>
-          <Grid.Col span={6}>
-            <div style={{textAlign:"center", fontSize:30, fontWeight:"bold"}}>{dataInfo[dataIndex].label} of the {taxa[speciesIndex].label}</div>
-          </Grid.Col>
-          <Grid.Col span={3}></Grid.Col>
-        </Grid>
+      <div className="widgets"> 
+        {isMobile()?
+          <ControlBarMobile /> : <ControlBar/>
+        }
       </div>
       {/* Calls the custom legend component with the data type and species type as parameters. */}
       <Legend dataTypeIndex={dataIndex} speciesIndex={speciesIndex} />
@@ -235,4 +300,4 @@ function Home(this: any) {
   );
 }
 
-export default Home;
+export default HomePage;

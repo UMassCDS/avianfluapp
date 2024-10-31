@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { Grid, Stack, Tooltip } from '@mantine/core';
 import { getScalingFilename, dataInfo} from '../hooks/dataUrl';
-
+import { isMobile } from '../utils/mobile';
 // Interface for the Legend 
 interface LegendProps {
   dataTypeIndex: number;
@@ -48,32 +48,57 @@ function Legend(props: LegendProps) {
       });
   }, [dataTypeIndex, speciesIndex]);
 
+  function stackedUnits() {
+    let units: string[] = dataInfo[dataTypeIndex].units.split('/');
+    return units.join('/\n')
+  }
+
   return (
-    <div className="Legend" style={{background:"lightgrey", borderRadius:10}}>
-      <Grid align='stretch'>
-        <Grid.Col span={4}>
-          <div
-            style={{
-              display: 'inline-block',
-              width: '14px',
-              height: '180px',
-              margin: '10px',
-              background: `linear-gradient( 0deg, ${colorScale} )`,
-            }}
-          />
-        </Grid.Col>
-        <Grid.Col span={8} >
-          <Stack h={200} align='flex-start'  justify='space-between' gap='xl'>
-            <div>{highLabel}</div>
-            <div>{midLabel}</div>
-            <div>{lowLabel}</div>
-          </Stack>
-        </Grid.Col>
-      </Grid>
-      <Tooltip label='Text to explain scaling'>
-        <div style={{textAlign:"center"}}>{dataInfo[dataTypeIndex].units}</div>
-      </Tooltip>
-    </div>
+    <div>
+    {isMobile()?
+      <div className="Legend" style={{background:"lightgrey", borderRadius:10}}>
+        <div style={{textAlign:"center", fontSize:12}}>{highLabel}</div>
+        <div
+          style={{
+            margin: 'auto',
+            width: '10px',
+            height: '120px',
+            background: `linear-gradient( 0deg, ${colorScale} )`,
+          }}
+        />
+        <div style={{textAlign:"center", fontSize:12}}>{lowLabel}</div>
+        <Tooltip label='Average of 10 years of data.'>
+          <div style={{textAlign:"center", fontSize:12}}>{stackedUnits()}</div>
+        </Tooltip>
+      </div>
+    : 
+      <div className="Legend" style={{background:"lightgrey", borderRadius:10}}>
+        <Grid align='stretch'>
+            <Grid.Col span={4}>
+              <div
+                style={{
+                  display: 'inline-block',
+                  width: '14px',
+                  height: '180px',
+                  margin: '10px',
+                  background: `linear-gradient( 0deg, ${colorScale} )`,
+                }}
+              />
+            </Grid.Col>
+            <Grid.Col span={8} >
+              <Stack h={200} align='flex-start'  justify='space-between' gap='xl'>
+                <div>{highLabel}</div>
+                <div>{midLabel}</div>
+                <div>{lowLabel}</div>
+              </Stack>
+            </Grid.Col>
+          </Grid>
+          <Tooltip label='Average of 10 years of data.'>
+            <div style={{textAlign:"center"}}>{dataInfo[dataTypeIndex].units}</div>
+          </Tooltip>
+      </div>
+    }
+  </div>
   );
 }
 
