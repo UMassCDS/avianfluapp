@@ -165,6 +165,7 @@ const HomePage = () => {
             onClick={() => ref_combo.toggleDropdown()}
             leftSectionPointerEvents="none"
             size={textSize}
+            multiline={true}
           >
             {label || <Input.Placeholder>Pick value</Input.Placeholder>}
           </InputBase>
