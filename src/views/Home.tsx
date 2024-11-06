@@ -42,6 +42,20 @@ const HomePage = () => {
   const navigate = useNavigate();
   const textSize = isMobile()?"xs":"md";
   const textEm:string|number = isMobile()?10:14;  // font sizes
+  console.log(isMobile());
+  const [width, setWidth] = useState<number>(window.innerWidth);
+
+  function handleWindowSizeChange() {
+      setWidth(window.innerWidth);
+  }
+  useEffect(() => {
+      window.addEventListener('resize', handleWindowSizeChange);
+      return () => {
+          window.removeEventListener('resize', handleWindowSizeChange);
+      }
+  }, []);
+
+  console.log(width)
 
   /* Allows the user to use the front and back arrow keys to control the week number 
      and which image files are being displayed. It is set with the values at the time 
@@ -220,8 +234,8 @@ const HomePage = () => {
         </Grid.Col>
         { /* next row */ }
         <Grid.Col span={3}>
-          {/* The dropdown for the species type */}
-          <Tooltip label='These Species were chosen because'>
+          {/* The dropdown for the species type PAM */}
+          <Tooltip label={width}>
             <SpeciesComponent />
           </Tooltip>
         </Grid.Col>
@@ -244,8 +258,8 @@ const HomePage = () => {
           </Tooltip>
         </Grid.Col>
         <Grid.Col span={6}>
-          {/* The dropdown for the species type */}
-          <Tooltip label='These Species were chosen because'>
+          {/* The dropdown for the species type PAM */}
+          <Tooltip label={width}>
             <SpeciesComponent />
           </Tooltip>
         </Grid.Col>
