@@ -233,7 +233,7 @@ const HomePage = () => {
           </Tooltip>
         </Grid.Col>
         <Grid.Col span={8}>
-          <div style={{textAlign:"center", fontSize:60, fontWeight:"bold"}}>Avian Influenza</div>
+          <div style={{textAlign:"center", fontSize:60, fontWeight:"bold"}}>{window.innerWidth}</div>
         </Grid.Col>
         <Grid.Col span={2}>
           <Button leftSection={<IconInfoCircle/>} variant='default' >
