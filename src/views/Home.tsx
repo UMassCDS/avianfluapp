@@ -98,6 +98,9 @@ const HomePage = () => {
     const startOfYear = new Date(today.getFullYear(),0,1);
     const diff_dates = today.valueOf()-startOfYear.valueOf()
     const new_week = Math.floor(diff_dates/WEEK_TO_MSEC);
+    let temp = Math.floor(diff_dates/(24*60*60*1000));
+    var message = "atStartup: days "+temp.toString()+" "+today.toDateString();
+    alert(message)
     checkImageAndUpdate(new_week);
     document.addEventListener('keydown', handleSelection);
     return () => {
@@ -123,7 +126,7 @@ const HomePage = () => {
   }
 
   useEffect(() => {
-    console.log("WEEK is now %d", week);
+    alert("WEEK is now "+ week.toString());
     console.log("SPECIES is now %d", speciesIndex);
   }, [week]);
 
