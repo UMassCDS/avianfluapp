@@ -41,12 +41,15 @@ const HomePage = () => {
   const speciesCombo = useCombobox();
   const navigate = useNavigate();
   const textSize = isMobile()?"xs":"md";
-  const textEm:string|number = isMobile()?10:14;  // font sizes
+  let textEm = 14;  // font sizes
   console.log(isMobile());
   const [width, setWidth] = useState<number>(window.innerWidth);
 
   function handleWindowSizeChange() {
       setWidth(window.innerWidth);
+      if (window.innerWidth < 350) {
+        textEm = 10;
+      }
   }
   useEffect(() => {
       window.addEventListener('resize', handleWindowSizeChange);
@@ -193,7 +196,7 @@ const HomePage = () => {
 
   // Maps the species from the taxa file provided to a dropdown with options. 
   const speciesOptions = taxa.map((t, index) => (
-    <Combobox.Option value={index.toString()} key={t.value} style={{fontSize:{textEm}}}>
+    <Combobox.Option value={index.toString()} key={t.value} style={{fontSize:textEm}}>
       {t.label}
     </Combobox.Option>
   ));
@@ -225,9 +228,7 @@ const HomePage = () => {
         <Grid.Col span={8}>
           <div style={{textAlign:"center", fontSize:60, fontWeight:"bold"}}>Avian Influenza</div>
         </Grid.Col>
-        <Grid.Col span={1}>
-        </Grid.Col>
-        <Grid.Col span={1}>
+        <Grid.Col span={2}>
           <Button leftSection={<IconInfoCircle/>} variant='default' >
             <Link style={{fontSize:buttonFontSize}} to="/about"> About </Link>
           </Button>
@@ -249,7 +250,7 @@ const HomePage = () => {
 
   // same as ControlBar, but smaller
   const ControlBarMobile = forwardRef<HTMLDivElement>((props, ref) => (
-    <div ref={ref} {...props} style={{fontSize:{textEm}}}>
+    <div ref={ref} {...props} style={{fontSize:textEm}}>
       <Grid align='stretch'>
         <Grid.Col span={4}>
           {/* Dropdown for data type */}
