@@ -1,5 +1,5 @@
 import { ActionIcon, Button, Combobox, ComboboxStore, Grid, Input, InputBase, useCombobox } from '@mantine/core';
-import { CheckIcon, Radio, Stack, Tooltip } from '@mantine/core';
+import { CheckIcon, MantineSize, Radio, Stack, Tooltip } from '@mantine/core';
 import { MapContainer, TileLayer, ImageOverlay } from 'react-leaflet';
 import { forwardRef, useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -8,13 +8,13 @@ import { imageURL, getScalingFilename, dataInfo} from '../hooks/dataUrl';
 import taxa from '../assets/taxa.json';
 import Timeline from '../components/Timeline';
 import Legend from '../components/Legend';
-import { isMobile } from '../utils/mobile';
 import '../styles/Home.css';
 import 'leaflet/dist/leaflet.css';
 
 const MIN_WEEK = 1;   // week indexing in files
 const MAX_WEEK = 52;  // number of weeks in a year
 const WEEK_TO_MSEC = 7*24*60*60*1000;
+const MIN_REG_WINDOW_WIDTH = 350;
 // the lat/long bounds of the data image provided by the backend
 const imageBounds = [
   [9.622994, -170.291626],
@@ -39,26 +39,22 @@ const HomePage = () => {
   // default state of the map overlay url for the current data displayed.
   const [overlayUrl, setOverlayUrl] = useState("");
   const speciesCombo = useCombobox();
+  // useNavigate is used to switch pages
   const navigate = useNavigate();
-  const textSize = isMobile()?"xs":"md";
-  let textEm = 14;  // font sizes
-  console.log(isMobile());
-  const [width, setWidth] = useState<number>(window.innerWidth);
+  const [textSize, setTextSize] = useState<MantineSize>("md");
+  const [fontHeight, setFontHeight] = useState<number>(14);
 
   function handleWindowSizeChange() {
-      setWidth(window.innerWidth);
-      if (window.innerWidth < 350) {
-        textEm = 10;
+      if (window.innerWidth <  MIN_REG_WINDOW_WIDTH) {
+        // mobile
+        setTextSize("xs");
+        setFontHeight(10);
+      } else {
+        // reg window
+        setTextSize("md");
+        setFontHeight(14);
       }
   }
-  useEffect(() => {
-      window.addEventListener('resize', handleWindowSizeChange);
-      return () => {
-          window.removeEventListener('resize', handleWindowSizeChange);
-      }
-  }, []);
-
-  console.log(width)
 
   /* Allows the user to use the front and back arrow keys to control the week number 
      and which image files are being displayed. It is set with the values at the time 
@@ -102,9 +98,12 @@ const HomePage = () => {
     var message = "atStartup: days "+temp.toString()+" "+today.toDateString();
     alert(message)
     checkImageAndUpdate(new_week);
+    handleWindowSizeChange();
     document.addEventListener('keydown', handleSelection);
+    window.addEventListener('resize', handleWindowSizeChange);
     return () => {
       document.removeEventListener('keydown', handleSelection);
+      window.removeEventListener('resize', handleWindowSizeChange);
     };
   }, []);
 
@@ -127,7 +126,6 @@ const HomePage = () => {
 
   useEffect(() => {
     alert("WEEK is now "+ week.toString());
-    console.log("SPECIES is now %d", speciesIndex);
   }, [week]);
 
   useEffect(() => {
@@ -153,9 +151,15 @@ const HomePage = () => {
 
   // maps data types (abundance, movement etc) to radio buttons
   const dataTypeRadio = dataInfo.map((dt, index) => (
-    <Radio icon={CheckIcon} checked={dataIndex===index} onChange={() => {
-      checkInputTypes(index, speciesIndex)}
-    } size={textSize} label={dt.label} />
+    <Radio 
+      icon={CheckIcon} 
+      checked={dataIndex===index} 
+      onChange={() => {
+        checkInputTypes(index, speciesIndex)}
+      } 
+      size={textSize}
+      label={dt.label} 
+    />
   ));
   
   // creates component surrounding the data type widgets to add tool tip
@@ -199,7 +203,7 @@ const HomePage = () => {
 
   // Maps the species from the taxa file provided to a dropdown with options. 
   const speciesOptions = taxa.map((t, index) => (
-    <Combobox.Option value={index.toString()} key={t.value} style={{fontSize:textEm}}>
+    <Combobox.Option value={index.toString()} key={t.value} style={{fontSize:fontHeight}}>
       {t.label}
     </Combobox.Option>
   ));
@@ -238,8 +242,8 @@ const HomePage = () => {
         </Grid.Col>
         { /* next row */ }
         <Grid.Col span={3}>
-          {/* The dropdown for the species type PAM */}
-          <Tooltip label={width}>
+          {/* The dropdown for the species type */}
+          <Tooltip label='Wild bird species that potentially carry Avian Influenza'>
             <SpeciesComponent />
           </Tooltip>
         </Grid.Col>
@@ -253,7 +257,7 @@ const HomePage = () => {
 
   // same as ControlBar, but smaller
   const ControlBarMobile = forwardRef<HTMLDivElement>((props, ref) => (
-    <div ref={ref} {...props} style={{fontSize:textEm}}>
+    <div ref={ref} {...props} style={{fontSize:fontHeight}}>
       <Grid align='stretch'>
         <Grid.Col span={4}>
           {/* Dropdown for data type */}
@@ -262,8 +266,8 @@ const HomePage = () => {
           </Tooltip>
         </Grid.Col>
         <Grid.Col span={6}>
-          {/* The dropdown for the species type PAM */}
-          <Tooltip label={width}>
+          {/* The dropdown for the species type */}
+          <Tooltip label='Wild bird species that potentially carry Avian Influenza'>
             <SpeciesComponent />
           </Tooltip>
         </Grid.Col>
@@ -307,7 +311,7 @@ const HomePage = () => {
         />
       </MapContainer>
       <div className="widgets"> 
-        {isMobile()?
+        {(window.innerWidth <  MIN_REG_WINDOW_WIDTH)?
           <ControlBarMobile /> : <ControlBar/>
         }
       </div>
