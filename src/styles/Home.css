@@ -7,15 +7,22 @@
     .widgets {
         z-index: 10;
         position: fixed;
-        top: 2%;
+        top: 5px;
         left: 50px;
+        right: 50px;
     }
 
     .test {
         background-color: pink;
         opacity: 0.6;
     }
-    
+    .about {
+        z-index: 10;
+        position: fixed;
+        top: 5px;
+        right: 5px;
+    }
+
     	
     .Legend {
         position: absolute;

@@ -46,7 +46,6 @@ function Timeline(props: TimelineProps) {
 
   useEffect(() => {
     // update the label WHEN the check for overlay is complete
-    alert("Timeline week "+week.toString());
     setWeekLabel(dateLabels[week-1]);
   }, [week]);
 

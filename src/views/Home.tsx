@@ -1,8 +1,8 @@
-import { ActionIcon, Button, Combobox, ComboboxStore, Grid, Input, InputBase, useCombobox } from '@mantine/core';
+import { ActionIcon, Combobox, ComboboxStore, Grid, Input, InputBase, useCombobox } from '@mantine/core';
 import { CheckIcon, MantineSize, Radio, Stack, Tooltip } from '@mantine/core';
 import { MapContainer, TileLayer, ImageOverlay } from 'react-leaflet';
 import { forwardRef, useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { IconInfoCircle } from '@tabler/icons-react';
 import { imageURL, getScalingFilename, dataInfo} from '../hooks/dataUrl';
 import taxa from '../assets/taxa.json';
@@ -14,13 +14,12 @@ import 'leaflet/dist/leaflet.css';
 const MIN_WEEK = 1;   // week indexing in files
 const MAX_WEEK = 52;  // number of weeks in a year
 const WEEK_TO_MSEC = 7*24*60*60*1000;
-const MIN_REG_WINDOW_WIDTH = 350;
+const MIN_REG_WINDOW_WIDTH = 600;
 // the lat/long bounds of the data image provided by the backend
 const imageBounds = [
   [9.622994, -170.291626],
   [79.98956, -49.783429],
 ];
-const buttonFontSize = 16;
 
 /* This is the main page and only page of the application. 
    Here, the map renders as well as all the AvianFluApp feature controls */
@@ -41,18 +40,25 @@ const HomePage = () => {
   const speciesCombo = useCombobox();
   // useNavigate is used to switch pages
   const navigate = useNavigate();
-  const [textSize, setTextSize] = useState<MantineSize>("md");
+  const [iconSize, setIconSize] = useState<MantineSize>('xl');
+  const [textSize, setTextSize] = useState<MantineSize>('md');
   const [fontHeight, setFontHeight] = useState<number>(14);
+  const [titleSize, setTitleSize] = useState<number>(40);
+
 
   function handleWindowSizeChange() {
       if (window.innerWidth <  MIN_REG_WINDOW_WIDTH) {
-        // mobile
-        setTextSize("xs");
+        // small window
+        setTextSize('xs');
         setFontHeight(10);
+        setIconSize('xl');
+        setTitleSize(20);
       } else {
         // reg window
-        setTextSize("md");
+        setTextSize('md');
         setFontHeight(14);
+        setIconSize('xl');
+        setTitleSize(40);
       }
   }
 
@@ -88,15 +94,13 @@ const HomePage = () => {
   }, [adjustWeek]);
 
   // Called once on startup. Adds a listener for user keyboard events. 
+  // Note: it appears this is not called when using Firefox on the iPhone PM 11/9/2024
   useEffect(() => {
     // determine current week - find msec between today and beginning fo the year
     const today = new Date()
     const startOfYear = new Date(today.getFullYear(),0,1);
     const diff_dates = today.valueOf()-startOfYear.valueOf()
     const new_week = Math.floor(diff_dates/WEEK_TO_MSEC);
-    let temp = Math.floor(diff_dates/(24*60*60*1000));
-    var message = "atStartup: days "+temp.toString()+" "+today.toDateString();
-    alert(message)
     checkImageAndUpdate(new_week);
     handleWindowSizeChange();
     document.addEventListener('keydown', handleSelection);
@@ -123,10 +127,6 @@ const HomePage = () => {
     setWeek(this_week);
     setOverlayUrl(image_url);
   }
-
-  useEffect(() => {
-    alert("WEEK is now "+ week.toString());
-  }, [week]);
 
   useEffect(() => {
     checkImageAndUpdate(week);
@@ -225,60 +225,28 @@ const HomePage = () => {
   // species selection, type selection and about button
   const ControlBar = forwardRef<HTMLDivElement>((props, ref) => (
     <div ref={ref} {...props}>
-      <Grid align='stretch'>
-        <Grid.Col span={2}>
+      <Grid justify='center' align='stretch'>
+        { /* top row Title */ }
+        <Grid.Col span={12}>
+          <div style={{textAlign:"center", fontSize:titleSize, fontWeight:"bold"}}>Avian Influenza</div>
+        </Grid.Col>
+        { /* 2nd row */ }
+        <Grid.Col span={{ base: 4, md: 2, lg: 2 }}>
           {/* Dropdown for data type */}
           <Tooltip label='Types of data sets'>
             <DataTypeComponent />
           </Tooltip>
         </Grid.Col>
-        <Grid.Col span={8}>
-          <div style={{textAlign:"center", fontSize:60, fontWeight:"bold"}}>{window.innerWidth}</div>
-        </Grid.Col>
-        <Grid.Col span={2}>
-          <Button leftSection={<IconInfoCircle/>} variant='default' >
-            <Link style={{fontSize:buttonFontSize}} to="/about"> About </Link>
-          </Button>
-        </Grid.Col>
-        { /* next row */ }
-        <Grid.Col span={3}>
+        <Grid.Col span={{ base: 6, md: 4, lg: 3 }}>
           {/* The dropdown for the species type */}
           <Tooltip label='Wild bird species that potentially carry Avian Influenza'>
             <SpeciesComponent />
           </Tooltip>
         </Grid.Col>
-        <Grid.Col span={6}>
-          <div style={{textAlign:"center", fontSize:30, fontWeight:"bold"}}>{dataInfo[dataIndex].label} of the {taxa[speciesIndex].label}</div>
-        </Grid.Col>
-        <Grid.Col span={3}></Grid.Col>
       </Grid>
     </div>
   ));
 
-  // same as ControlBar, but smaller
-  const ControlBarMobile = forwardRef<HTMLDivElement>((props, ref) => (
-    <div ref={ref} {...props} style={{fontSize:fontHeight}}>
-      <Grid align='stretch'>
-        <Grid.Col span={4}>
-          {/* Dropdown for data type */}
-          <Tooltip label='Types of data sets'>
-            <DataTypeComponent />
-          </Tooltip>
-        </Grid.Col>
-        <Grid.Col span={6}>
-          {/* The dropdown for the species type */}
-          <Tooltip label='Wild bird species that potentially carry Avian Influenza'>
-            <SpeciesComponent />
-          </Tooltip>
-        </Grid.Col>
-        <Grid.Col span={2}>
-          <ActionIcon onClick={() => { navigate("/about")}}>
-            <IconInfoCircle/>
-          </ActionIcon>
-        </Grid.Col>
-      </Grid>
-    </div>
-  ));
 
   // Here is where you list the components and elements that you want rendered. 
   return (
@@ -311,9 +279,14 @@ const HomePage = () => {
         />
       </MapContainer>
       <div className="widgets"> 
-        {(window.innerWidth <  MIN_REG_WINDOW_WIDTH)?
-          <ControlBarMobile /> : <ControlBar/>
-        }
+        <ControlBar/>
+      </div>
+      <div className="about"> 
+        <Tooltip label='About page'>
+            <ActionIcon size={iconSize} onClick={() => { navigate("/about")}}>
+              <IconInfoCircle/>
+            </ActionIcon>
+        </Tooltip>
       </div>
       {/* Calls the custom legend component with the data type and species type as parameters. */}
       <Legend dataTypeIndex={dataIndex} speciesIndex={speciesIndex} />
