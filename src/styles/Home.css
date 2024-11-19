@@ -7,23 +7,33 @@
     .widgets {
         z-index: 10;
         position: fixed;
-        top: 2%;
-        left: 2%;
-        bottom: 2%;
-        right: 2%;
+        top: 5px;
+        left: 50px;
+        right: 50px;
     }
 
     .test {
         background-color: pink;
         opacity: 0.6;
     }
-    
+    .about {
+        z-index: 10;
+        position: fixed;
+        top: 5px;
+        right: 5px;
+    }
+
+    	
+    .Legend {
+        position: absolute;
+        bottom: 150px;
+        left: 10px;
+        z-index: 10;
+        white-space: pre-line;
+    }
+
     .Timeline {
-        background-color: white;
-        height: 55px;
-        width: 70%;
-        border-radius: 5px;
-        padding: 10px;
+        width: 90%;
         position: fixed;
         top: 90%;
         left: 50%;

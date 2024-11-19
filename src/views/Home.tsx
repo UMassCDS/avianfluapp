@@ -1,8 +1,8 @@
-import { Button, Combobox, ComboboxStore, Grid, Input, InputBase, useCombobox } from '@mantine/core';
-import { CheckIcon, Radio, Stack, Tooltip } from '@mantine/core';
+import { ActionIcon, Combobox, ComboboxStore, Grid, Input, InputBase, useCombobox } from '@mantine/core';
+import { CheckIcon, MantineSize, Radio, Stack, Tooltip } from '@mantine/core';
 import { MapContainer, TileLayer, ImageOverlay } from 'react-leaflet';
 import { forwardRef, useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { IconInfoCircle } from '@tabler/icons-react';
 import { imageURL, getScalingFilename, dataInfo} from '../hooks/dataUrl';
 import taxa from '../assets/taxa.json';
@@ -11,18 +11,20 @@ import Legend from '../components/Legend';
 import {OutbreakData} from '../components/OutbreakPoints'
 import '../styles/Home.css';
 import 'leaflet/dist/leaflet.css';
+
+const MIN_WEEK = 1;   // week indexing in files
 const MAX_WEEK = 52;  // number of weeks in a year
 const WEEK_TO_MSEC = 7*24*60*60*1000;
+const MIN_REG_WINDOW_WIDTH = 600;
 // the lat/long bounds of the data image provided by the backend
 const imageBounds = [
   [9.622994, -170.291626],
   [79.98956, -49.783429],
 ];
-const buttonFontSize = 16;
 
 /* This is the main page and only page of the application. 
    Here, the map renders as well as all the AvianFluApp feature controls */
-function Home(this: any) {
+const HomePage = () => {  
   // Sets the default position for the map.
   const position = {
     lat: 45,
@@ -32,44 +34,89 @@ function Home(this: any) {
   const [dataIndex, setDataIndex] = useState(0);
   // Sets state for the species type 
   const [speciesIndex, setSpeciesIndex] = useState(0);
-  // determine current week - find msec between today and beginning fo the year
-  const today = new Date()
-  const startOfYear = new Date(today.getFullYear(),0,1);
-  const diff_dates = today.valueOf()-startOfYear.valueOf()
-  // Sets state for the week number
-  let this_week = Math.floor(diff_dates/WEEK_TO_MSEC); 
-  const [week, setWeek] = useState(this_week);
+  const [week, setWeek] = useState(0);
+  const [adjustWeek, setAdjustWeek] = useState(0);
   // default state of the map overlay url for the current data displayed.
-  const [overlayUrl, setOverlayUrl] = useState(imageURL(0, 0, this_week));
+  const [overlayUrl, setOverlayUrl] = useState("");
   const speciesCombo = useCombobox();
+  // useNavigate is used to switch pages
+  const navigate = useNavigate();
+  const [iconSize, setIconSize] = useState<MantineSize>('xl');
+  const [textSize, setTextSize] = useState<MantineSize>('md');
+  const [fontHeight, setFontHeight] = useState<number>(14);
+  const [titleSize, setTitleSize] = useState<number>(40);
+
+
+  function handleWindowSizeChange() {
+      if (window.innerWidth <  MIN_REG_WINDOW_WIDTH) {
+        // small window
+        setTextSize('xs');
+        setFontHeight(10);
+        setIconSize('xl');
+        setTitleSize(20);
+      } else {
+        // reg window
+        setTextSize('md');
+        setFontHeight(14);
+        setIconSize('xl');
+        setTitleSize(40);
+      }
+  }
 
   /* Allows the user to use the front and back arrow keys to control the week number 
-     and which image files are being displayed. */ 
+     and which image files are being displayed. It is set with the values at the time 
+     of addListener and does not get updated state variables. */ 
   const handleSelection = (event: KeyboardEvent) => {
     if (event.key === 'ArrowRight') {
-      // increments active index (wraps around when at top)
       event.preventDefault();
-      let temp = week + 1;
-      if (temp > MAX_WEEK) temp = 1;
-      setWeek(temp);
+      setAdjustWeek(1);
     } else if (event.key === 'ArrowLeft') {
-      // decrements active index (wraps around when at bottom)
       event.preventDefault();
-      let temp = week - 1;
-      if (temp <= 0) temp = MAX_WEEK;
-      setWeek(temp);
+      setAdjustWeek(-1);
     }
-  };
+  }
+
+  useEffect(() => {
+    if (adjustWeek === 0) {
+      return;
+    }
+    if (adjustWeek > 0) {
+      // increments active index (wraps around when at top)
+      let temp = week + MIN_WEEK;
+      if (temp > MAX_WEEK) temp = MIN_WEEK;
+      checkImageAndUpdate(temp);
+    } else {
+      // decrements active index (wraps around when at bottom)
+      let temp = week - 1;
+      if (temp < 1) temp = MAX_WEEK;
+      checkImageAndUpdate(temp);
+    }
+    setAdjustWeek(0);
+  }, [adjustWeek]);
 
   // Called once on startup. Adds a listener for user keyboard events. 
+  // Note: it appears this is not called when using Firefox on the iPhone PM 11/9/2024
   useEffect(() => {
+    // determine current week - find msec between today and beginning fo the year
+    const today = new Date()
+    const startOfYear = new Date(today.getFullYear(),0,1);
+    const diff_dates = today.valueOf()-startOfYear.valueOf()
+    const new_week = Math.floor(diff_dates/WEEK_TO_MSEC);
+    checkImageAndUpdate(new_week);
+    handleWindowSizeChange();
     document.addEventListener('keydown', handleSelection);
+    window.addEventListener('resize', handleWindowSizeChange);
     return () => {
       document.removeEventListener('keydown', handleSelection);
+      window.removeEventListener('resize', handleWindowSizeChange);
     };
   }, []);
 
   async function checkImageAndUpdate(this_week: number) {
+    if (this_week <= 0) {
+      // the week is not initialized yet
+      return;
+    }
     var image_url = imageURL(dataIndex, speciesIndex, this_week);
     var response = await fetch(image_url);
     if (!response.ok) {
@@ -105,9 +152,15 @@ function Home(this: any) {
 
   // maps data types (abundance, movement etc) to radio buttons
   const dataTypeRadio = dataInfo.map((dt, index) => (
-    <Radio icon={CheckIcon} checked={dataIndex===index} onChange={() => {
-      checkInputTypes(index, speciesIndex)}
-    } size="md" label={dt.label} />
+    <Radio 
+      icon={CheckIcon} 
+      checked={dataIndex===index} 
+      onChange={() => {
+        checkInputTypes(index, speciesIndex)}
+      } 
+      size={textSize}
+      label={dt.label} 
+    />
   ));
   
   // creates component surrounding the data type widgets to add tool tip
@@ -126,7 +179,7 @@ function Home(this: any) {
         onOptionSubmit={(val) => {
           onSubmit(val, ref_combo); 
         }}
-        size="md"
+        size={textSize}
       >
         <Combobox.Target>
           <InputBase
@@ -136,6 +189,8 @@ function Home(this: any) {
             leftSection={<Combobox.Chevron />}
             onClick={() => ref_combo.toggleDropdown()}
             leftSectionPointerEvents="none"
+            size={textSize}
+            multiline={true}
           >
             {label || <Input.Placeholder>Pick value</Input.Placeholder>}
           </InputBase>
@@ -149,22 +204,50 @@ function Home(this: any) {
 
   // Maps the species from the taxa file provided to a dropdown with options. 
   const speciesOptions = taxa.map((t, index) => (
-    <Combobox.Option value={index.toString()} key={t.value} style={{fontSize:14}}>
+    <Combobox.Option value={index.toString()} key={t.value} style={{fontSize:fontHeight}}>
       {t.label}
     </Combobox.Option>
   ));
 
+  // checks the scaling file for the species and data type exists
   function checkSpecies(val: string, ref_combo: ComboboxStore) {
     let index = Number.parseInt(val); 
     checkInputTypes(dataIndex, index);
     ref_combo.closeDropdown();
   }
 
+  // Species combo box
   const SpeciesComponent = forwardRef<HTMLDivElement>((props, ref) => (
     <div ref={ref} {...props}>
       {genericCombo(speciesCombo, checkSpecies, taxa[speciesIndex].label, speciesOptions)}
     </div>
   ));
+
+  // species selection, type selection and about button
+  const ControlBar = forwardRef<HTMLDivElement>((props, ref) => (
+    <div ref={ref} {...props}>
+      <Grid justify='center' align='stretch'>
+        { /* top row Title */ }
+        <Grid.Col span={12}>
+          <div style={{textAlign:"center", fontSize:titleSize, fontWeight:"bold"}}>Avian Influenza</div>
+        </Grid.Col>
+        { /* 2nd row */ }
+        <Grid.Col span={{ base: 4, md: 2, lg: 2 }}>
+          {/* Dropdown for data type */}
+          <Tooltip label='Types of data sets'>
+            <DataTypeComponent />
+          </Tooltip>
+        </Grid.Col>
+        <Grid.Col span={{ base: 6, md: 4, lg: 3 }}>
+          {/* The dropdown for the species type */}
+          <Tooltip label='Wild bird species that potentially carry Avian Influenza'>
+            <SpeciesComponent />
+          </Tooltip>
+        </Grid.Col>
+      </Grid>
+    </div>
+  ));
+
 
   // Here is where you list the components and elements that you want rendered. 
   return (
@@ -196,52 +279,22 @@ function Home(this: any) {
           opacity={0.7}
         />
       </MapContainer>
-      <div className="widgets">
-        <Grid align='stretch'>
-          <Grid.Col span={1}>
-          </Grid.Col>
-          <Grid.Col span={1}>
-            {/* Dropdown for data type */}
-            <Tooltip label='Types of data sets'>
-              <DataTypeComponent />
-            </Tooltip>
-          </Grid.Col>
-          <Grid.Col span={8}>
-            <div style={{textAlign:"center", fontSize:60, fontWeight:"bold"}}>Avian Influenza</div>
-          </Grid.Col>
-          <Grid.Col span={1}>
-          </Grid.Col>
-          <Grid.Col span={1}>
-            <Button leftSection={<IconInfoCircle/>} variant='default' >
-              <Link style={{fontSize:buttonFontSize}} to="/about"> About </Link>
-            </Button>
-          </Grid.Col>
-          { /* next row */ }
-          <Grid.Col span={1}>
-          </Grid.Col>
-          <Grid.Col span={2}>
-            {/* The dropdown for the species type */}
-            <Tooltip label='These Species were chosen because'>
-              <SpeciesComponent />
-            </Tooltip>
-          </Grid.Col>
-          <Grid.Col span={6}>
-            <div style={{textAlign:"center", fontSize:30, fontWeight:"bold"}}>{dataInfo[dataIndex].label} of the {taxa[speciesIndex].label}</div>
-          </Grid.Col>
-          <Grid.Col span={3}></Grid.Col>
-          { /* next row */ }
-          <Grid.Col span={2}>
-            {/* Calls the custom legend component with the data type and species type as parameters. */}
-            <Legend dataTypeIndex={dataIndex} speciesIndex={speciesIndex} />
-          </Grid.Col>
-          <Grid.Col span={6}></Grid.Col>
-          <Grid.Col span={4}> <OutbreakData></OutbreakData> </Grid.Col>
-        </Grid>
-        {/* Calls the custom timeline component with the current week onChange function as parameters */}
-        <Timeline week={week} onChangeWeek={checkImageAndUpdate} />
+      <div className="widgets"> 
+        <ControlBar/>
       </div>
+      <div className="about"> 
+        <Tooltip label='About page'>
+            <ActionIcon size={iconSize} onClick={() => { navigate("/about")}}>
+              <IconInfoCircle/>
+            </ActionIcon>
+        </Tooltip>
+      </div>
+      {/* Calls the custom legend component with the data type and species type as parameters. */}
+      <Legend dataTypeIndex={dataIndex} speciesIndex={speciesIndex} />
+      {/* Calls the custom timeline component with the current week onChange function as parameters */}
+      <Timeline week={week} onChangeWeek={checkImageAndUpdate} />
     </div>
   );
 }
 
-export default Home;
+export default HomePage;
