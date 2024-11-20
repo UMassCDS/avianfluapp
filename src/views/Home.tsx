@@ -48,19 +48,19 @@ const HomePage = () => {
 
 
   function handleWindowSizeChange() {
-      if (window.innerWidth <  MIN_REG_WINDOW_WIDTH) {
-        // small window
-        setTextSize('xs');
-        setFontHeight(10);
-        setIconSize('xl');
-        setTitleSize(20);
-      } else {
-        // reg window
-        setTextSize('md');
-        setFontHeight(14);
-        setIconSize('xl');
-        setTitleSize(40);
-      }
+    if (window.innerWidth <  MIN_REG_WINDOW_WIDTH) {
+      // small window
+      setTextSize('xs');
+      setFontHeight(10);
+      setIconSize('xl');
+      setTitleSize(20);
+    } else {
+      // reg window
+      setTextSize('md');
+      setFontHeight(14);
+      setIconSize('xl');
+      setTitleSize(40);
+    }
   }
 
   /* Allows the user to use the front and back arrow keys to control the week number 
@@ -154,6 +154,7 @@ const HomePage = () => {
   const dataTypeRadio = dataInfo.map((dt, index) => (
     <Radio 
       icon={CheckIcon} 
+      key={dt.label}
       checked={dataIndex===index} 
       onChange={() => {
         checkInputTypes(index, speciesIndex)}
@@ -224,8 +225,8 @@ const HomePage = () => {
   ));
 
   // species selection, type selection and about button
-  const ControlBar = forwardRef<HTMLDivElement>((props, ref) => (
-    <div ref={ref} {...props}>
+  const ControlBar = () => (
+    <div>
       <Grid justify='center' align='stretch'>
         { /* top row Title */ }
         <Grid.Col span={12}>
@@ -246,7 +247,7 @@ const HomePage = () => {
         </Grid.Col>
       </Grid>
     </div>
-  ));
+  );
 
 
   // Here is where you list the components and elements that you want rendered. 
@@ -281,6 +282,7 @@ const HomePage = () => {
       </MapContainer>
       <div className="widgets"> 
         <ControlBar/>
+        {OutbreakData()}
       </div>
       <div className="about"> 
         <Tooltip label='About page'>
