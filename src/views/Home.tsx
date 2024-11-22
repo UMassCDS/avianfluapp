@@ -8,7 +8,7 @@ import { imageURL, getScalingFilename, dataInfo} from '../hooks/dataUrl';
 import taxa from '../assets/taxa.json';
 import Timeline from '../components/Timeline';
 import Legend from '../components/Legend';
-import {OutbreakData} from '../components/OutbreakPoints'
+import {OutbreakData, loadOutbreaks} from '../components/OutbreakPoints'
 import '../styles/Home.css';
 import 'leaflet/dist/leaflet.css';
 
@@ -103,6 +103,7 @@ const HomePage = () => {
     const diff_dates = today.valueOf()-startOfYear.valueOf()
     const new_week = Math.floor(diff_dates/WEEK_TO_MSEC);
     checkImageAndUpdate(new_week);
+    loadOutbreaks();
     handleWindowSizeChange();
     document.addEventListener('keydown', handleSelection);
     window.addEventListener('resize', handleWindowSizeChange);

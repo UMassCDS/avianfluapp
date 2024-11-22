@@ -588,6 +588,13 @@
     "lat": 62.3153
   },
   {
+    "county": "Matanuska Susitna",
+    "state": "ALASKA",
+    "geoid": "02170",
+    "lon": -149.5902,
+    "lat": 62.3153
+  },
+  {
     "county": "Nome",
     "state": "ALASKA",
     "geoid": "02180",
@@ -2325,6 +2332,13 @@
   },
   {
     "county": "DeSoto",
+    "state": "FLORIDA",
+    "geoid": "12027",
+    "lon": -81.8096,
+    "lat": 27.1869
+  },
+  {    
+    "county": "De Soto",
     "state": "FLORIDA",
     "geoid": "12027",
     "lon": -81.8096,
@@ -20412,6 +20426,13 @@
     "lat": 38.814
   },
   {
+    "county": "Alexandria City",
+    "state": "VIRGINIA",
+    "geoid": "51510",
+    "lon": -77.0818,
+    "lat": 38.814
+  },
+  {
     "county": "Bristol",
     "state": "VIRGINIA",
     "geoid": "51520",
@@ -20504,6 +20525,13 @@
   },
   {
     "county": "Hampton",
+    "state": "VIRGINIA",
+    "geoid": "51650",
+    "lon": -76.359,
+    "lat": 37.0352
+  },
+  {
+    "county": "Hampton City",
     "state": "VIRGINIA",
     "geoid": "51650",
     "lon": -76.359,
@@ -20644,6 +20672,13 @@
   },
   {
     "county": "Virginia Beach",
+    "state": "VIRGINIA",
+    "geoid": "51810",
+    "lon": -76.0456,
+    "lat": 36.7327
+  },
+  {
+    "county": "Virginia Beach City",
     "state": "VIRGINIA",
     "geoid": "51810",
     "lon": -76.0456,
@@ -21715,6 +21750,13 @@
   },
   {
     "county": "St. Croix",
+    "state": "WISCONSIN",
+    "geoid": "55109",
+    "lon": -92.45,
+    "lat": 45.0346
+  },
+  {
+    "county": "Saint Croix",
     "state": "WISCONSIN",
     "geoid": "55109",
     "lon": -92.45,
