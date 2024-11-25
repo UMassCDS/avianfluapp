@@ -8,7 +8,7 @@ import { imageURL, getScalingFilename, dataInfo} from '../hooks/dataUrl';
 import taxa from '../assets/taxa.json';
 import Timeline from '../components/Timeline';
 import Legend from '../components/Legend';
-import {OutbreakData, loadOutbreaks} from '../components/OutbreakPoints'
+import {AddOutbreaks, loadOutbreaks} from '../components/OutbreakPoints'
 import '../styles/Home.css';
 import 'leaflet/dist/leaflet.css';
 
@@ -280,10 +280,10 @@ const HomePage = () => {
           // @ts-ignore
           opacity={0.7}
         />
+        {AddOutbreaks()}
       </MapContainer>
       <div className="widgets"> 
         <ControlBar/>
-        {OutbreakData()}
       </div>
       <div className="about"> 
         <Tooltip label='About page'>
