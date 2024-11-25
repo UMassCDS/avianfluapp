@@ -15,7 +15,7 @@ function About(this: any) {
                 In other words, the purple will represent the same amount over the course of the year, 
                 but can change when other species or types are chosen. 
             </p><p>
-                The radio buttons on the top represent the type of data - abundance or migration. 
+                The radio buttons on the top represent the type of data - abundance or movement. 
                 See below for the full explanation.
             </p><p> 
                 The drop-down lets the user select one species or all of the species of birds.
