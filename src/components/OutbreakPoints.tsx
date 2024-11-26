@@ -84,7 +84,7 @@ export function OutbreakMarkers(week: number) {
         currentMarkers.map((info, i) => (
             <Marker
                 position={info.GeoLoc}
-                key = {i}
+                key={i}
             >
                 <Popup>
                     {info.label}
