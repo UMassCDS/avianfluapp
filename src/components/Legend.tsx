@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { Grid, Stack, Tooltip } from '@mantine/core';
 import { getScalingFilename, dataInfo} from '../hooks/dataUrl';
-import { isMobile } from '../utils/mobile';
+import { isMobile } from '../utils/utils';
 // Interface for the Legend 
 interface LegendProps {
   dataTypeIndex: number;

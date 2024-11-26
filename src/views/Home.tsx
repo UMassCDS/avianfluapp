@@ -8,12 +8,13 @@ import { imageURL, getScalingFilename, dataInfo} from '../hooks/dataUrl';
 import taxa from '../assets/taxa.json';
 import Timeline from '../components/Timeline';
 import Legend from '../components/Legend';
+import {OutbreakMarkers, loadOutbreaks} from '../components/OutbreakPoints'
+import {dateToWeek} from '../utils/utils'
 import '../styles/Home.css';
 import 'leaflet/dist/leaflet.css';
 
 const MIN_WEEK = 1;   // week indexing in files
 const MAX_WEEK = 52;  // number of weeks in a year
-const WEEK_TO_MSEC = 7*24*60*60*1000;
 const MIN_REG_WINDOW_WIDTH = 600;
 // the lat/long bounds of the data image provided by the backend
 const imageBounds = [
@@ -47,19 +48,19 @@ const HomePage = () => {
 
 
   function handleWindowSizeChange() {
-      if (window.innerWidth <  MIN_REG_WINDOW_WIDTH) {
-        // small window
-        setTextSize('xs');
-        setFontHeight(10);
-        setIconSize('xl');
-        setTitleSize(20);
-      } else {
-        // reg window
-        setTextSize('md');
-        setFontHeight(14);
-        setIconSize('xl');
-        setTitleSize(40);
-      }
+    if (window.innerWidth <  MIN_REG_WINDOW_WIDTH) {
+      // small window
+      setTextSize('xs');
+      setFontHeight(10);
+      setIconSize('xl');
+      setTitleSize(20);
+    } else {
+      // reg window
+      setTextSize('md');
+      setFontHeight(14);
+      setIconSize('xl');
+      setTitleSize(40);
+    }
   }
 
   /* Allows the user to use the front and back arrow keys to control the week number 
@@ -97,11 +98,9 @@ const HomePage = () => {
   // Note: it appears this is not called when using Firefox on the iPhone PM 11/9/2024
   useEffect(() => {
     // determine current week - find msec between today and beginning fo the year
-    const today = new Date()
-    const startOfYear = new Date(today.getFullYear(),0,1);
-    const diff_dates = today.valueOf()-startOfYear.valueOf()
-    const new_week = Math.floor(diff_dates/WEEK_TO_MSEC);
-    checkImageAndUpdate(new_week);
+    const this_week = dateToWeek(new Date())
+    loadOutbreaks();
+    checkImageAndUpdate(this_week);
     handleWindowSizeChange();
     document.addEventListener('keydown', handleSelection);
     window.addEventListener('resize', handleWindowSizeChange);
@@ -153,6 +152,7 @@ const HomePage = () => {
   const dataTypeRadio = dataInfo.map((dt, index) => (
     <Radio 
       icon={CheckIcon} 
+      key={dt.label}
       checked={dataIndex===index} 
       onChange={() => {
         checkInputTypes(index, speciesIndex)}
@@ -223,8 +223,8 @@ const HomePage = () => {
   ));
 
   // species selection, type selection and about button
-  const ControlBar = forwardRef<HTMLDivElement>((props, ref) => (
-    <div ref={ref} {...props}>
+  const ControlBar = () => (
+    <div>
       <Grid justify='center' align='stretch'>
         { /* top row Title */ }
         <Grid.Col span={12}>
@@ -245,7 +245,7 @@ const HomePage = () => {
         </Grid.Col>
       </Grid>
     </div>
-  ));
+  );
 
 
   // Here is where you list the components and elements that you want rendered. 
@@ -277,6 +277,7 @@ const HomePage = () => {
           // @ts-ignore
           opacity={0.7}
         />
+        {OutbreakMarkers(week)}
       </MapContainer>
       <div className="widgets"> 
         <ControlBar/>
