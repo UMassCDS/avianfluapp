@@ -2,66 +2,39 @@
 import {Marker, Popup } from 'react-leaflet';
 import geoCounties from '../assets/counties.json';
 import outbreaks from '../assets/outbreaks.json';
+import {monthDayToWeek} from '../utils/utils'
 
 // lat, long position in degrees
 type GeoLocation = [number, number]
-   
-type CountyDict = {
-    [county: string]: GeoLocation;
-};
-
-type StateDict = {
-    [state: string]: CountyDict;
-};
 
 type outMarker = {
-    Confirmed: Date;
-    State: string;
-    County: string;
-    Production: string;
-    EndDate: any| Date;
-    NumInfected: number;
     GeoLoc: GeoLocation;
+    year: number;
+    week: number;
+    label: string;
 }
 
 const outbreakMarkers: outMarker[]=[];
-const today = new Date();
-console.log(today.getFullYear() - 3);
-const MSEC_TO_DAY = 24*60*60*1000;
-
-function isShowOutbreak(text_date: string):boolean {
-    // return true if we want to show this outbreak
-    // for now the check is if it is from the last 3 years
-    let parts = text_date.split('-')
-    // part 0 is year
-    console.log(parts[0]);
-    if (Number(parts[0]) >= today.getFullYear() - 3) {
-        let dateOfYear = new Date(today.getFullYear(),Number(parts[1])-1,Number(parts[2]));
-        const diff_dates = today.valueOf()-dateOfYear.valueOf()
-        const diff_day = Math.abs(Math.floor(diff_dates/MSEC_TO_DAY));
-
-        return diff_day < 21;
-    }
-    return false;
-}
-
-// TODO may want to keep parts instead of Date
-function convertToDate(text_date: string) {
-    let parts = text_date.split('-')
-    // part 0 is year, part 1 is month (Date obj starts w/ Jan as zero), part 2 is day
-    return new Date(Number(parts[0]), Number(parts[1])-1, Number(parts[2]));
-}
+const NUM_YEARS = 3; // number of years back
+const NUM_WEEKS = 2; // number of weeks +/-
+const thisYear = new Date().getFullYear();
 
 export function loadOutbreaks() {
     if (outbreakMarkers.length > 0) {
         // only run this once
         return;
     }
-    // create a dict with [state][county] = GeoLocation
-    var locationDict: StateDict = {}
-    const states = new Set<string>();
+
+    // create a dict with [state][county] = GeoLocation    
+    type LocationDict = {
+        [state: string]: {
+            [county: string]: GeoLocation;
+        };
+    };
+    var locationDict: LocationDict = {}
 
     // get all of the states
+    const states = new Set<string>();
     geoCounties.map((info) => (
         states.add(info.state)
     ))
@@ -77,34 +50,44 @@ export function loadOutbreaks() {
     for (var outbreak of outbreaks) {
         if (locationDict[outbreak.State][outbreak['County Name'].toUpperCase()] === undefined) {
             console.log(outbreak.State+", "+outbreak['County Name'].toUpperCase());
-        }
-        else if (isShowOutbreak(outbreak.Confirmed)) {
+        } else {
             let marker:outMarker = {
-                Confirmed: convertToDate(outbreak.Confirmed),
-                State: outbreak.State,
-                County: outbreak["County Name"],
-                Production: outbreak.Production,
-                EndDate: convertToDate(outbreak.EndDate),
-                NumInfected: Number(outbreak.NumInfected),
-                GeoLoc: locationDict[outbreak.State][outbreak['County Name'].toUpperCase()]
+                year: Number(outbreak.Confirmed.split('-')[0]),
+                week: monthDayToWeek(Number(outbreak.Confirmed.split('-')[1])-1, Number(outbreak.Confirmed.split('-')[2])),
+                GeoLoc: locationDict[outbreak.State][outbreak['County Name'].toUpperCase()],
+                label: outbreak["County Name"]+','+outbreak.State+' @'+outbreak.Confirmed,
+                // label: outbreak["County Name"]+','+outbreak.State+': '+outbreak.NumInfected+','+outbreak.Production
             }
             outbreakMarkers.push(marker);
         }
     }
-    console.log(outbreakMarkers.length)
 }
 
-// create another function that add a marker with a given outbreak info to the map w/ correct lat/long and label
-export function AddOutbreaks() {
-    console.log(outbreakMarkers.length);
+
+function selectedOutbreaks(this_week: number):outMarker[] {
+    // determine which outbreaks occurred within the last NUM_YEARS
+    // and within the same week +/- NUM_WEEKS
+    const markers: outMarker[]=[];
+
+    for (var info of outbreakMarkers) {
+        if ((info.year >= thisYear - NUM_YEARS ) && (Math.abs(info.week-this_week) <= NUM_WEEKS)) {
+            markers.push(info);
+        }
+    }
+    return markers;
+}
+
+// Adds markers with a outbreak info to the map w/ at the correct lat/long
+export function OutbreakMarkers(week: number) {
+    const currentMarkers = selectedOutbreaks(week);
     return (
-        outbreakMarkers.map((info, i) => (
+        currentMarkers.map((info, i) => (
             <Marker
                 position={info.GeoLoc}
                 key = {i}
             >
                 <Popup>
-                    {info.County+','+info.State+': '+info.NumInfected+','+info.Production}
+                    {info.label}
                 </Popup>
             </Marker>
         ))

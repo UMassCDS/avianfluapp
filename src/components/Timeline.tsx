@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Slider } from '@mantine/core';
-import { isMobile } from '../utils/mobile';
+import { isMobile } from '../utils/utils';
 
 // Displays tick marks and labels 
 const marks = [
