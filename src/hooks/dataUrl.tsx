@@ -13,8 +13,8 @@ export var dataInfo: {
     units: 'Birds/km^2',
   },
   {
-    datatype: 'netmovement', 
-    label:'Migration',
+    datatype: 'movement', 
+    label:'Movement',
     units: 'Birds/km/week',
   },
 ];
