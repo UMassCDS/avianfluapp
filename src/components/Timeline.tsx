@@ -5,20 +5,8 @@ import ab_dates from '../assets/abundance_dates.json';
 import mv_dates from '../assets/movement_dates.json';
 
 
-// Displays tick marks and labels 
-const marks = [
-  { value: 1, label: 'Jan' },
-  { value: 5, label: 'Feb' },
-  { value: 9, label: 'Mar' },
-  { value: 13, label: 'Apr' },
-  { value: 18, label: 'May' },
-  { value: 22, label: 'Jun' },
-  { value: 27, label: 'Jul' },
-  { value: 32, label: 'Aug' },
-  { value: 36, label: 'Sep' },
-  { value: 40, label: 'Oct' },
-  { value: 45, label: 'Nov' },
-  { value: 49, label: 'Dec' },
+const months: Array<string> = [
+  'Jan','Feb','Mar','Apr', 'May' ,'Jun','Jul','Aug', 'Sep','Oct','Nov','Dec'
 ];
 
 // Keeps track of the props and prop type going into the component (look up interfaces in TypeScript)
@@ -28,6 +16,11 @@ interface TimelineProps {
   onChangeWeek: (val: number) => void;
 }
 
+interface markProps {
+  value: number;
+  label: string;
+}
+
 /* Creates a custom timeline slider that updates what week number of the year the user is currently on. */
 function Timeline(props: TimelineProps) {
   const { week, onChangeWeek } = props;
@@ -35,18 +28,32 @@ function Timeline(props: TimelineProps) {
   const [weekLabel, setWeekLabel] = useState<string>('');
   const [labelInit, setLabelInit] = useState<boolean>(false);
   const [myLabels, setMyLabels] = useState<Array<Array<string>>>([[],[]]);
+  const [marks, setMarks] = useState<Array<Array<markProps>>>([[],[]]);
 
   useEffect(() => {
     // initialize labels[dataset][week]
     // TODO the order of the labels needs to match the order of datasets in dataUrl.tsx/dataInfo[]
+    let datasets = [ab_dates, mv_dates]
     let local_dates: Array<Array<string>> = [[],[]];
-    ab_dates.map((info) => (
-      local_dates[0].push(info.label)
-    ))
-    mv_dates.map((info) => (
-      local_dates[1].push(info.label)
-    ))
+    for (var i =0; i < datasets.length; i += 1) {
+      datasets[i].map((info) => (
+        local_dates[i].push(info.label)
+      ))
+    }
     setMyLabels(local_dates);
+
+    // initialize which timesteps get a month marker
+    let local_marks:Array<Array<markProps>> =[[],[]]
+    for (var i =0; i < datasets.length; i += 1) {
+      for (var month of months){
+        const result = datasets[i].find(({ label }) => label.includes(month));
+        if (result !== undefined) {
+          const thisMark: markProps = {value: result.index, label: month};
+          local_marks[i].push(thisMark);
+        }
+      }
+    }
+    setMarks(local_marks);
     setLabelInit(true);
   }, []);
 
@@ -77,7 +84,7 @@ function Timeline(props: TimelineProps) {
         defaultValue={week}
         value={week}
         label={weekLabel}
-        marks={marks} // lg screen
+        marks={marks[dataset]} // lg screen
         min={1}
         max={52}
         labelAlwaysOn
