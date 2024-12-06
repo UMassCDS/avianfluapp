@@ -71,10 +71,10 @@ export function loadOutbreaks() {
         if (locationDict[outbreak.State][outbreak['County Name'].toUpperCase()] === undefined) {
             console.log(outbreak.State+", "+outbreak['County Name'].toUpperCase());
         } else {
-            const year = Number(outbreak.Confirmed.split('-')[0]);
+            const outbreak_year = Number(outbreak.Confirmed.split('-')[0]);
             let marker:outMarker = {
-                year: year,
-                yearsAgo: thisYear - year,
+                year: outbreak_year,
+                yearsAgo: thisYear - outbreak_year,
                 week: monthDayToWeek(Number(outbreak.Confirmed.split('-')[1])-1, Number(outbreak.Confirmed.split('-')[2])),
                 geoLoc: locationDict[outbreak.State][outbreak['County Name'].toUpperCase()],
                 label: outbreak["County Name"]+','+outbreak.State+' @'+outbreak.Confirmed,
