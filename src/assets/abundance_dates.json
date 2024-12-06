@@ -1,0 +1,262 @@
+[
+  {
+    "index": 1,
+    "date": "2022-01-04",
+    "label": "Jan 4"
+  },
+  {
+    "index": 2,
+    "date": "2022-01-11",
+    "label": "Jan 11"
+  },
+  {
+    "index": 3,
+    "date": "2022-01-18",
+    "label": "Jan 18"
+  },
+  {
+    "index": 4,
+    "date": "2022-01-25",
+    "label": "Jan 25"
+  },
+  {
+    "index": 5,
+    "date": "2022-02-01",
+    "label": "Feb 1"
+  },
+  {
+    "index": 6,
+    "date": "2022-02-08",
+    "label": "Feb 8"
+  },
+  {
+    "index": 7,
+    "date": "2022-02-15",
+    "label": "Feb 15"
+  },
+  {
+    "index": 8,
+    "date": "2022-02-22",
+    "label": "Feb 22"
+  },
+  {
+    "index": 9,
+    "date": "2022-03-01",
+    "label": "Mar 1"
+  },
+  {
+    "index": 10,
+    "date": "2022-03-08",
+    "label": "Mar 8"
+  },
+  {
+    "index": 11,
+    "date": "2022-03-15",
+    "label": "Mar 15"
+  },
+  {
+    "index": 12,
+    "date": "2022-03-22",
+    "label": "Mar 22"
+  },
+  {
+    "index": 13,
+    "date": "2022-03-29",
+    "label": "Mar 29"
+  },
+  {
+    "index": 14,
+    "date": "2022-04-05",
+    "label": "Apr 5"
+  },
+  {
+    "index": 15,
+    "date": "2022-04-12",
+    "label": "Apr 12"
+  },
+  {
+    "index": 16,
+    "date": "2022-04-19",
+    "label": "Apr 19"
+  },
+  {
+    "index": 17,
+    "date": "2022-04-26",
+    "label": "Apr 26"
+  },
+  {
+    "index": 18,
+    "date": "2022-05-03",
+    "label": "May 3"
+  },
+  {
+    "index": 19,
+    "date": "2022-05-10",
+    "label": "May 10"
+  },
+  {
+    "index": 20,
+    "date": "2022-05-17",
+    "label": "May 17"
+  },
+  {
+    "index": 21,
+    "date": "2022-05-24",
+    "label": "May 24"
+  },
+  {
+    "index": 22,
+    "date": "2022-05-31",
+    "label": "May 31"
+  },
+  {
+    "index": 23,
+    "date": "2022-06-07",
+    "label": "Jun 7"
+  },
+  {
+    "index": 24,
+    "date": "2022-06-14",
+    "label": "Jun 14"
+  },
+  {
+    "index": 25,
+    "date": "2022-06-21",
+    "label": "Jun 21"
+  },
+  {
+    "index": 26,
+    "date": "2022-06-28",
+    "label": "Jun 28"
+  },
+  {
+    "index": 27,
+    "date": "2022-07-05",
+    "label": "Jul 5"
+  },
+  {
+    "index": 28,
+    "date": "2022-07-12",
+    "label": "Jul 12"
+  },
+  {
+    "index": 29,
+    "date": "2022-07-19",
+    "label": "Jul 19"
+  },
+  {
+    "index": 30,
+    "date": "2022-07-26",
+    "label": "Jul 26"
+  },
+  {
+    "index": 31,
+    "date": "2022-08-02",
+    "label": "Aug 2"
+  },
+  {
+    "index": 32,
+    "date": "2022-08-09",
+    "label": "Aug 9"
+  },
+  {
+    "index": 33,
+    "date": "2022-08-16",
+    "label": "Aug 16"
+  },
+  {
+    "index": 34,
+    "date": "2022-08-23",
+    "label": "Aug 23"
+  },
+  {
+    "index": 35,
+    "date": "2022-08-30",
+    "label": "Aug 30"
+  },
+  {
+    "index": 36,
+    "date": "2022-09-06",
+    "label": "Sep 6"
+  },
+  {
+    "index": 37,
+    "date": "2022-09-13",
+    "label": "Sep 13"
+  },
+  {
+    "index": 38,
+    "date": "2022-09-20",
+    "label": "Sep 20"
+  },
+  {
+    "index": 39,
+    "date": "2022-09-27",
+    "label": "Sep 27"
+  },
+  {
+    "index": 40,
+    "date": "2022-10-04",
+    "label": "Oct 4"
+  },
+  {
+    "index": 41,
+    "date": "2022-10-11",
+    "label": "Oct 11"
+  },
+  {
+    "index": 42,
+    "date": "2022-10-18",
+    "label": "Oct 18"
+  },
+  {
+    "index": 43,
+    "date": "2022-10-25",
+    "label": "Oct 25"
+  },
+  {
+    "index": 44,
+    "date": "2022-11-01",
+    "label": "Nov 1"
+  },
+  {
+    "index": 45,
+    "date": "2022-11-08",
+    "label": "Nov 8"
+  },
+  {
+    "index": 46,
+    "date": "2022-11-15",
+    "label": "Nov 15"
+  },
+  {
+    "index": 47,
+    "date": "2022-11-22",
+    "label": "Nov 22"
+  },
+  {
+    "index": 48,
+    "date": "2022-11-29",
+    "label": "Nov 29"
+  },
+  {
+    "index": 49,
+    "date": "2022-12-06",
+    "label": "Dec 6"
+  },
+  {
+    "index": 50,
+    "date": "2022-12-13",
+    "label": "Dec 13"
+  },
+  {
+    "index": 51,
+    "date": "2022-12-20",
+    "label": "Dec 20"
+  },
+  {
+    "index": 52,
+    "date": "2022-12-27",
+    "label": "Dec 27"
+  }
+]

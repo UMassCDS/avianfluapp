@@ -292,7 +292,7 @@ const HomePage = () => {
       {/* Calls the custom legend component with the data type and species type as parameters. */}
       <Legend dataTypeIndex={dataIndex} speciesIndex={speciesIndex} />
       {/* Calls the custom timeline component with the current week onChange function as parameters */}
-      <Timeline week={week} onChangeWeek={checkImageAndUpdate} />
+      <Timeline week={week} dataset={dataIndex} onChangeWeek={checkImageAndUpdate} />
     </div>
   );
 }
