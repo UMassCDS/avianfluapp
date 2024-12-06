@@ -32,7 +32,7 @@ const outbreakMarkers: outMarker[]=[];
 const NUM_YEARS = 3; // number of years back
 const NUM_WEEKS = 2; // number of weeks +/-
 const thisYear = new Date().getFullYear();
-const markerIcons: Icon[] = [
+const markerIcons: (typeof Icon)[] = [
     outbreakIcon(iconOne),
     outbreakIcon(iconTwo),
     outbreakIcon(iconThree),
