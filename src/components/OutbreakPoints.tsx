@@ -1,4 +1,3 @@
-//import { useEffect, useState } from 'react';
 import { Marker, Popup } from 'react-leaflet';
 import { Icon } from 'leaflet';
 import geoCounties from '../assets/counties.json';
@@ -104,10 +103,10 @@ export function OutbreakMarkers(week: number) {
     const currentMarkers = selectedOutbreaks(week);
     return (
         currentMarkers.map((info, i) => (
-            <Marker
+            // @ts-ignore
+            <Marker icon={markerIcons[info.yearsAgo]}
                 position={info.geoLoc}
                 key={i}
-                icon={markerIcons[info.yearsAgo]}
             >
                 <Popup>
                     {info.label}
