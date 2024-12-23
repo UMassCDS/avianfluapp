@@ -2,6 +2,7 @@
 import { MantineProvider } from '@mantine/core';
 import HomePage from './views/Home';
 import About from './views/About';
+import FeedbackForm from './views/Feedback';
 import NotFound from './views/NotFound';
 import '@mantine/core/styles.css';
 import '@mantine/dates/styles.css';
@@ -15,6 +16,7 @@ export function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/about" element={<About />} />
+        <Route path="/feedback" element={<FeedbackForm />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </div>
