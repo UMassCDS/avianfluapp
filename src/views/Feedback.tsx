@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button, Textarea, TextInput } from '@mantine/core';
 import { IconSend } from '@tabler/icons-react';
+import emailjs from 'emailjs-com';
+
 import '../styles/Default.css';
 
 const EMAIL_REGEX = new RegExp(/^[^\s;]+@[^\s;]+\.[^\s;]*$/)
@@ -21,7 +23,14 @@ function FeedbackForm(this: any) {
       alert("Please enter a valid email.");
     } else {
       // TODO when send complete, show message and return to to main page
-      alert("Email a message: "+text)
+      // @ts-ignore
+      let data = {email_addr:{email}, message:{text}}
+      emailjs.send('service_hsqfqjo', 'template_x0c9ck6', data, 'zhDN63ABiSy7PF_7o')
+        .then(() => {
+          alert("Message sent");
+        }, (error) => {
+          alert(error.text);
+        });
       navigate("/")
     }
   }
