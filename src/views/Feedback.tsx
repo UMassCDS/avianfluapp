@@ -11,6 +11,8 @@ const EMAIL_REGEX = new RegExp(/^[^\s;]+@[^\s;]+\.[^\s;]*$/)
 function FeedbackForm(this: any) {
   const [email, setEmail] = useState("");
   const [text, setText] = useState("");
+  const [buttonText, setButtonText] = useState("Submit Feedback");
+  const [buttonDisable, setButtonDisable] = useState(false)
   const navigate = useNavigate();
 
 
@@ -22,16 +24,21 @@ function FeedbackForm(this: any) {
     } else if ((email.length > 0) && !EMAIL_REGEX.test(email)) {
       alert("Please enter a valid email.");
     } else {
-      // TODO when send complete, show message and return to to main page
+      // Disable button while it is sending the email
+      setButtonText("Sending Feedback...");
+      setButtonDisable(true);
       // @ts-ignore
-      let data = {email_addr:{email}, message:{text}}
-      emailjs.send('service_hsqfqjo', 'template_x0c9ck6', data, 'zhDN63ABiSy7PF_7o')
+      let data = {email_addr:email, message:text}
+      //  the send arguments are: service_id, template_id, feedback_info, account_key
+      // after the send is complete, then show the result and go back to the main page.
+      emailjs.send('service_umass2025', 'template_x0c9ck6', data, 'zhDN63ABiSy7PF_7o')
         .then(() => {
-          alert("Message sent");
+          alert("Feedback message sent");
+          navigate("/")
         }, (error) => {
           alert(error.text);
+          navigate("/")
         });
-      navigate("/")
     }
   }
 
@@ -57,8 +64,9 @@ function FeedbackForm(this: any) {
         <Button 
           rightSection={<IconSend size={14}/>} 
           onClick={() => {sendFeedback()}}
+          disabled={buttonDisable}
         >
-          Submit Feedback
+          {buttonText}
         </Button>
 
     </div>
