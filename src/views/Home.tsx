@@ -3,7 +3,7 @@ import { CheckIcon, MantineSize, Radio, Stack, Tooltip } from '@mantine/core';
 import { MapContainer, TileLayer, ImageOverlay } from 'react-leaflet';
 import { forwardRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { IconInfoCircle, IconTestPipe } from '@tabler/icons-react';
+import { IconInfoCircle, IconTestPipe, IconWriting } from '@tabler/icons-react';
 import { Router, Request, Response } from "express";
 import 'leaflet/dist/leaflet.css';
 
@@ -309,11 +309,16 @@ const HomePage = () => {
         <ControlBar/>
       </div>
       <div className="about">
-        <Tooltip label='Leave feedback and suggestions.'>
+        <Tooltip label='Test RestAPI'>
             <ActionIcon style={{margin:12}} size={iconSize} onClick={() => { runTest()}}>
               <IconTestPipe/>
             </ActionIcon>
         </Tooltip> 
+        <Tooltip label='Leave feedback and suggestions.'>
+            <ActionIcon style={{margin:12}} size={iconSize} onClick={() => { navigate("/feedback")}}>
+              <IconWriting/>
+            </ActionIcon>
+        </Tooltip>
         <Tooltip label='About page'>
             <ActionIcon size={iconSize} onClick={() => { navigate("/about")}}>
               <IconInfoCircle/>
