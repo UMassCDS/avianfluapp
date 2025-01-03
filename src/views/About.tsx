@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom';
 import '../styles/Default.css';
 
 
-// PAM REMOVE https://docs.google.com/document/d/1RuisjKy8_Mt5HaA7f5B9jXWjw5Q51rT7q0JsNjZi16g/edit?tab=t.0
 function About(this: any) {
 
     const HowTo = (
@@ -119,8 +118,8 @@ function About(this: any) {
 
     return (
     <div className="DefaultPage">
-        <Link to="/">Return to App</Link>
         <h1 style={{textAlign:"center"}}>Avian Influenza</h1>
+        <Link to="/">Return to App</Link>
         {HowTo}
         {Data}
         {Species}
