@@ -1,5 +1,11 @@
 library(plumber)
 
+#* @filter cors
+cors <- function(res) {
+  res$setHeader("Access-Control-Allow-Origin", "*")
+  plumber::forward()
+}
+
 #* @apiTitle Simple API
 
 #* Echo provided text

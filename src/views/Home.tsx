@@ -4,9 +4,8 @@ import { MapContainer, TileLayer, ImageOverlay } from 'react-leaflet';
 import { forwardRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IconInfoCircle, IconTestPipe, IconWriting } from '@tabler/icons-react';
-import { Router, Request, Response } from "express";
 import 'leaflet/dist/leaflet.css';
-
+import axios from 'axios';
 import { imageURL, getScalingFilename, dataInfo} from '../hooks/dataUrl';
 import taxa from '../assets/taxa.json';
 import Timeline from '../components/Timeline';
@@ -14,6 +13,7 @@ import Legend from '../components/Legend';
 import {OutbreakMarkers, loadOutbreaks} from '../components/OutbreakPoints'
 import {dateToWeek} from '../utils/utils'
 import '../styles/Home.css';
+// const express = require('express');
 
 const MIN_WEEK = 1;   // week indexing in files
 const MAX_WEEK = 52;  // number of weeks in a year
@@ -48,31 +48,24 @@ const HomePage = () => {
   const [fontHeight, setFontHeight] = useState<number>(14);
   const [titleSize, setTitleSize] = useState<number>(40);
 
-  const router = Router();
 
   function runTest() {
     console.log("Pam's test code");
-    const headers: Headers = new Headers()
-    // Add a few headers
-    headers.set('Content-Type', 'application/json')
-    headers.set('Accept', 'application/json')
-    // Add a custom header, which we can use to check
-    headers.set('X-Custom-Header', 'CustomValue')
-
-    // Create the request object, which will be a RequestInfo type. 
-    // Here, we will pass in the URL as well as the options object as parameters.
-    const request: RequestInfo = new Request('http://127.0.0.1:8000/echo', {
-      method: 'GET',
-      headers: headers
-    })
-
-    // For our example, the data is stored on a static `users.json` file
-    fetch(request)
-      .then(res => {
-        console.log("got response:", res)
+    axios.get('http://localhost:8000/echo', {params: {text: "Tiggy Rules"}})
+      .then(function (response) {
+        // handle success
+        console.log(response.data);
       })
+      .catch(function (error) {
+        // handle error
+        console.log(error);
+      })
+      .finally(function () {
+        // always executed
+      }
+    );
   }
-
+  
   function handleWindowSizeChange() {
     if (window.innerWidth <  MIN_REG_WINDOW_WIDTH) {
       // small window
