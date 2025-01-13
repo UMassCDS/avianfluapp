@@ -75,11 +75,13 @@ export function loadOutbreaks() {
             let marker:outMarker = {
                 year: outbreak_year,
                 yearsAgo: thisYear - outbreak_year,
-                week: monthDayToWeek(Number(outbreak.Confirmed.split('-')[1])-1, Number(outbreak.Confirmed.split('-')[2])),
+                week: monthDayToWeek(Number(outbreak.Confirmed.split('-')[1]), Number(outbreak.Confirmed.split('-')[2])),
                 geoLoc: locationDict[outbreak.State][outbreak['County Name'].toUpperCase()],
                 label: outbreak.Confirmed+': '+outbreak.Production+' ('+outbreak.NumInfected+')',
             }
-            outbreakMarkers.push(marker);
+            if (marker.yearsAgo <= 1 ) {   
+                outbreakMarkers.push(marker);
+            }
         }
     }
 }
@@ -94,10 +96,10 @@ function selectedOutbreaks(this_week: number):outMarker[] {
             // this year near the display date
             markers.push(info);
         }
-        else if ((info.yearsAgo === 1)  && (info.week < thisWeek) && (Math.abs(info.week-this_week) < NUM_WEEKS)) {
+        else if ((info.yearsAgo === 1)  && (info.week > thisWeek) && (Math.abs(info.week-this_week) < NUM_WEEKS)) {
             // last year, after today and near displayed day, 
             markers.push(info);
-        }
+        } 
     }
     return markers;
 }
@@ -107,6 +109,7 @@ function selectedOutbreaks(this_week: number):outMarker[] {
 // Note: "week" value is for the currently displayed week. 
 export function OutbreakMarkers(week: number) {
     const currentMarkers = selectedOutbreaks(week);
+    console.log("Current week "+week)
     return (
         currentMarkers.map((info, i) => (
             // @ts-ignore

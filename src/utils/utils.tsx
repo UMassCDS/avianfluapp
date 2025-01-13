@@ -7,6 +7,7 @@ export function isMobile():boolean|undefined {
     return useMediaQuery(`(max-width: ${em(750)})`);
 }
 
+PAM not sure this is right!!!
 export function dateToWeek(thisDate:Date):number {
     const startOfYear = new Date(thisDate.getFullYear(),0,1);
     const diff_dates = thisDate.valueOf()-startOfYear.valueOf()

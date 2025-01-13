@@ -100,6 +100,7 @@ const HomePage = () => {
     // determine current week - find msec between today and beginning fo the year
     const this_week = dateToWeek(new Date())
     loadOutbreaks();
+    console.log("init week to "+this_week);
     checkImageAndUpdate(this_week);
     handleWindowSizeChange();
     document.addEventListener('keydown', handleSelection);

@@ -1,10 +1,1826 @@
 [
   {
+    "Confirmed": "2025-01-10",
+    "State": "SOUTH DAKOTA",
+    "County Name": "Gregory",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "90"
+	},
+  {
+    "Confirmed": "2025-01-09",
+    "State": "DELAWARE",
+    "County Name": "Kent",
+    "Production": "Commercial Broiler Production",
+    "EndDate": "Active",
+    "NumInfected": "194,800"
+	},
+  {
+    "Confirmed": "2025-01-09",
+    "State": "GEORGIA",
+    "County Name": "Clayton",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "10"
+	},
+  {
+    "Confirmed": "2025-01-09",
+    "State": "IDAHO",
+    "County Name": "Canyon",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "50"
+	},
+  {
+    "Confirmed": "2025-01-09",
+    "State": "MICHIGAN",
+    "County Name": "Oakland",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "100"
+	},
+  {
+    "Confirmed": "2025-01-09",
+    "State": "OHIO",
+    "County Name": "Darke",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "Active",
+    "NumInfected": "21,100"
+	},
+  {
+    "Confirmed": "2025-01-09",
+    "State": "OREGON",
+    "County Name": "Union",
+    "Production": "WOAH Poultry",
+    "EndDate": "NA",
+    "NumInfected": "400"
+	},
+  {
+    "Confirmed": "2025-01-09",
+    "State": "TEXAS",
+    "County Name": "Brazoria",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "30"
+	},
+  {
+    "Confirmed": "2025-01-09",
+    "State": "TEXAS",
+    "County Name": "Burnet",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "0"
+	},
+  {
+    "Confirmed": "2025-01-08",
+    "State": "MISSOURI",
+    "County Name": "Perry",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "20"
+	},
+  {
+    "Confirmed": "2025-01-08",
+    "State": "OHIO",
+    "County Name": "Darke",
+    "Production": "Commercial Table Egg Layer",
+    "EndDate": "Active",
+    "NumInfected": "245,300"
+	},
+  {
+    "Confirmed": "2025-01-07",
+    "State": "FLORIDA",
+    "County Name": "Palm Beach",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "4"
+	},
+  {
+    "Confirmed": "2025-01-07",
+    "State": "INDIANA",
+    "County Name": "Jay",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "Active",
+    "NumInfected": "19,900"
+	},
+  {
+    "Confirmed": "2025-01-07",
+    "State": "IOWA",
+    "County Name": "Clinton",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "40"
+	},
+  {
+    "Confirmed": "2025-01-07",
+    "State": "NORTH CAROLINA",
+    "County Name": "Hyde",
+    "Production": "Commercial Table Egg Layer",
+    "EndDate": "Active",
+    "NumInfected": "3,314,900"
+	},
+  {
+    "Confirmed": "2025-01-07",
+    "State": "SOUTH DAKOTA",
+    "County Name": "Hanson",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "0"
+	},
+  {
+    "Confirmed": "2025-01-06",
+    "State": "MINNESOTA",
+    "County Name": "Olmsted",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "120"
+	},
+  {
+    "Confirmed": "2025-01-04",
+    "State": "DELAWARE",
+    "County Name": "Kent",
+    "Production": "Commercial Broiler Production",
+    "EndDate": "Active",
+    "NumInfected": "125,000"
+	},
+  {
+    "Confirmed": "2025-01-04",
+    "State": "MICHIGAN",
+    "County Name": "Ottawa",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "Active",
+    "NumInfected": "47,000"
+	},
+  {
+    "Confirmed": "2025-01-04",
+    "State": "MICHIGAN",
+    "County Name": "Ottawa",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "Active",
+    "NumInfected": "55,200"
+	},
+  {
+    "Confirmed": "2025-01-03",
+    "State": "ARKANSAS",
+    "County Name": "Sharp",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "20"
+	},
+  {
+    "Confirmed": "2025-01-03",
+    "State": "CALIFORNIA",
+    "County Name": "Butte",
+    "Production": "Commercial Raised for Release Upland Game Bird",
+    "EndDate": "Active",
+    "NumInfected": "44,700"
+	},
+  {
+    "Confirmed": "2025-01-03",
+    "State": "CALIFORNIA",
+    "County Name": "Stanislaus",
+    "Production": "Commercial Broiler Production",
+    "EndDate": "Active",
+    "NumInfected": "0"
+	},
+  {
+    "Confirmed": "2025-01-03",
+    "State": "IDAHO",
+    "County Name": "Canyon",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "20"
+	},
+  {
+    "Confirmed": "2025-01-03",
+    "State": "IDAHO",
+    "County Name": "Canyon",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "20"
+	},
+  {
+    "Confirmed": "2025-01-03",
+    "State": "IDAHO",
+    "County Name": "Canyon",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "70"
+	},
+  {
+    "Confirmed": "2025-01-03",
+    "State": "IDAHO",
+    "County Name": "Canyon",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "20"
+	},
+  {
+    "Confirmed": "2025-01-03",
+    "State": "WEST VIRGINIA",
+    "County Name": "Pocahontas",
+    "Production": "WOAH Poultry",
+    "EndDate": "Active",
+    "NumInfected": "9"
+	},
+  {
+    "Confirmed": "2025-01-02",
+    "State": "CALIFORNIA",
+    "County Name": "Stanislaus",
+    "Production": "Commercial Table Egg Layer",
+    "EndDate": "Active",
+    "NumInfected": "75,200"
+	},
+  {
+    "Confirmed": "2024-12-31",
+    "State": "CALIFORNIA",
+    "County Name": "Butte",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "70"
+	},
+  {
+    "Confirmed": "2024-12-31",
+    "State": "CALIFORNIA",
+    "County Name": "Riverside",
+    "Production": "Commercial Table Egg Layer",
+    "EndDate": "Active",
+    "NumInfected": "181,300"
+	},
+  {
+    "Confirmed": "2024-12-31",
+    "State": "MICHIGAN",
+    "County Name": "Jackson",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "9"
+	},
+  {
+    "Confirmed": "2024-12-31",
+    "State": "MICHIGAN",
+    "County Name": "Ottawa",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "Active",
+    "NumInfected": "23,600"
+	},
+  {
+    "Confirmed": "2024-12-31",
+    "State": "MICHIGAN",
+    "County Name": "Ottawa",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "Active",
+    "NumInfected": "29,600"
+	},
+  {
+    "Confirmed": "2024-12-31",
+    "State": "SOUTH CAROLINA",
+    "County Name": "Spartanburg",
+    "Production": "Commercial Upland Gamebird Producer",
+    "EndDate": "NA",
+    "NumInfected": "490"
+	},
+  {
+    "Confirmed": "2024-12-31",
+    "State": "SOUTH DAKOTA",
+    "County Name": "Miner",
+    "Production": "WOAH Poultry",
+    "EndDate": "Active",
+    "NumInfected": "1,500"
+	},
+  {
+    "Confirmed": "2024-12-30",
+    "State": "ARKANSAS",
+    "County Name": "Clay",
+    "Production": "Commercial Broiler Production",
+    "EndDate": "Active",
+    "NumInfected": "227,500"
+	},
+  {
+    "Confirmed": "2024-12-30",
+    "State": "IDAHO",
+    "County Name": "Twin Falls",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "30"
+	},
+  {
+    "Confirmed": "2024-12-30",
+    "State": "MISSISSIPPI",
+    "County Name": "Copiah",
+    "Production": "Commercial Broiler Production",
+    "EndDate": "Active",
+    "NumInfected": "210,000"
+	},
+  {
+    "Confirmed": "2024-12-30",
+    "State": "NEBRASKA",
+    "County Name": "Johnson",
+    "Production": "Commercial Broiler Production",
+    "EndDate": "Active",
+    "NumInfected": "217,600"
+	},
+  {
+    "Confirmed": "2024-12-30",
+    "State": "TENNESSEE",
+    "County Name": "Tipton",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "10"
+	},
+  {
+    "Confirmed": "2024-12-27",
+    "State": "CALIFORNIA",
+    "County Name": "Sacramento",
+    "Production": "Commercial Broiler Production",
+    "EndDate": "Active",
+    "NumInfected": "153,800"
+	},
+  {
+    "Confirmed": "2024-12-27",
+    "State": "CALIFORNIA",
+    "County Name": "Stanislaus",
+    "Production": "Commercial Broiler Production",
+    "EndDate": "Active",
+    "NumInfected": "101,700"
+	},
+  {
+    "Confirmed": "2024-12-27",
+    "State": "KANSAS",
+    "County Name": "Anderson",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "40"
+	},
+  {
+    "Confirmed": "2024-12-27",
+    "State": "KANSAS",
+    "County Name": "Coffey",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "50"
+	},
+  {
+    "Confirmed": "2024-12-27",
+    "State": "MICHIGAN",
+    "County Name": "Ottawa",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "Active",
+    "NumInfected": "113,200"
+	},
+  {
+    "Confirmed": "2024-12-27",
+    "State": "MISSOURI",
+    "County Name": "Cooper",
+    "Production": "Commercial Turkey Breeder Hens",
+    "EndDate": "Active",
+    "NumInfected": "14,900"
+	},
+  {
+    "Confirmed": "2024-12-27",
+    "State": "MISSOURI",
+    "County Name": "Pemiscot",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "70"
+	},
+  {
+    "Confirmed": "2024-12-27",
+    "State": "OHIO",
+    "County Name": "Darke",
+    "Production": "Commercial Table Egg Layer",
+    "EndDate": "Active",
+    "NumInfected": "931,300"
+	},
+  {
+    "Confirmed": "2024-12-27",
+    "State": "WISCONSIN",
+    "County Name": "Burnett",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "Active",
+    "NumInfected": "18,600"
+	},
+  {
+    "Confirmed": "2024-12-27",
+    "State": "WYOMING",
+    "County Name": "Sheridan",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "0"
+	},
+  {
+    "Confirmed": "2024-12-26",
+    "State": "KANSAS",
+    "County Name": "Phillips",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "10"
+	},
+  {
+    "Confirmed": "2024-12-24",
+    "State": "CALIFORNIA",
+    "County Name": "Riverside",
+    "Production": "Commercial Table Egg Layer",
+    "EndDate": "Active",
+    "NumInfected": "1,105,500"
+	},
+  {
+    "Confirmed": "2024-12-24",
+    "State": "CALIFORNIA",
+    "County Name": "San Joaquin",
+    "Production": "Commercial Table Egg Layer",
+    "EndDate": "Active",
+    "NumInfected": "627,800"
+	},
+  {
+    "Confirmed": "2024-12-24",
+    "State": "CALIFORNIA",
+    "County Name": "Stanislaus",
+    "Production": "Commercial Table Egg Layer",
+    "EndDate": "Active",
+    "NumInfected": "392,100"
+	},
+  {
+    "Confirmed": "2024-12-24",
+    "State": "MISSOURI",
+    "County Name": "Cass",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "60"
+	},
+  {
+    "Confirmed": "2024-12-24",
+    "State": "MISSOURI",
+    "County Name": "Dade",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "90"
+	},
+  {
+    "Confirmed": "2024-12-24",
+    "State": "OKLAHOMA",
+    "County Name": "Adair",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "Active",
+    "NumInfected": "45,000"
+	},
+  {
+    "Confirmed": "2024-12-24",
+    "State": "OKLAHOMA",
+    "County Name": "Adair",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "Active",
+    "NumInfected": "85,000"
+	},
+  {
+    "Confirmed": "2024-12-24",
+    "State": "VERMONT",
+    "County Name": "Franklin",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "20"
+	},
+  {
+    "Confirmed": "2024-12-23",
+    "State": "CALIFORNIA",
+    "County Name": "El Dorado",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "30"
+	},
+  {
+    "Confirmed": "2024-12-23",
+    "State": "ILLINOIS",
+    "County Name": "Lawrence",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "Active",
+    "NumInfected": "40,300"
+	},
+  {
+    "Confirmed": "2024-12-23",
+    "State": "MICHIGAN",
+    "County Name": "Ottawa",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "Active",
+    "NumInfected": "75,500"
+	},
+  {
+    "Confirmed": "2024-12-20",
+    "State": "ARKANSAS",
+    "County Name": "Craighead",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "50"
+	},
+  {
+    "Confirmed": "2024-12-20",
+    "State": "KANSAS",
+    "County Name": "Sedgwick",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "30"
+	},
+  {
+    "Confirmed": "2024-12-20",
+    "State": "MINNESOTA",
+    "County Name": "Chippewa",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "2025-01-10",
+    "NumInfected": "54,800"
+	},
+  {
+    "Confirmed": "2024-12-20",
+    "State": "MINNESOTA",
+    "County Name": "Houston",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "60"
+	},
+  {
+    "Confirmed": "2024-12-20",
+    "State": "MISSISSIPPI",
+    "County Name": "Greene",
+    "Production": "Commercial Broiler Breeder",
+    "EndDate": "Active",
+    "NumInfected": "26,000"
+	},
+  {
+    "Confirmed": "2024-12-20",
+    "State": "MISSOURI",
+    "County Name": "Cooper",
+    "Production": "Commercial Turkey Breeder Hens",
+    "EndDate": "Active",
+    "NumInfected": "13,000"
+	},
+  {
+    "Confirmed": "2024-12-19",
+    "State": "ALABAMA",
+    "County Name": "Cullman",
+    "Production": "Commercial Broiler Production",
+    "EndDate": "2025-01-01",
+    "NumInfected": "116,000"
+	},
+  {
+    "Confirmed": "2024-12-19",
+    "State": "ALABAMA",
+    "County Name": "Pickens",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "50"
+	},
+  {
+    "Confirmed": "2024-12-19",
+    "State": "ARKANSAS",
+    "County Name": "Jackson",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "230"
+	},
+  {
+    "Confirmed": "2024-12-19",
+    "State": "CALIFORNIA",
+    "County Name": "Stanislaus",
+    "Production": "Commercial Table Egg Layer",
+    "EndDate": "Active",
+    "NumInfected": "295,800"
+	},
+  {
+    "Confirmed": "2024-12-19",
+    "State": "MINNESOTA",
+    "County Name": "Fillmore",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "Active",
+    "NumInfected": "28,600"
+	},
+  {
+    "Confirmed": "2024-12-19",
+    "State": "MINNESOTA",
+    "County Name": "Stearns",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "2025-01-02",
+    "NumInfected": "12,600"
+	},
+  {
+    "Confirmed": "2024-12-19",
+    "State": "OHIO",
+    "County Name": "Greene",
+    "Production": "WOAH Poultry",
+    "EndDate": "2025-01-04",
+    "NumInfected": "110"
+	},
+  {
+    "Confirmed": "2024-12-19",
+    "State": "OREGON",
+    "County Name": "Coos",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "40"
+	},
+  {
+    "Confirmed": "2024-12-19",
+    "State": "OREGON",
+    "County Name": "Deschutes",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "90"
+	},
+  {
+    "Confirmed": "2024-12-19",
+    "State": "WISCONSIN",
+    "County Name": "Kenosha",
+    "Production": "WOAH Poultry",
+    "EndDate": "2025-01-06",
+    "NumInfected": "6"
+	},
+  {
+    "Confirmed": "2024-12-18",
+    "State": "KANSAS",
+    "County Name": "Doniphan",
+    "Production": "Commercial Raised for Release Upland Game Bird",
+    "EndDate": "Active",
+    "NumInfected": "5,700"
+	},
+  {
+    "Confirmed": "2024-12-18",
+    "State": "KANSAS",
+    "County Name": "Rooks",
+    "Production": "Commercial Raised for Release Upland Game Bird",
+    "EndDate": "Active",
+    "NumInfected": "5,300"
+	},
+  {
+    "Confirmed": "2024-12-18",
+    "State": "LOUISIANA",
+    "County Name": "Jefferson Davis",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "30"
+	},
+  {
+    "Confirmed": "2024-12-18",
+    "State": "MISSOURI",
+    "County Name": "Howard",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "60"
+	},
+  {
+    "Confirmed": "2024-12-18",
+    "State": "NORTH DAKOTA",
+    "County Name": "Nelson",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "60"
+	},
+  {
+    "Confirmed": "2024-12-17",
+    "State": "CALIFORNIA",
+    "County Name": "Stanislaus",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "Active",
+    "NumInfected": "33,100"
+	},
+  {
+    "Confirmed": "2024-12-17",
+    "State": "IDAHO",
+    "County Name": "Lemhi",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "20"
+	},
+  {
+    "Confirmed": "2024-12-17",
+    "State": "IDAHO",
+    "County Name": "Lemhi",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "150"
+	},
+  {
+    "Confirmed": "2024-12-17",
+    "State": "IOWA",
+    "County Name": "Monona",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "30"
+	},
+  {
+    "Confirmed": "2024-12-17",
+    "State": "IOWA",
+    "County Name": "O'brien",
+    "Production": "Commercial Table Egg Layer",
+    "EndDate": "2025-01-06",
+    "NumInfected": "351,400"
+	},
+  {
+    "Confirmed": "2024-12-17",
+    "State": "IOWA",
+    "County Name": "Sioux",
+    "Production": "Commercial Table Egg Layer",
+    "EndDate": "Active",
+    "NumInfected": "428,600"
+	},
+  {
+    "Confirmed": "2024-12-17",
+    "State": "IOWA",
+    "County Name": "Worth",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "Active",
+    "NumInfected": "19,500"
+	},
+  {
+    "Confirmed": "2024-12-17",
+    "State": "NEBRASKA",
+    "County Name": "Lancaster",
+    "Production": "WOAH Poultry",
+    "EndDate": "2024-12-31",
+    "NumInfected": "290"
+	},
+  {
+    "Confirmed": "2024-12-17",
+    "State": "SOUTH DAKOTA",
+    "County Name": "Bon Homme",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "2025-01-09",
+    "NumInfected": "48,700"
+	},
+  {
+    "Confirmed": "2024-12-17",
+    "State": "SOUTH DAKOTA",
+    "County Name": "Charles Mix",
+    "Production": "WOAH Poultry",
+    "EndDate": "Active",
+    "NumInfected": "1,800"
+	},
+  {
+    "Confirmed": "2024-12-17",
+    "State": "SOUTH DAKOTA",
+    "County Name": "Charles Mix",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "2025-01-09",
+    "NumInfected": "76,600"
+	},
+  {
+    "Confirmed": "2024-12-16",
+    "State": "CALIFORNIA",
+    "County Name": "Merced",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "Active",
+    "NumInfected": "53,100"
+	},
+  {
+    "Confirmed": "2024-12-16",
+    "State": "CALIFORNIA",
+    "County Name": "Merced",
+    "Production": "Commercial Table Egg Pullets",
+    "EndDate": "Active",
+    "NumInfected": "424,700"
+	},
+  {
+    "Confirmed": "2024-12-16",
+    "State": "NEBRASKA",
+    "County Name": "Sarpy",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "30"
+	},
+  {
+    "Confirmed": "2024-12-14",
+    "State": "CALIFORNIA",
+    "County Name": "Merced",
+    "Production": "Commercial Duck Meat Bird",
+    "EndDate": "Active",
+    "NumInfected": "119,000"
+	},
+  {
+    "Confirmed": "2024-12-14",
+    "State": "CALIFORNIA",
+    "County Name": "Monterey",
+    "Production": "Commercial Duck Breeder",
+    "EndDate": "2024-12-28",
+    "NumInfected": "13,700"
+	},
+  {
+    "Confirmed": "2024-12-14",
+    "State": "CALIFORNIA",
+    "County Name": "Tulare",
+    "Production": "Commercial Duck Meat Bird",
+    "EndDate": "2024-12-29",
+    "NumInfected": "41,100"
+	},
+  {
+    "Confirmed": "2024-12-14",
+    "State": "LOUISIANA",
+    "County Name": "Bossier",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "40"
+	},
+  {
+    "Confirmed": "2024-12-13",
+    "State": "CALIFORNIA",
+    "County Name": "Tulare",
+    "Production": "Commercial Broiler Production",
+    "EndDate": "Active",
+    "NumInfected": "514,500"
+	},
+  {
+    "Confirmed": "2024-12-13",
+    "State": "ILLINOIS",
+    "County Name": "Livingston",
+    "Production": "Commercial Turkey Breeder Hens",
+    "EndDate": "Active",
+    "NumInfected": "40,900"
+	},
+  {
+    "Confirmed": "2024-12-13",
+    "State": "WISCONSIN",
+    "County Name": "Barron",
+    "Production": "Commercial Turkey Breeder Hens",
+    "EndDate": "2025-01-02",
+    "NumInfected": "13,200"
+	},
+  {
+    "Confirmed": "2024-12-12",
+    "State": "ARKANSAS",
+    "County Name": "Craighead",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "10"
+	},
+  {
+    "Confirmed": "2024-12-12",
+    "State": "ARKANSAS",
+    "County Name": "Pope",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "40"
+	},
+  {
+    "Confirmed": "2024-12-12",
+    "State": "IOWA",
+    "County Name": "Sac",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "2025-01-07",
+    "NumInfected": "45,200"
+	},
+  {
+    "Confirmed": "2024-12-12",
+    "State": "SOUTH DAKOTA",
+    "County Name": "Kingsbury",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "2024-12-26",
+    "NumInfected": "39,300"
+	},
+  {
+    "Confirmed": "2024-12-11",
+    "State": "IOWA",
+    "County Name": "Palo Alto",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "2024-12-30",
+    "NumInfected": "31,100"
+	},
+  {
+    "Confirmed": "2024-12-11",
+    "State": "IOWA",
+    "County Name": "Sioux",
+    "Production": "Commercial Table Egg Layer",
+    "EndDate": "2025-01-03",
+    "NumInfected": "1,575,700"
+	},
+  {
+    "Confirmed": "2024-12-11",
+    "State": "NEBRASKA",
+    "County Name": "Dodge",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "10"
+	},
+  {
+    "Confirmed": "2024-12-11",
+    "State": "OKLAHOMA",
+    "County Name": "Adair",
+    "Production": "WOAH Poultry",
+    "EndDate": "2025-01-08",
+    "NumInfected": "40,000"
+	},
+  {
+    "Confirmed": "2024-12-11",
+    "State": "SOUTH DAKOTA",
+    "County Name": "Brule",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "2024-12-31",
+    "NumInfected": "50,900"
+	},
+  {
+    "Confirmed": "2024-12-10",
+    "State": "CALIFORNIA",
+    "County Name": "Stanislaus",
+    "Production": "Commercial Duck Breeder",
+    "EndDate": "Active",
+    "NumInfected": "81,800"
+	},
+  {
+    "Confirmed": "2024-12-10",
+    "State": "CALIFORNIA",
+    "County Name": "Tulare",
+    "Production": "Commercial Broiler Production",
+    "EndDate": "Active",
+    "NumInfected": "330,200"
+	},
+  {
+    "Confirmed": "2024-12-10",
+    "State": "COLORADO",
+    "County Name": "La Plata",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "20"
+	},
+  {
+    "Confirmed": "2024-12-10",
+    "State": "IDAHO",
+    "County Name": "Franklin",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "40"
+	},
+  {
+    "Confirmed": "2024-12-10",
+    "State": "IDAHO",
+    "County Name": "Jefferson",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "60"
+	},
+  {
+    "Confirmed": "2024-12-10",
+    "State": "KANSAS",
+    "County Name": "Jewell",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "40"
+	},
+  {
+    "Confirmed": "2024-12-10",
+    "State": "MISSOURI",
+    "County Name": "Cedar",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "20"
+	},
+  {
+    "Confirmed": "2024-12-10",
+    "State": "MISSOURI",
+    "County Name": "Daviess",
+    "Production": "WOAH Poultry",
+    "EndDate": "2024-12-26",
+    "NumInfected": "19,900"
+	},
+  {
+    "Confirmed": "2024-12-10",
+    "State": "SOUTH DAKOTA",
+    "County Name": "Beadle",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "2024-12-29",
+    "NumInfected": "52,200"
+	},
+  {
+    "Confirmed": "2024-12-10",
+    "State": "SOUTH DAKOTA",
+    "County Name": "Charles Mix",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "2024-12-24",
+    "NumInfected": "32,400"
+	},
+  {
+    "Confirmed": "2024-12-10",
+    "State": "SOUTH DAKOTA",
+    "County Name": "Moody",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "2024-12-26",
+    "NumInfected": "46,700"
+	},
+  {
+    "Confirmed": "2024-12-09",
+    "State": "ARKANSAS",
+    "County Name": "Lafayette",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "40"
+	},
+  {
+    "Confirmed": "2024-12-09",
+    "State": "CALIFORNIA",
+    "County Name": "Kern",
+    "Production": "WOAH Poultry",
+    "EndDate": "Active",
+    "NumInfected": "45,400"
+	},
+  {
+    "Confirmed": "2024-12-09",
+    "State": "SOUTH DAKOTA",
+    "County Name": "Beadle",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "2024-12-23",
+    "NumInfected": "50,900"
+	},
+  {
+    "Confirmed": "2024-12-09",
+    "State": "SOUTH DAKOTA",
+    "County Name": "Hutchinson",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "2024-12-22",
+    "NumInfected": "42,800"
+	},
+  {
+    "Confirmed": "2024-12-06",
+    "State": "CALIFORNIA",
+    "County Name": "Stanislaus",
+    "Production": "WOAH Poultry",
+    "EndDate": "Active",
+    "NumInfected": "44,100"
+	},
+  {
+    "Confirmed": "2024-12-06",
+    "State": "COLORADO",
+    "County Name": "Pitkin",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "50"
+	},
+  {
+    "Confirmed": "2024-12-06",
+    "State": "IOWA",
+    "County Name": "Sioux",
+    "Production": "Commercial Table Egg Layer",
+    "EndDate": "2025-01-07",
+    "NumInfected": "4,200,000"
+	},
+  {
+    "Confirmed": "2024-12-06",
+    "State": "NEBRASKA",
+    "County Name": "Nemaha",
+    "Production": "Commercial Turkey Breeder Hens",
+    "EndDate": "2024-12-31",
+    "NumInfected": "12,400"
+	},
+  {
+    "Confirmed": "2024-12-06",
+    "State": "WYOMING",
+    "County Name": "Washakie",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "20"
+	},
+  {
+    "Confirmed": "2024-12-05",
+    "State": "CALIFORNIA",
+    "County Name": "Merced",
+    "Production": "Commercial Table Egg Layer",
+    "EndDate": "Active",
+    "NumInfected": "1,723,800"
+	},
+  {
+    "Confirmed": "2024-12-05",
+    "State": "CALIFORNIA",
+    "County Name": "Merced",
+    "Production": "Commercial Table Egg Layer",
+    "EndDate": "Active",
+    "NumInfected": "793,700"
+	},
+  {
+    "Confirmed": "2024-12-05",
+    "State": "CALIFORNIA",
+    "County Name": "Merced",
+    "Production": "Commercial Table Egg Layer",
+    "EndDate": "Active",
+    "NumInfected": "306,100"
+	},
+  {
+    "Confirmed": "2024-12-05",
+    "State": "CALIFORNIA",
+    "County Name": "San Joaquin",
+    "Production": "Commercial Duck Meat Bird",
+    "EndDate": "2025-01-12",
+    "NumInfected": "13,000"
+	},
+  {
+    "Confirmed": "2024-12-04",
+    "State": "CALIFORNIA",
+    "County Name": "Riverside",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "70"
+	},
+  {
+    "Confirmed": "2024-12-04",
+    "State": "CALIFORNIA",
+    "County Name": "Sacramento",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "2024-12-28",
+    "NumInfected": "61,200"
+	},
+  {
+    "Confirmed": "2024-12-04",
+    "State": "CALIFORNIA",
+    "County Name": "Stanislaus",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "2025-01-01",
+    "NumInfected": "23,100"
+	},
+  {
+    "Confirmed": "2024-12-04",
+    "State": "CALIFORNIA",
+    "County Name": "Stanislaus",
+    "Production": "Commercial Table Egg Layer",
+    "EndDate": "Active",
+    "NumInfected": "720,800"
+	},
+  {
+    "Confirmed": "2024-12-04",
+    "State": "CALIFORNIA",
+    "County Name": "Stanislaus",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "Active",
+    "NumInfected": "57,700"
+	},
+  {
+    "Confirmed": "2024-12-04",
+    "State": "SOUTH DAKOTA",
+    "County Name": "Charles Mix",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "2024-12-23",
+    "NumInfected": "65,200"
+	},
+  {
+    "Confirmed": "2024-12-03",
+    "State": "CALIFORNIA",
+    "County Name": "Fresno",
+    "Production": "Commercial Broiler Production",
+    "EndDate": "2024-12-29",
+    "NumInfected": "237,100"
+	},
+  {
+    "Confirmed": "2024-12-03",
+    "State": "KANSAS",
+    "County Name": "Douglas",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "100"
+	},
+  {
+    "Confirmed": "2024-12-03",
+    "State": "OKLAHOMA",
+    "County Name": "Adair",
+    "Production": "Commercial Broiler Breeder",
+    "EndDate": "2025-01-08",
+    "NumInfected": "51,600"
+	},
+  {
+    "Confirmed": "2024-12-03",
+    "State": "SOUTH DAKOTA",
+    "County Name": "Mcpherson",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "2025-01-07",
+    "NumInfected": "78,200"
+	},
+  {
+    "Confirmed": "2024-12-03",
+    "State": "SOUTH DAKOTA",
+    "County Name": "Spink",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "2025-01-07",
+    "NumInfected": "41,400"
+	},
+  {
+    "Confirmed": "2024-12-03",
+    "State": "UTAH",
+    "County Name": "Utah",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "30"
+	},
+  {
+    "Confirmed": "2024-12-02",
+    "State": "NORTH DAKOTA",
+    "County Name": "Bottineau",
+    "Production": "WOAH Poultry",
+    "EndDate": "Active",
+    "NumInfected": "30"
+	},
+  {
+    "Confirmed": "2024-11-29",
+    "State": "CALIFORNIA",
+    "County Name": "Fresno",
+    "Production": "Commercial Duck Breeder",
+    "EndDate": "2024-12-29",
+    "NumInfected": "23,100"
+	},
+  {
+    "Confirmed": "2024-11-29",
+    "State": "CALIFORNIA",
+    "County Name": "Fresno",
+    "Production": "Commercial Broiler Production",
+    "EndDate": "2025-01-01",
+    "NumInfected": "266,400"
+	},
+  {
+    "Confirmed": "2024-11-29",
+    "State": "CALIFORNIA",
+    "County Name": "Merced",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "2024-12-22",
+    "NumInfected": "25,200"
+	},
+  {
+    "Confirmed": "2024-11-29",
+    "State": "CALIFORNIA",
+    "County Name": "Tulare",
+    "Production": "Commercial Duck Breeder",
+    "EndDate": "2025-01-04",
+    "NumInfected": "26,500"
+	},
+  {
+    "Confirmed": "2024-11-29",
+    "State": "MINNESOTA",
+    "County Name": "Meeker",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "2024-12-26",
+    "NumInfected": "223,800"
+	},
+  {
+    "Confirmed": "2024-11-29",
+    "State": "TENNESSEE",
+    "County Name": "Gibson",
+    "Production": "Commercial Broiler Breeder",
+    "EndDate": "2024-12-21",
+    "NumInfected": "37,700"
+	},
+  {
+    "Confirmed": "2024-11-27",
+    "State": "MINNESOTA",
+    "County Name": "Meeker",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "2024-12-19",
+    "NumInfected": "24,700"
+	},
+  {
+    "Confirmed": "2024-11-27",
+    "State": "NORTH DAKOTA",
+    "County Name": "Ransom",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "Active",
+    "NumInfected": "59,500"
+	},
+  {
+    "Confirmed": "2024-11-27",
+    "State": "OREGON",
+    "County Name": "Union",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "30"
+	},
+  {
+    "Confirmed": "2024-11-27",
+    "State": "SOUTH DAKOTA",
+    "County Name": "Beadle",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "2024-12-18",
+    "NumInfected": "41,100"
+	},
+  {
+    "Confirmed": "2024-11-27",
+    "State": "SOUTH DAKOTA",
+    "County Name": "Faulk",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "2024-12-19",
+    "NumInfected": "56,000"
+	},
+  {
+    "Confirmed": "2024-11-27",
+    "State": "UTAH",
+    "County Name": "Sanpete",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "2024-12-23",
+    "NumInfected": "51,800"
+	},
+  {
+    "Confirmed": "2024-11-26",
+    "State": "ALASKA",
+    "County Name": "Matanuska Susitna",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "70"
+	},
+  {
+    "Confirmed": "2024-11-25",
+    "State": "MINNESOTA",
+    "County Name": "Meeker",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "2024-12-18",
+    "NumInfected": "30,500"
+	},
+  {
+    "Confirmed": "2024-11-22",
+    "State": "CALIFORNIA",
+    "County Name": "Merced",
+    "Production": "Commercial Table Egg Pullets",
+    "EndDate": "2025-01-04",
+    "NumInfected": "538,600"
+	},
+  {
+    "Confirmed": "2024-11-22",
+    "State": "NORTH DAKOTA",
+    "County Name": "Mchenry",
+    "Production": "WOAH Poultry",
+    "EndDate": "Active",
+    "NumInfected": "80"
+	},
+  {
+    "Confirmed": "2024-11-21",
+    "State": "ARIZONA",
+    "County Name": "Maricopa",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "490"
+	},
+  {
+    "Confirmed": "2024-11-21",
+    "State": "CALIFORNIA",
+    "County Name": "Madera",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "0"
+	},
+  {
+    "Confirmed": "2024-11-21",
+    "State": "CALIFORNIA",
+    "County Name": "Tulare",
+    "Production": "Commercial Duck Meat Bird",
+    "EndDate": "2025-01-03",
+    "NumInfected": "96,900"
+	},
+  {
+    "Confirmed": "2024-11-21",
+    "State": "IDAHO",
+    "County Name": "Lemhi",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "20"
+	},
+  {
+    "Confirmed": "2024-11-21",
+    "State": "OKLAHOMA",
+    "County Name": "Roger Mills",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "0"
+	},
+  {
+    "Confirmed": "2024-11-21",
+    "State": "UTAH",
+    "County Name": "Piute",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "2024-12-28",
+    "NumInfected": "35,500"
+	},
+  {
+    "Confirmed": "2024-11-21",
+    "State": "UTAH",
+    "County Name": "Salt Lake",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "30"
+	},
+  {
+    "Confirmed": "2024-11-20",
+    "State": "ALASKA",
+    "County Name": "Matanuska Susitna",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "40"
+	},
+  {
+    "Confirmed": "2024-11-20",
+    "State": "CALIFORNIA",
+    "County Name": "Kern",
+    "Production": "Commercial Table Egg Layer",
+    "EndDate": "Active",
+    "NumInfected": "1,022,400"
+	},
+  {
+    "Confirmed": "2024-11-20",
+    "State": "CALIFORNIA",
+    "County Name": "Marin",
+    "Production": "Commercial Duck Meat Bird",
+    "EndDate": "Active",
+    "NumInfected": "6,500"
+	},
+  {
+    "Confirmed": "2024-11-19",
+    "State": "CALIFORNIA",
+    "County Name": "Fresno",
+    "Production": "Commercial Broiler Production",
+    "EndDate": "2024-12-29",
+    "NumInfected": "172,800"
+	},
+  {
+    "Confirmed": "2024-11-19",
+    "State": "CALIFORNIA",
+    "County Name": "Merced",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "2025-01-04",
+    "NumInfected": "38,200"
+	},
+  {
+    "Confirmed": "2024-11-19",
+    "State": "ILLINOIS",
+    "County Name": "Henry",
+    "Production": "WOAH Poultry",
+    "EndDate": "2025-01-03",
+    "NumInfected": "5,600"
+	},
+  {
+    "Confirmed": "2024-11-19",
+    "State": "SOUTH DAKOTA",
+    "County Name": "Lake",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "20"
+	},
+  {
+    "Confirmed": "2024-11-19",
+    "State": "WASHINGTON",
+    "County Name": "Whatcom",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "40"
+	},
+  {
+    "Confirmed": "2024-11-18",
+    "State": "HAWAII",
+    "County Name": "Honolulu",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "9"
+	},
+  {
+    "Confirmed": "2024-11-18",
+    "State": "MINNESOTA",
+    "County Name": "Martin",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "40"
+	},
+  {
+    "Confirmed": "2024-11-18",
+    "State": "MINNESOTA",
+    "County Name": "Martin",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "30"
+	},
+  {
+    "Confirmed": "2024-11-15",
+    "State": "CALIFORNIA",
+    "County Name": "Stanislaus",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "2024-12-03",
+    "NumInfected": "21,500"
+	},
+  {
+    "Confirmed": "2024-11-15",
+    "State": "HAWAII",
+    "County Name": "Honolulu",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "70"
+	},
+  {
+    "Confirmed": "2024-11-15",
+    "State": "UTAH",
+    "County Name": "Piute",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "2024-12-25",
+    "NumInfected": "35,000"
+	},
+  {
+    "Confirmed": "2024-11-14",
+    "State": "CALIFORNIA",
+    "County Name": "Fresno",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "2024-12-17",
+    "NumInfected": "17,700"
+	},
+  {
+    "Confirmed": "2024-11-14",
+    "State": "CALIFORNIA",
+    "County Name": "Fresno",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "2024-12-17",
+    "NumInfected": "17,500"
+	},
+  {
+    "Confirmed": "2024-11-14",
+    "State": "CALIFORNIA",
+    "County Name": "Fresno",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "2024-12-18",
+    "NumInfected": "39,600"
+	},
+  {
+    "Confirmed": "2024-11-14",
+    "State": "CALIFORNIA",
+    "County Name": "Fresno",
+    "Production": "Commercial Broiler Production",
+    "EndDate": "2024-12-21",
+    "NumInfected": "259,000"
+	},
+  {
+    "Confirmed": "2024-11-14",
+    "State": "CALIFORNIA",
+    "County Name": "Kings",
+    "Production": "Commercial Broiler Production",
+    "EndDate": "2024-12-12",
+    "NumInfected": "279,300"
+	},
+  {
+    "Confirmed": "2024-11-14",
+    "State": "CALIFORNIA",
+    "County Name": "Kings",
+    "Production": "Commercial Broiler Production",
+    "EndDate": "2024-12-19",
+    "NumInfected": "53,300"
+	},
+  {
+    "Confirmed": "2024-11-14",
+    "State": "CALIFORNIA",
+    "County Name": "Kings",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "8"
+	},
+  {
+    "Confirmed": "2024-11-14",
+    "State": "CALIFORNIA",
+    "County Name": "Merced",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "Active",
+    "NumInfected": "53,200"
+	},
+  {
+    "Confirmed": "2024-11-14",
+    "State": "CALIFORNIA",
+    "County Name": "San Joaquin",
+    "Production": "Commercial Broiler Production",
+    "EndDate": "2024-12-21",
+    "NumInfected": "29,100"
+	},
+  {
+    "Confirmed": "2024-11-14",
+    "State": "COLORADO",
+    "County Name": "Weld",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "80"
+	},
+  {
+    "Confirmed": "2024-11-13",
+    "State": "ARIZONA",
+    "County Name": "Pinal",
+    "Production": "Commercial Table Egg Layer",
+    "EndDate": "2024-12-20",
+    "NumInfected": "829,200"
+	},
+  {
+    "Confirmed": "2024-11-13",
+    "State": "OREGON",
+    "County Name": "Malheur",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "8"
+	},
+  {
+    "Confirmed": "2024-11-12",
+    "State": "CALIFORNIA",
+    "County Name": "Fresno",
+    "Production": "Commercial Broiler Production",
+    "EndDate": "2024-12-06",
+    "NumInfected": "237,700"
+	},
+  {
+    "Confirmed": "2024-11-12",
+    "State": "CALIFORNIA",
+    "County Name": "Fresno",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "Active",
+    "NumInfected": "34,800"
+	},
+  {
+    "Confirmed": "2024-11-12",
+    "State": "CALIFORNIA",
+    "County Name": "Kern",
+    "Production": "Commercial Table Egg Layer",
+    "EndDate": "2025-01-10",
+    "NumInfected": "2,155,100"
+	},
+  {
+    "Confirmed": "2024-11-12",
+    "State": "CALIFORNIA",
+    "County Name": "Tulare",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "120"
+	},
+  {
+    "Confirmed": "2024-11-12",
+    "State": "MONTANA",
+    "County Name": "Missoula",
+    "Production": "WOAH Poultry",
+    "EndDate": "Active",
+    "NumInfected": "280"
+	},
+  {
+    "Confirmed": "2024-11-12",
+    "State": "UTAH",
+    "County Name": "Piute",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "2024-12-19",
+    "NumInfected": "37,500"
+	},
+  {
+    "Confirmed": "2024-11-07",
+    "State": "WASHINGTON",
+    "County Name": "Snohomish",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "170"
+	},
+  {
+    "Confirmed": "2024-11-02",
+    "State": "CALIFORNIA",
+    "County Name": "Sacramento",
+    "Production": "Commercial Turkey Meat Bird",
+    "EndDate": "2024-12-12",
+    "NumInfected": "48,300"
+	},
+  {
+    "Confirmed": "2024-11-02",
+    "State": "CALIFORNIA",
+    "County Name": "Sonoma",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "30"
+	},
+  {
+    "Confirmed": "2024-11-01",
+    "State": "MONTANA",
+    "County Name": "Flathead",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "40"
+	},
+  {
+    "Confirmed": "2024-11-01",
+    "State": "OREGON",
+    "County Name": "Jackson",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "60"
+	},
+  {
+    "Confirmed": "2024-11-01",
+    "State": "WASHINGTON",
+    "County Name": "Okanogan",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "20"
+	},
+  {
+    "Confirmed": "2024-11-01",
+    "State": "WASHINGTON",
+    "County Name": "Stevens",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "130"
+	},
+  {
+    "Confirmed": "2024-10-30",
+    "State": "CALIFORNIA",
+    "County Name": "Fresno",
+    "Production": "Commercial Broiler Production",
+    "EndDate": "2024-12-09",
+    "NumInfected": "204,600"
+	},
+  {
+    "Confirmed": "2024-10-30",
+    "State": "CALIFORNIA",
+    "County Name": "Kings",
+    "Production": "Commercial Broiler Production",
+    "EndDate": "2024-12-15",
+    "NumInfected": "117,200"
+	},
+  {
+    "Confirmed": "2024-10-30",
+    "State": "PENNSYLVANIA",
+    "County Name": "Venango",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "20"
+	},
+  {
+    "Confirmed": "2024-10-29",
+    "State": "CALIFORNIA",
+    "County Name": "Kings",
+    "Production": "Commercial Broiler Production",
+    "EndDate": "2024-12-06",
+    "NumInfected": "104,500"
+	},
+  {
+    "Confirmed": "2024-10-29",
+    "State": "CALIFORNIA",
+    "County Name": "Kings",
+    "Production": "Commercial Broiler Production",
+    "EndDate": "2024-12-06",
+    "NumInfected": "305,500"
+	},
+  {
+    "Confirmed": "2024-10-29",
+    "State": "CALIFORNIA",
+    "County Name": "Tulare",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "10"
+	},
+  {
+    "Confirmed": "2024-10-25",
+    "State": "OREGON",
+    "County Name": "Crook",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "180"
+	},
+  {
+    "Confirmed": "2024-10-25",
+    "State": "WASHINGTON",
+    "County Name": "Lewis",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "60"
+	},
+  {
+    "Confirmed": "2024-10-24",
+    "State": "CALIFORNIA",
+    "County Name": "Tulare",
+    "Production": "Commercial Broiler Production",
+    "EndDate": "2024-11-25",
+    "NumInfected": "6,000"
+	},
+  {
+    "Confirmed": "2024-10-23",
+    "State": "OREGON",
+    "County Name": "Clackamas",
+    "Production": "Commercial Table Egg Layer",
+    "EndDate": "2024-11-29",
+    "NumInfected": "150,000"
+	},
+  {
+    "Confirmed": "2024-10-17",
+    "State": "WASHINGTON",
+    "County Name": "Kitsap",
+    "Production": "WOAH Non-Poultry",
+    "EndDate": "NA",
+    "NumInfected": "60"
+	},
+  {
+    "Confirmed": "2024-10-16",
+    "State": "CALIFORNIA",
+    "County Name": "Tulare",
+    "Production": "Commercial Broiler Production",
+    "EndDate": "2024-12-02",
+    "NumInfected": "786,600"
+	},
+  {
+    "Confirmed": "2024-10-15",
+    "State": "UTAH",
+    "County Name": "Cache",
+    "Production": "Commercial Table Egg Layer",
+    "EndDate": "2024-11-17",
+    "NumInfected": "1,852,900"
+	},
+  {
+    "Confirmed": "2024-10-15",
+    "State": "WASHINGTON",
+    "County Name": "Franklin",
+    "Production": "Commercial Table Egg Layer",
+    "EndDate": "2024-11-27",
+    "NumInfected": "839,700"
+	},
+  {
     "Confirmed": "2024-10-07",
     "State": "FLORIDA",
     "County Name": "Miami-dade",
-    "Production": "WOAH Poultry",
-    "EndDate": "NA",
+    "Production": "Live Bird Sales  (non-slaughter)",
+    "EndDate": "2024-10-23",
     "NumInfected": "70"
 	},
   {
@@ -12,7 +1828,7 @@
     "State": "IDAHO",
     "County Name": "Canyon",
     "Production": "WOAH Poultry",
-    "EndDate": "Active",
+    "EndDate": "2024-11-07",
     "NumInfected": "100"
 	},
   {
@@ -20,7 +1836,7 @@
     "State": "IDAHO",
     "County Name": "Lincoln",
     "Production": "WOAH Poultry",
-    "EndDate": "Active",
+    "EndDate": "2024-10-16",
     "NumInfected": "700"
 	},
   {
@@ -28,7 +1844,7 @@
     "State": "CALIFORNIA",
     "County Name": "Merced",
     "Production": "Commercial Turkey Meat Bird",
-    "EndDate": "Active",
+    "EndDate": "2024-10-11",
     "NumInfected": "64,800"
 	},
   {
@@ -300,7 +2116,7 @@
     "State": "MINNESOTA",
     "County Name": "Stearns",
     "Production": "Commercial Turkey Meat Bird",
-    "EndDate": "2024-06-07",
+    "EndDate": "NA",
     "NumInfected": "7,000"
 	},
   {
@@ -4900,7 +6716,7 @@
     "State": "MINNESOTA",
     "County Name": "Itasca",
     "Production": "WOAH Non-Poultry",
-    "EndDate": "2022-11-05",
+    "EndDate": "NA",
     "NumInfected": "40"
 	},
   {
@@ -6268,7 +8084,7 @@
     "State": "OREGON",
     "County Name": "Deschutes",
     "Production": "WOAH Non-Poultry",
-    "EndDate": "2022-10-03",
+    "EndDate": "NA",
     "NumInfected": "120"
 	},
   {
@@ -7644,7 +9460,7 @@
     "State": "INDIANA",
     "County Name": "Elkhart",
     "Production": "Commercial Duck Meat Bird",
-    "EndDate": "2022-05-05",
+    "EndDate": "NA",
     "NumInfected": "6,600"
 	},
   {
@@ -8340,7 +10156,7 @@
     "State": "NEW YORK",
     "County Name": "Orleans",
     "Production": "WOAH Poultry",
-    "EndDate": "2022-05-10",
+    "EndDate": "NA",
     "NumInfected": "30"
 	},
   {
