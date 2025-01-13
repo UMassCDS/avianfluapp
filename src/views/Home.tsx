@@ -8,7 +8,7 @@ import { imageURL, getScalingFilename, dataInfo} from '../hooks/dataUrl';
 import taxa from '../assets/taxa.json';
 import Timeline from '../components/Timeline';
 import Legend from '../components/Legend';
-import {OutbreakMarkers, loadOutbreaks} from '../components/OutbreakPoints'
+import {OutbreakMarkers, loadOutbreaks, OutbreakLegend} from '../components/OutbreakPoints'
 import {dateToWeek} from '../utils/utils'
 import '../styles/Home.css';
 import 'leaflet/dist/leaflet.css';
@@ -281,6 +281,7 @@ const HomePage = () => {
       </MapContainer>
       <div className="widgets"> 
         <ControlBar/>
+        <OutbreakLegend/>
       </div>
       <div className="about"> 
         <Tooltip label='Leave feedback and suggestions.'>

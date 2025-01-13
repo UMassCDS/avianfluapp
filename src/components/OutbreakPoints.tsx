@@ -2,10 +2,10 @@ import { Marker, Popup } from 'react-leaflet';
 import { Icon } from 'leaflet';
 import geoCounties from '../assets/counties.json';
 import outbreaks from '../assets/outbreaks.json';
-import iconOne from '../assets/iconBlue.png';
-import iconTwo from '../assets/iconLightBlue.png';
+import iconOne from '../assets/redLocationIcon.png';
+import iconTwo from '../assets/orangeLocationIcon.png';
 import iconThree from '../assets/iconPaleBlue.png';
-import {monthDayToWeek} from '../utils/utils'
+import {monthDayToWeek, dateToWeek} from '../utils/utils'
 
 // lat, long position in degrees
 type GeoLocation = [number, number]
@@ -21,16 +21,17 @@ type outMarker = {
 function outbreakIcon(icon_path: string) {
     return new Icon({
         iconUrl: icon_path,
-        iconSize : [35,35], // size of the icon
-        iconAnchor : [18, 35], // the tip of the icon points to the middle bottom of the png
-        popupAnchor : [8, -30] // point from which the popup should open relative to the iconAnchor
+        iconSize: [22,35], // size of the icon
+        iconAnchor: [18, 35], // the tip of the icon points to the middle bottom of the png
+        popupAnchor: [8, -30] // point from which the popup should open relative to the iconAnchor
     })
 }
 
 const outbreakMarkers: outMarker[]=[];
-const NUM_YEARS = 3; // number of years back
+const NUM_YEARS = 1; // number of years back
 const NUM_WEEKS = 2; // number of weeks +/-
 const thisYear = new Date().getFullYear();
+const thisWeek = dateToWeek(new Date());
 const markerIcons: (typeof Icon)[] = [
     outbreakIcon(iconOne),
     outbreakIcon(iconTwo),
@@ -76,7 +77,8 @@ export function loadOutbreaks() {
                 yearsAgo: thisYear - outbreak_year,
                 week: monthDayToWeek(Number(outbreak.Confirmed.split('-')[1])-1, Number(outbreak.Confirmed.split('-')[2])),
                 geoLoc: locationDict[outbreak.State][outbreak['County Name'].toUpperCase()],
-                label: outbreak["County Name"]+','+outbreak.State+' @'+outbreak.Confirmed,
+                label: outbreak.Confirmed,
+                // label: outbreak["County Name"]+','+outbreak.State+' @'+outbreak.Confirmed,
                 // label: outbreak["County Name"]+','+outbreak.State+': '+outbreak.NumInfected+','+outbreak.Production
             }
             outbreakMarkers.push(marker);
@@ -86,19 +88,25 @@ export function loadOutbreaks() {
 
 
 function selectedOutbreaks(this_week: number):outMarker[] {
-    // determine which outbreaks occurred within the last NUM_YEARS
-    // and within the same week +/- NUM_WEEKS
+    // show only outbreaks in the last year.  
     const markers: outMarker[]=[];
 
     for (var info of outbreakMarkers) {
-        if ((info.yearsAgo <= NUM_YEARS ) && (Math.abs(info.week-this_week) < NUM_WEEKS)) {
+        if ((info.yearsAgo === 0)  && (Math.abs(info.week-this_week) < NUM_WEEKS)) {
+            // this year near the display date
+            markers.push(info);
+        }
+        else if ((info.yearsAgo === 1)  && (info.week < thisWeek) && (Math.abs(info.week-this_week) < NUM_WEEKS)) {
+            // last year, after today and near displayed day, 
             markers.push(info);
         }
     }
     return markers;
 }
 
+
 // Adds markers with a outbreak info to the map w/ at the correct lat/long
+// Note: "week" value is for the currently displayed week. 
 export function OutbreakMarkers(week: number) {
     const currentMarkers = selectedOutbreaks(week);
     return (
@@ -115,3 +123,18 @@ export function OutbreakMarkers(week: number) {
         ))
     ); 
 }
+
+
+// meaning of marker color
+export const OutbreakLegend = () => (
+    <div>
+        <div style={{display:"flex"}}>
+            <img src={iconOne} id="this_year" style={{ width: '20px', height: '30px' }} />    
+            <label style={{fontWeight:"bold", margin:'5px'}}>{thisYear}</label>
+        </div>
+        <div style={{display:"flex"}}>
+            <img src={iconTwo} id="last_year" style={{ width: '20px', height: '30px' }} />    
+            <label style={{fontWeight:"bold", margin:'5px'}}>{thisYear-1}</label>
+        </div>
+    </div>
+);
