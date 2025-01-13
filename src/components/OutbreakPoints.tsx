@@ -77,9 +77,7 @@ export function loadOutbreaks() {
                 yearsAgo: thisYear - outbreak_year,
                 week: monthDayToWeek(Number(outbreak.Confirmed.split('-')[1])-1, Number(outbreak.Confirmed.split('-')[2])),
                 geoLoc: locationDict[outbreak.State][outbreak['County Name'].toUpperCase()],
-                label: outbreak.Confirmed,
-                // label: outbreak["County Name"]+','+outbreak.State+' @'+outbreak.Confirmed,
-                // label: outbreak["County Name"]+','+outbreak.State+': '+outbreak.NumInfected+','+outbreak.Production
+                label: outbreak.Confirmed+': '+outbreak.Production+' ('+outbreak.NumInfected+')',
             }
             outbreakMarkers.push(marker);
         }
@@ -116,7 +114,7 @@ export function OutbreakMarkers(week: number) {
                 position={info.geoLoc}
                 key={i}
             >
-                <Popup>
+                <Popup maxWidth='120'>
                     {info.label}
                 </Popup>
             </Marker>
