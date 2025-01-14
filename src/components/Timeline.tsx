@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Slider } from '@mantine/core';
+import { RangeSlider } from '@mantine/core';
 import { isMobile } from '../utils/utils';
 import ab_dates from '../assets/abundance_dates.json';
 import mv_dates from '../assets/movement_dates.json';
@@ -67,8 +67,8 @@ function Timeline(props: TimelineProps) {
   return (
     <div className="Timeline">
       {isMobile()?
-      <Slider
-        defaultValue={week}
+      <RangeSlider
+        defaultValue={[week, week]}
         value={week}
         label={weekLabel}
         min={1}
@@ -80,8 +80,8 @@ function Timeline(props: TimelineProps) {
         onChange={(v) => { onChangeWeek(v)}}
       />
       : 
-      <Slider
-        defaultValue={week}
+      <RangeSlider
+        defaultValue={[week, week]}
         value={week}
         label={weekLabel}
         marks={marks[dataset]} // lg screen
