@@ -109,7 +109,6 @@ function selectedOutbreaks(this_week: number):outMarker[] {
 // Note: "week" value is for the currently displayed week. 
 export function OutbreakMarkers(week: number) {
     const currentMarkers = selectedOutbreaks(week);
-    console.log("Current week "+week)
     return (
         currentMarkers.map((info, i) => (
             // @ts-ignore
