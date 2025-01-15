@@ -38,8 +38,9 @@ export function imageURL(
   week: number,
 ): string {
   const name = dataInfo[data_index].datatype;
+  // week in code is zero based, for the filenames it starts with one.
   const finalUrl = `${
     baseUrl + name
-  }/${taxa[taxa_index].value}/${name}_${taxa[taxa_index].value}_${week}.png`;
+  }/${taxa[taxa_index].value}/${name}_${taxa[taxa_index].value}_${week+1}.png`;
   return finalUrl;
 }

@@ -9,12 +9,11 @@ import taxa from '../assets/taxa.json';
 import Timeline from '../components/Timeline';
 import Legend from '../components/Legend';
 import {OutbreakMarkers, loadOutbreaks} from '../components/OutbreakPoints'
-import {dateToWeek} from '../utils/utils'
+import {dateToWeek, MIN_WEEK, MAX_WEEK} from '../utils/utils'
 import '../styles/Home.css';
 import 'leaflet/dist/leaflet.css';
 
-const MIN_WEEK = 1;   // week indexing in files
-const MAX_WEEK = 52;  // number of weeks in a year
+
 const MIN_REG_WINDOW_WIDTH = 600;
 // the lat/long bounds of the data image provided by the backend
 const imageBounds = [
@@ -34,7 +33,7 @@ const HomePage = () => {
   const [dataIndex, setDataIndex] = useState(0);
   // Sets state for the species type 
   const [speciesIndex, setSpeciesIndex] = useState(0);
-  const [week, setWeek] = useState(0);
+  const [week, setWeek] = useState(MIN_WEEK);
   const [adjustWeek, setAdjustWeek] = useState(0);
   // default state of the map overlay url for the current data displayed.
   const [overlayUrl, setOverlayUrl] = useState("");
@@ -81,14 +80,14 @@ const HomePage = () => {
       return;
     }
     if (adjustWeek > 0) {
-      // increments active index (wraps around when at top)
-      let temp = week + MIN_WEEK;
+      // increments active index (wraps around when at end of year)
+      let temp = week + 1;
       if (temp > MAX_WEEK) temp = MIN_WEEK;
       checkImageAndUpdate(temp);
     } else {
-      // decrements active index (wraps around when at bottom)
+      // decrements active index (wraps around when at beginning of year)
       let temp = week - 1;
-      if (temp < 1) temp = MAX_WEEK;
+      if (temp < MIN_WEEK) temp = MAX_WEEK;
       checkImageAndUpdate(temp);
     }
     setAdjustWeek(0);
@@ -97,10 +96,9 @@ const HomePage = () => {
   // Called once on startup. Adds a listener for user keyboard events. 
   // Note: it appears this is not called when using Firefox on the iPhone PM 11/9/2024
   useEffect(() => {
-    // determine current week - find msec between today and beginning fo the year
-    const this_week = dateToWeek(new Date())
     loadOutbreaks();
-    checkImageAndUpdate(this_week);
+    // determine current week 
+    checkImageAndUpdate(dateToWeek(new Date()));
     handleWindowSizeChange();
     document.addEventListener('keydown', handleSelection);
     window.addEventListener('resize', handleWindowSizeChange);
@@ -111,10 +109,6 @@ const HomePage = () => {
   }, []);
 
   async function checkImageAndUpdate(this_week: number) {
-    if (this_week <= 0) {
-      // the week is not initialized yet
-      return;
-    }
     var image_url = imageURL(dataIndex, speciesIndex, this_week);
     var response = await fetch(image_url);
     if (!response.ok) {
