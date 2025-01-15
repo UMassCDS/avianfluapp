@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { RangeSlider } from '@mantine/core';
+import { Slider, RangeSlider } from '@mantine/core';
 import { isMobile } from '../utils/utils';
 import ab_dates from '../assets/abundance_dates.json';
 import mv_dates from '../assets/movement_dates.json';
-
+const MAX_WEEK = 52;  // number of weeks in a year
 
 const months: Array<string> = [
   'Jan','Feb','Mar','Apr', 'May' ,'Jun','Jul','Aug', 'Sep','Oct','Nov','Dec'
@@ -13,6 +13,7 @@ const months: Array<string> = [
 interface TimelineProps {
   week: number;
   dataset: number;
+  isRegSize: boolean;
   onChangeWeek: (val: number) => void;
 }
 
@@ -21,15 +22,25 @@ interface markProps {
   label: string;
 }
 
+interface sliderProps {
+  size: string;
+  thumb: number;
+  showLabel: boolean;
+  marks: Array<markProps>;
+}
+const minRange = 5;  // TODO when we can handle inversion, make this -51
+//           inverted={true}  this helps the timeline show right, but only if we flip values in weekRange
+
 /* Creates a custom timeline slider that updates what week number of the year the user is currently on. */
 function Timeline(props: TimelineProps) {
-  const { week, onChangeWeek } = props;
-  const dataset = props.dataset;
-  const [weekLabel, setWeekLabel] = useState<string>('');
+  const { week, dataset, isRegSize, onChangeWeek } = props;
+  const [weekRange, setWeekRange] = useState<[number,number]>([week, (week+5)%MAX_WEEK]);
   const [labelInit, setLabelInit] = useState<boolean>(false);
   const [myLabels, setMyLabels] = useState<Array<Array<string>>>([[],[]]);
   const [marks, setMarks] = useState<Array<Array<markProps>>>([[],[]]);
+  const [sizingProps, setSizingProps] = useState<sliderProps>();
 
+  // Timeline - 
   useEffect(() => {
     // initialize labels[dataset][week]
     // TODO the order of the labels needs to match the order of datasets in dataUrl.tsx/dataInfo[]
@@ -58,40 +69,53 @@ function Timeline(props: TimelineProps) {
   }, []);
 
   useEffect(() => {
+    // set props for both sliders after things initialized and if window size changes
+    var sProps: sliderProps ;
+    if (isRegSize) {
+      sProps = {size:'md', thumb:20, showLabel:true, marks:marks[dataset]}
+    } else {
+      sProps = {size:'sm', thumb:12, showLabel:false, marks:[]}
+    }
+    setSizingProps(sProps);
+  }, [marks, isRegSize]);
+
+
+  function showLabel(labelIndex: number) {
     // update the label WHEN the check for overlay is complete
     if (labelInit) {
-      setWeekLabel(myLabels[dataset][week-1]);
+      return myLabels[dataset][labelIndex-1];
     }
-  }, [week, props.dataset]);
+    return "";
+  };
 
   return (
     <div className="Timeline">
-      {isMobile()?
-      <RangeSlider
-        defaultValue={[week, week]}
+      <Slider
+        defaultValue={week}
         value={week}
-        label={weekLabel}
+        label={myLabels[dataset][week-1]}
         min={1}
         max={52}
-        labelAlwaysOn
-        size='sm' // sm screen
-        step={1}
-        thumbSize={12}  // sm screen
+        marks={sizingProps?.marks}
+        size={sizingProps?.size}
+        thumbSize={sizingProps?.thumb}
+        labelAlwaysOn={sizingProps?.showLabel}
         onChange={(v) => { onChangeWeek(v)}}
       />
-      : 
       <RangeSlider
-        defaultValue={[week, week]}
-        value={week}
-        label={weekLabel}
-        marks={marks[dataset]} // lg screen
+        defaultValue={weekRange}
+        value={weekRange}
+        label={showLabel}
         min={1}
         max={52}
-        labelAlwaysOn
         step={1}
-        thumbSize={20} // lg screen
-        onChange={(v) => onChangeWeek(v)}
-      />}
+        minRange={minRange}
+        marks={sizingProps?.marks}
+        size={sizingProps?.size}
+        thumbSize={sizingProps?.thumb}
+        labelAlwaysOn={false}
+        onChange={(v) => { setWeekRange(v)}}
+      />
     </div>
   );
 }
