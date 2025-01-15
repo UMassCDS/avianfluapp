@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Slider, RangeSlider } from '@mantine/core';
-import { isMobile } from '../utils/utils';
+import { ActionIcon, Slider, RangeSlider } from '@mantine/core';
+import { IconPlayerPlayFilled, IconPlayerPauseFilled } from '@tabler/icons-react';
 import ab_dates from '../assets/abundance_dates.json';
 import mv_dates from '../assets/movement_dates.json';
 const MAX_WEEK = 52;  // number of weeks in a year
@@ -39,8 +39,10 @@ function Timeline(props: TimelineProps) {
   const [myLabels, setMyLabels] = useState<Array<Array<string>>>([[],[]]);
   const [marks, setMarks] = useState<Array<Array<markProps>>>([[],[]]);
   const [sizingProps, setSizingProps] = useState<sliderProps>();
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [playNext, setPlayNext] = useState<boolean>(false);
+  const [playbackId, setPlaybackId] = useState<ReturnType<typeof setInterval>>();
 
-  // Timeline - 
   useEffect(() => {
     // initialize labels[dataset][week]
     // TODO the order of the labels needs to match the order of datasets in dataUrl.tsx/dataInfo[]
@@ -79,7 +81,6 @@ function Timeline(props: TimelineProps) {
     setSizingProps(sProps);
   }, [marks, isRegSize]);
 
-
   function showLabel(labelIndex: number) {
     // update the label WHEN the check for overlay is complete
     if (labelInit) {
@@ -88,8 +89,48 @@ function Timeline(props: TimelineProps) {
     return "";
   };
 
+  useEffect(() => {
+    // play next
+    if (playNext) {
+      // TODO will have to deal with wrapping eventually
+      var next_week:number = week+1;
+      if (next_week > weekRange[1]) {
+        next_week = weekRange[0];
+      }
+      // goes back to Home to update the map
+      onChangeWeek(next_week);
+      setPlayNext(false);
+    }
+  }, [playNext])
+
+  function playbackClick() {
+    if (isPlaying) {
+      // stop playback
+      clearInterval(playbackId);
+    } else {
+      // trigger playback every 0.6 sec
+      // remember whatever function is called will use the variables w/ their values now, 
+      // and not notice any updates
+      var id = setInterval(() => {setPlayNext(true)}, 600);
+      setPlaybackId(id);
+      // start it now - this will either pickup where it left off, or start at beginning as needed.
+      setPlayNext(true)
+    }
+    // toggle isPlaying
+    setIsPlaying(prevPlay => !prevPlay);
+  };
+
   return (
     <div className="Timeline">
+      {isPlaying?
+        <ActionIcon size={'xl'} onClick={() => { playbackClick() }}>
+          <IconPlayerPauseFilled/>
+        </ActionIcon>
+      :
+        <ActionIcon size={'xl'} onClick={() => { playbackClick() }}>
+          <IconPlayerPlayFilled/>
+        </ActionIcon>
+      }
       <Slider
         defaultValue={week}
         value={week}
