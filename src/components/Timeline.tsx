@@ -3,10 +3,10 @@ import { ActionIcon, Slider, RangeSlider } from '@mantine/core';
 import { IconPlayerPlayFilled, IconPlayerPauseFilled } from '@tabler/icons-react';
 import ab_dates from '../assets/abundance_dates.json';
 import mv_dates from '../assets/movement_dates.json';
-const MAX_WEEK = 52;  // number of weeks in a year
+import {MIN_WEEK, MAX_WEEK} from '../utils/utils'
 
 const months: Array<string> = [
-  'Jan','Feb','Mar','Apr', 'May' ,'Jun','Jul','Aug', 'Sep','Oct','Nov','Dec'
+  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
 ];
 
 // Keeps track of the props and prop type going into the component (look up interfaces in TypeScript)
@@ -85,7 +85,7 @@ function Timeline(props: TimelineProps) {
   function showLabel(labelIndex: number) {
     // update the label WHEN the check for overlay is complete
     if (labelInit) {
-      return myLabels[dataset][labelIndex-1];
+      return myLabels[dataset][labelIndex];
     }
     return "";
   };
@@ -96,13 +96,15 @@ function Timeline(props: TimelineProps) {
       // TODO will have to deal with wrapping eventually
       console.log("Week "+week);
       var next_week:number = week+1;
-      // check if at end of the range
+      // check if at end of the range 
       if ((!isYearWrap) && (next_week > weekRange[1])) {
         next_week = weekRange[0];
       }
       else if (isYearWrap) { 
+        // if it is a yearWrap it's a little more complicated. 
+        // check if it is before the begining and reaches the end
         next_week = next_week%52;
-        if (next_week > weekRange[0]) {
+        if ((next_week < weekRange[1]) && (next_week > weekRange[0])) {
           next_week = weekRange[1];
         }     
       }
@@ -163,9 +165,9 @@ function Timeline(props: TimelineProps) {
       <Slider
         defaultValue={week}
         value={week}
-        label={myLabels[dataset][week-1]}
-        min={1}
-        max={52}
+        label={myLabels[dataset][week]}
+        min={MIN_WEEK}
+        max={MAX_WEEK}
         marks={sizingProps?.marks}
         size={sizingProps?.size}
         thumbSize={sizingProps?.thumb}
@@ -176,8 +178,8 @@ function Timeline(props: TimelineProps) {
         defaultValue={weekRange}
         value={weekRange}
         label={showLabel}
-        min={1}
-        max={52}
+        min={MIN_WEEK}
+        max={MAX_WEEK}
         step={1}
         minRange={minRange}
         marks={sizingProps?.marks}
