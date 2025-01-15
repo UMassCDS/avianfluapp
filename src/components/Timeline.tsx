@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Slider } from '@mantine/core';
-import { isMobile } from '../utils/utils';
+import { isMobile, MIN_WEEK, MAX_WEEK } from '../utils/utils';
 import ab_dates from '../assets/abundance_dates.json';
 import mv_dates from '../assets/movement_dates.json';
 
 
 const months: Array<string> = [
-  'Jan','Feb','Mar','Apr', 'May' ,'Jun','Jul','Aug', 'Sep','Oct','Nov','Dec'
+  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
 ];
 
 // Keeps track of the props and prop type going into the component (look up interfaces in TypeScript)
@@ -60,7 +60,7 @@ function Timeline(props: TimelineProps) {
   useEffect(() => {
     // update the label WHEN the check for overlay is complete
     if (labelInit) {
-      setWeekLabel(myLabels[dataset][week-1]);
+      setWeekLabel(myLabels[dataset][week]);
     }
   }, [week, props.dataset]);
 
@@ -70,9 +70,8 @@ function Timeline(props: TimelineProps) {
       <Slider
         defaultValue={week}
         value={week}
-        label={weekLabel}
-        min={1}
-        max={52}
+        min={MIN_WEEK}
+        max={MAX_WEEK}
         labelAlwaysOn
         size='sm' // sm screen
         step={1}
@@ -85,8 +84,8 @@ function Timeline(props: TimelineProps) {
         value={week}
         label={weekLabel}
         marks={marks[dataset]} // lg screen
-        min={1}
-        max={52}
+        min={MIN_WEEK}
+        max={MAX_WEEK}
         labelAlwaysOn
         step={1}
         thumbSize={20} // lg screen
