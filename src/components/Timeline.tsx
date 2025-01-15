@@ -28,7 +28,7 @@ interface sliderProps {
   showLabel: boolean;
   marks: Array<markProps>;
 }
-const minRange = 5;  // TODO when we can handle inversion, make this -51
+const minRange = -51;  // makes it so end can be before start - supports playback over end of year
 //           inverted={true}  this helps the timeline show right, but only if we flip values in weekRange
 
 /* Creates a custom timeline slider that updates what week number of the year the user is currently on. */
@@ -42,10 +42,11 @@ function Timeline(props: TimelineProps) {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [playNext, setPlayNext] = useState<boolean>(false);
   const [playbackId, setPlaybackId] = useState<ReturnType<typeof setInterval>>();
+  const [isYearWrap, setIsYearWrap] = useState<boolean>(false);
 
   useEffect(() => {
     // initialize labels[dataset][week]
-    // TODO the order of the labels needs to match the order of datasets in dataUrl.tsx/dataInfo[]
+    // The order of the labels needs to match the order of datasets in dataUrl.tsx/dataInfo[]
     let datasets = [ab_dates, mv_dates]
     let local_dates: Array<Array<string>> = [[],[]];
     for (var i =0; i < datasets.length; i += 1) {
@@ -93,15 +94,24 @@ function Timeline(props: TimelineProps) {
     // play next
     if (playNext) {
       // TODO will have to deal with wrapping eventually
+      console.log("Week "+week);
       var next_week:number = week+1;
-      if (next_week > weekRange[1]) {
+      // check if at end of the range
+      if ((!isYearWrap) && (next_week > weekRange[1])) {
         next_week = weekRange[0];
       }
+      else if (isYearWrap) { 
+        next_week = next_week%52;
+        if (next_week > weekRange[0]) {
+          next_week = weekRange[1];
+        }     
+      }
+      console.log(next_week);
       // goes back to Home to update the map
       onChangeWeek(next_week);
       setPlayNext(false);
     }
-  }, [playNext])
+  }, [playNext, weekRange, week])
 
   function playbackClick() {
     if (isPlaying) {
@@ -119,6 +129,25 @@ function Timeline(props: TimelineProps) {
     // toggle isPlaying
     setIsPlaying(prevPlay => !prevPlay);
   };
+
+  // handle wrapping playback
+  function checkIfReversed() {
+    if (weekRange[1] < weekRange[0]) {
+      console.log("time to reverse "+weekRange)
+      // toggle isYearWrap
+      setIsYearWrap(isWrap => !isWrap);
+      // reverse weeks in range
+      setWeekRange(weeks => [weeks[1], weeks[0]]);
+    }
+  };
+
+  useEffect(() => {
+    if (isYearWrap) {
+      console.log("WRAPPED "+weekRange);
+    } else {
+      console.log("REG "+weekRange);
+    }
+  }, [isYearWrap, weekRange])
 
   return (
     <div className="Timeline">
@@ -152,10 +181,12 @@ function Timeline(props: TimelineProps) {
         step={1}
         minRange={minRange}
         marks={sizingProps?.marks}
+        inverted={isYearWrap}
         size={sizingProps?.size}
         thumbSize={sizingProps?.thumb}
         labelAlwaysOn={false}
         onChange={(v) => { setWeekRange(v)}}
+        onChangeEnd={() => { checkIfReversed()}}
       />
     </div>
   );
