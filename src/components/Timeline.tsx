@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
-import { ActionIcon, Slider, RangeSlider } from '@mantine/core';
+import { ActionIcon, Grid, Slider, RangeSlider } from '@mantine/core';
+import { useMove } from '@mantine/hooks';
 import { IconPlayerPlayFilled, IconPlayerPauseFilled } from '@tabler/icons-react';
 import ab_dates from '../assets/abundance_dates.json';
 import mv_dates from '../assets/movement_dates.json';
 import {MIN_WEEK, MAX_WEEK} from '../utils/utils'
+
 
 const months: Array<string> = [
   'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
@@ -35,7 +37,6 @@ const minRange = -51;  // makes it so end can be before start - supports playbac
 function Timeline(props: TimelineProps) {
   const { week, dataset, isRegSize, onChangeWeek } = props;
   const [weekRange, setWeekRange] = useState<[number,number]>([week, (week+5)%MAX_WEEK]);
-  const [labelInit, setLabelInit] = useState<boolean>(false);
   const [myLabels, setMyLabels] = useState<Array<Array<string>>>([[],[]]);
   const [marks, setMarks] = useState<Array<Array<markProps>>>([[],[]]);
   const [sizingProps, setSizingProps] = useState<sliderProps>();
@@ -43,6 +44,14 @@ function Timeline(props: TimelineProps) {
   const [playNext, setPlayNext] = useState<boolean>(false);
   const [playbackId, setPlaybackId] = useState<ReturnType<typeof setInterval>>();
   const [isYearWrap, setIsYearWrap] = useState<boolean>(false);
+  const [value, setValue] = useState(week);
+  const [label, setLabel] = useState("");
+  const { ref } = useMove(({ x }) => setValue(x));
+
+  function thumbLabel():string|any {
+    var index = Math.floor(value*MAX_WEEK);
+    return myLabels[dataset][index];
+  };
 
   useEffect(() => {
     // initialize labels[dataset][week]
@@ -68,11 +77,11 @@ function Timeline(props: TimelineProps) {
       }
     }
     setMarks(local_marks);
-    setLabelInit(true);
   }, []);
 
   useEffect(() => {
-    // set props for both sliders after things initialized and if window size changes
+    // At init or when window size changes, 
+    // set props for both sliders
     var sProps: sliderProps ;
     if (isRegSize) {
       sProps = {size:'md', thumb:20, showLabel:true, marks:marks[dataset]}
@@ -82,18 +91,10 @@ function Timeline(props: TimelineProps) {
     setSizingProps(sProps);
   }, [marks, isRegSize]);
 
-  function showLabel(labelIndex: number) {
-    // update the label WHEN the check for overlay is complete
-    if (labelInit) {
-      return myLabels[dataset][labelIndex];
-    }
-    return "";
-  };
 
   useEffect(() => {
     // play next
     if (playNext) {
-      // TODO will have to deal with wrapping eventually
       console.log("Week "+week);
       var next_week:number = week+1;
       // check if at end of the range 
@@ -120,10 +121,10 @@ function Timeline(props: TimelineProps) {
       // stop playback
       clearInterval(playbackId);
     } else {
-      // trigger playback every 0.6 sec
+      // trigger playback every 0.4 sec
       // remember whatever function is called will use the variables w/ their values now, 
       // and not notice any updates
-      var id = setInterval(() => {setPlayNext(true)}, 600);
+      var id = setInterval(() => {setPlayNext(true)}, 400);
       setPlaybackId(id);
       // start it now - this will either pickup where it left off, or start at beginning as needed.
       setPlayNext(true)
@@ -153,43 +154,84 @@ function Timeline(props: TimelineProps) {
 
   return (
     <div className="Timeline">
-      {isPlaying?
-        <ActionIcon size={'xl'} onClick={() => { playbackClick() }}>
-          <IconPlayerPauseFilled/>
-        </ActionIcon>
-      :
-        <ActionIcon size={'xl'} onClick={() => { playbackClick() }}>
-          <IconPlayerPlayFilled/>
-        </ActionIcon>
-      }
-      <Slider
-        defaultValue={week}
-        value={week}
-        label={myLabels[dataset][week]}
-        min={MIN_WEEK}
-        max={MAX_WEEK}
-        marks={sizingProps?.marks}
-        size={sizingProps?.size}
-        thumbSize={sizingProps?.thumb}
-        labelAlwaysOn={sizingProps?.showLabel}
-        onChange={(v) => { onChangeWeek(v)}}
-      />
-      <RangeSlider
-        defaultValue={weekRange}
-        value={weekRange}
-        label={showLabel}
-        min={MIN_WEEK}
-        max={MAX_WEEK}
-        step={1}
-        minRange={minRange}
-        marks={sizingProps?.marks}
-        inverted={isYearWrap}
-        size={sizingProps?.size}
-        thumbSize={sizingProps?.thumb}
-        labelAlwaysOn={false}
-        onChange={(v) => { setWeekRange(v)}}
-        onChangeEnd={() => { checkIfReversed()}}
-      />
+      <Grid align='stretch'>
+        <Grid.Col span={1}>
+          {/* show Play or Pause button*/}
+          {isPlaying?
+            <ActionIcon size={'xl'} onClick={() => { playbackClick() }}>
+              <IconPlayerPauseFilled/>
+            </ActionIcon>
+          :
+            <ActionIcon size={'xl'} onClick={() => { playbackClick() }}>
+              <IconPlayerPlayFilled/>
+            </ActionIcon>
+          }
+        </Grid.Col>
+        <Grid.Col span={11}>
+          {/* slider with only the thumb marker */}
+          <div
+            ref={ref}
+            style={{
+              height: 16,
+              position: 'relative',
+            }}
+          >
+            {/* Thumb */}
+            <div
+              style={{
+                position: 'absolute',
+                left: `calc(${value * 100}% - ${'8px'})`,
+                top: 0,
+                width: '16',
+                height: '16',
+                backgroundColor: "white",
+              }} >
+                {thumbLabel()}
+              </div>
+          </div>
+          <Slider
+            defaultValue={week}
+            value={week}
+            label={myLabels[dataset][week]}
+            min={MIN_WEEK}
+            max={MAX_WEEK}
+            color="light gray"
+            marks={sizingProps?.marks}
+            size={sizingProps?.size}
+            thumbSize={sizingProps?.thumb}
+            labelAlwaysOn={sizingProps?.showLabel}
+            onChange={(v) => { onChangeWeek(v)}}
+            styles={() => ({
+              track: {backgroundColor: "pink"},
+              mark: {borderColor: "light gray"},
+              markFilled: {
+                borderColor: "purple",
+              },
+            })}
+          />
+          <RangeSlider
+            defaultValue={weekRange}
+            value={weekRange}
+            label={myLabels[dataset][week]}
+            min={MIN_WEEK}
+            max={MAX_WEEK}
+            step={1}
+            minRange={minRange}
+            marks={sizingProps?.marks}
+            inverted={isYearWrap}
+            size={sizingProps?.size}
+            thumbSize={sizingProps?.thumb}
+            labelAlwaysOn={false}
+            onChange={(v) => { setWeekRange(v)}}
+            onChangeEnd={() => { checkIfReversed()}}
+            styles={() => ({
+              thumb: {
+                backgroundColor: "green",
+              },
+            })}
+          />
+        </Grid.Col>
+      </Grid>
     </div>
   );
 }

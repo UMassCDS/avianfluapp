@@ -1,7 +1,7 @@
 .Home {
 
     .Map {
-        z-index: 0;
+        z-index: 1;
     }
 
     .widgets {
@@ -37,7 +37,7 @@
         position: fixed;
         top: 90%;
         left: 50%;
-        /* bring your own prefixes */
+        z-index: 10;
         transform: translate(-50%, -50%);
     }
 
