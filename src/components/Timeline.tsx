@@ -48,11 +48,6 @@ function Timeline(props: TimelineProps) {
   const [label, setLabel] = useState("");
   const { ref } = useMove(({ x }) => setValue(x));
 
-  function thumbLabel():string|any {
-    var index = Math.floor(value*MAX_WEEK);
-    return myLabels[dataset][index];
-  };
-
   useEffect(() => {
     // initialize labels[dataset][week]
     // The order of the labels needs to match the order of datasets in dataUrl.tsx/dataInfo[]
@@ -152,6 +147,18 @@ function Timeline(props: TimelineProps) {
     }
   }, [isYearWrap, weekRange])
 
+  useEffect(() => {
+    onChangeWeek(Math.floor(value*MAX_WEEK));
+  }, [value])
+
+  useEffect(() => {
+    setValue(week/MAX_WEEK);
+  }, [week])
+
+  function showLabel(labelIndex: number) {
+    return myLabels[dataset][labelIndex];
+  };
+
   return (
     <div className="Timeline">
       <Grid align='stretch'>
@@ -186,33 +193,14 @@ function Timeline(props: TimelineProps) {
                 height: '16',
                 backgroundColor: "white",
               }} >
-                {thumbLabel()}
+                {myLabels[dataset][week]}
               </div>
           </div>
-          <Slider
-            defaultValue={week}
-            value={week}
-            label={myLabels[dataset][week]}
-            min={MIN_WEEK}
-            max={MAX_WEEK}
-            color="light gray"
-            marks={sizingProps?.marks}
-            size={sizingProps?.size}
-            thumbSize={sizingProps?.thumb}
-            labelAlwaysOn={sizingProps?.showLabel}
-            onChange={(v) => { onChangeWeek(v)}}
-            styles={() => ({
-              track: {backgroundColor: "pink"},
-              mark: {borderColor: "light gray"},
-              markFilled: {
-                borderColor: "purple",
-              },
-            })}
-          />
+          
           <RangeSlider
             defaultValue={weekRange}
             value={weekRange}
-            label={myLabels[dataset][week]}
+            label={showLabel}
             min={MIN_WEEK}
             max={MAX_WEEK}
             step={1}
@@ -236,4 +224,26 @@ function Timeline(props: TimelineProps) {
   );
 }
 
+/* if you want to put regular slider back in
+          <Slider
+            defaultValue={week}
+            value={week}
+            label={showLabel}
+            min={MIN_WEEK}
+            max={MAX_WEEK}
+            color="light gray"
+            marks={sizingProps?.marks}
+            size={sizingProps?.size}
+            thumbSize={sizingProps?.thumb}
+            labelAlwaysOn={sizingProps?.showLabel}
+            onChange={(v) => { onChangeWeek(v)}}
+            styles={() => ({
+              track: {backgroundColor: "pink"},
+              mark: {borderColor: "light gray"},
+              markFilled: {
+                borderColor: "purple",
+              },
+            })}
+          />
+*/
 export default Timeline;
