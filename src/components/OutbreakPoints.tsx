@@ -116,7 +116,7 @@ export function OutbreakMarkers(week: number) {
                 position={info.geoLoc}
                 key={i}
             >
-                <Popup maxWidth='120'>
+                <Popup>
                     {info.label}
                 </Popup>
             </Marker>
