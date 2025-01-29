@@ -44,7 +44,7 @@ const HomePage = () => {
   const [textSize, setTextSize] = useState<MantineSize>('md');
   const [fontHeight, setFontHeight] = useState<number>(14);
   const [titleSize, setTitleSize] = useState<number>(40);
-  const [isRegSize, setIsRegSize] = useState<boolean>(true);
+  const [isMonitor, setIsMonitor] = useState<boolean>(true);
 
 
   function handleWindowSizeChange() {
@@ -54,14 +54,14 @@ const HomePage = () => {
       setFontHeight(10);
       setIconSize('xl');
       setTitleSize(20);
-      setIsRegSize(false);
+      setIsMonitor(false);
     } else {
       // reg window
       setTextSize('md');
       setFontHeight(14);
       setIconSize('xl');
       setTitleSize(40);
-      setIsRegSize(true);
+      setIsMonitor(true);
     }
   }
 
@@ -295,7 +295,7 @@ const HomePage = () => {
       {/* Calls the custom legend component with the data type and species type as parameters. */}
       <Legend dataTypeIndex={dataIndex} speciesIndex={speciesIndex} />
       {/* Calls the custom timeline component with the current week onChange function as parameters */}
-      <Timeline week={week} dataset={dataIndex} isRegSize={isRegSize} onChangeWeek={checkImageAndUpdate} />
+      <Timeline week={week} dataset={dataIndex} isMonitor={isMonitor} onChangeWeek={checkImageAndUpdate} />
     </div>
   );
 }

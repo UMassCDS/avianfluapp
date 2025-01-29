@@ -1,13 +1,16 @@
 import { useEffect, useState } from 'react';
-import { ActionIcon, Grid, Slider, RangeSlider } from '@mantine/core';
+import { ActionIcon, Grid, RangeSlider } from '@mantine/core';
 import { useMove } from '@mantine/hooks';
 import { IconPlayerPlayFilled, IconPlayerPauseFilled } from '@tabler/icons-react';
 import ab_dates from '../assets/abundance_dates.json';
 import mv_dates from '../assets/movement_dates.json';
 import {MIN_WEEK, MAX_WEEK} from '../utils/utils'
 
+// The Timeline includes three values the user can set.
+// 1. the currently displayed week of a year.  This is done with a separate 'thumb' above the range slider.
+// 2 & 3 are on the RangeSlider indicating the start and end weeks for playback are inflow/outflow.
 
-const months: Array<string> = [
+const monthLabels: Array<string> = [
   'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
 ];
 
@@ -15,39 +18,53 @@ const months: Array<string> = [
 interface TimelineProps {
   week: number;
   dataset: number;
-  isRegSize: boolean;
+  isMonitor: boolean; // True for monitor, false for smartphone or tablet
   onChangeWeek: (val: number) => void;
 }
 
+// text for the increments on the year slider
 interface markProps {
   value: number;
   label: string;
 }
 
 interface sliderProps {
-  size: string;
-  thumb: number;
+  size: string;     // size of the entire slider
+  thumb: number;    // size of the thumb on slider
   showLabel: boolean;
   marks: Array<markProps>;
 }
 const minRange = -51;  // makes it so end can be before start - supports playback over end of year
-//           inverted={true}  this helps the timeline show right, but only if we flip values in weekRange
 
 /* Creates a custom timeline slider that updates what week number of the year the user is currently on. */
 function Timeline(props: TimelineProps) {
-  const { week, dataset, isRegSize, onChangeWeek } = props;
-  const [weekRange, setWeekRange] = useState<[number,number]>([week, (week+5)%MAX_WEEK]);
-  const [myLabels, setMyLabels] = useState<Array<Array<string>>>([[],[]]);
-  const [marks, setMarks] = useState<Array<Array<markProps>>>([[],[]]);
+  const { week, dataset, isMonitor, onChangeWeek } = props;
+  // sizingProps are for things that change depending on if it is a smartPhone or monitor
   const [sizingProps, setSizingProps] = useState<sliderProps>();
+
+  // weekRange are the values on the RangeSlider. weekRange[0] is always the first one,
+  // and weekRange[1] is always the second one.  So to reverse the order, use isYearWrap.
+  const [weekRange, setWeekRange] = useState<[number,number]>([week, (week+5)%MAX_WEEK]);
+  const [isYearWrap, setIsYearWrap] = useState<boolean>(false);
+  // text indicating month on the timeline
+  const [marks, setMarks] = useState<Array<Array<markProps>>>([[],[]]);
+  // the date label that shows up on the 'thumbs'
+  const [dateLabels, setDateLabels] = useState<Array<Array<string>>>([[],[]]);
+
+  // value and ref are for the extra 'thumb' indicating the displayed week
+  const [value, setValue] = useState(week);
+  const { ref } = useMove(({ x }) => setValue(x));
+
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [playNext, setPlayNext] = useState<boolean>(false);
   const [playbackId, setPlaybackId] = useState<ReturnType<typeof setInterval>>();
-  const [isYearWrap, setIsYearWrap] = useState<boolean>(false);
-  const [value, setValue] = useState(week);
-  const [label, setLabel] = useState("");
-  const { ref } = useMove(({ x }) => setValue(x));
 
+
+  // The dates are slightly different for each dataset, so this initializes both 
+  // sets of dateLabels so they don't have to be determined later.
+  // Likewise the month breaks don't always occur on the same week number so the 
+  // 'marks' can change.
+  // TODO this may be moved into a csv file and just loaded
   useEffect(() => {
     // initialize labels[dataset][week]
     // The order of the labels needs to match the order of datasets in dataUrl.tsx/dataInfo[]
@@ -58,12 +75,12 @@ function Timeline(props: TimelineProps) {
         local_dates[i].push(info.label)
       ))
     }
-    setMyLabels(local_dates);
+    setDateLabels(local_dates);
 
     // initialize which timesteps get a month marker
     let local_marks:Array<Array<markProps>> =[[],[]]
     for (var i =0; i < datasets.length; i += 1) {
-      for (var month of months){
+      for (var month of monthLabels){
         const result = datasets[i].find(({ label }) => label.includes(month));
         if (result !== undefined) {
           const thisMark: markProps = {value: result.index, label: month};
@@ -78,39 +95,41 @@ function Timeline(props: TimelineProps) {
     // At init or when window size changes, 
     // set props for both sliders
     var sProps: sliderProps ;
-    if (isRegSize) {
+    if (isMonitor) {
       sProps = {size:'md', thumb:20, showLabel:true, marks:marks[dataset]}
     } else {
       sProps = {size:'sm', thumb:12, showLabel:false, marks:[]}
     }
     setSizingProps(sProps);
-  }, [marks, isRegSize]);
+  }, [marks, isMonitor]);
 
-
+  // handle displayThumb change
   useEffect(() => {
-    // play next
-    if (playNext) {
-      console.log("Week "+week);
-      var next_week:number = week+1;
-      // check if at end of the range 
-      if ((!isYearWrap) && (next_week > weekRange[1])) {
-        next_week = weekRange[0];
-      }
-      else if (isYearWrap) { 
-        // if it is a yearWrap it's a little more complicated. 
-        // check if it is before the begining and reaches the end
-        next_week = next_week%52;
-        if ((next_week < weekRange[1]) && (next_week > weekRange[0])) {
-          next_week = weekRange[1];
-        }     
-      }
-      console.log(next_week);
-      // goes back to Home to update the map
-      onChangeWeek(next_week);
-      setPlayNext(false);
-    }
-  }, [playNext, weekRange, week])
+    // slider value is 0 to 1. Convert that to a week index.
+    onChangeWeek(Math.floor(value*MAX_WEEK));
+  }, [value])
 
+  // change displayThumb if week changes
+  useEffect(() => {
+    // convert week index to a slider location value
+    setValue(week/MAX_WEEK);
+  }, [week])
+
+  // return thumb label for the given week and the current dataset
+  function showLabel(labelIndex: number) {
+    return dateLabels[dataset][labelIndex];
+  };
+  
+  // handle wrapping playback
+  function checkIfReversed(start:number,end:number) {
+    if (end < start) {
+      // toggle isYearWrap
+      setIsYearWrap(isWrap => !isWrap);
+      // reverse weeks in range
+      setWeekRange([end, start]);
+    }
+  };
+  
   function playbackClick() {
     if (isPlaying) {
       // stop playback
@@ -128,36 +147,27 @@ function Timeline(props: TimelineProps) {
     setIsPlaying(prevPlay => !prevPlay);
   };
 
-  // handle wrapping playback
-  function checkIfReversed() {
-    if (weekRange[1] < weekRange[0]) {
-      console.log("time to reverse "+weekRange)
-      // toggle isYearWrap
-      setIsYearWrap(isWrap => !isWrap);
-      // reverse weeks in range
-      setWeekRange(weeks => [weeks[1], weeks[0]]);
+  useEffect(() => {
+    // PLAYBACK - update the display for the next week
+    if (playNext) {
+      var next_week:number = week+1;
+      // check if at end of the range 
+      if ((!isYearWrap) && (next_week > weekRange[1])) {
+        next_week = weekRange[0];
+      } else if (isYearWrap) { 
+        // if it is a yearWrap it's a little more complicated. 
+        // check if it is before the beginning and reaches the end
+        // 52 = weeks per year
+        next_week = next_week%52;
+        if ((next_week < weekRange[1]) && (next_week > weekRange[0])) {
+          next_week = weekRange[1];
+        }     
+      }
+      // goes back to Home to update the map
+      onChangeWeek(next_week);
+      setPlayNext(false);
     }
-  };
-
-  useEffect(() => {
-    if (isYearWrap) {
-      console.log("WRAPPED "+weekRange);
-    } else {
-      console.log("REG "+weekRange);
-    }
-  }, [isYearWrap, weekRange])
-
-  useEffect(() => {
-    onChangeWeek(Math.floor(value*MAX_WEEK));
-  }, [value])
-
-  useEffect(() => {
-    setValue(week/MAX_WEEK);
-  }, [week])
-
-  function showLabel(labelIndex: number) {
-    return myLabels[dataset][labelIndex];
-  };
+  }, [playNext, weekRange, week])
 
   return (
     <div className="Timeline">
@@ -183,7 +193,7 @@ function Timeline(props: TimelineProps) {
               position: 'relative',
             }}
           >
-            {/* Thumb */}
+            {/* Thumb  - TODO use icon w/ pointy bit at the bottom*/}
             <div
               style={{
                 position: 'absolute',
@@ -193,10 +203,10 @@ function Timeline(props: TimelineProps) {
                 height: '16',
                 backgroundColor: "white",
               }} >
-                {myLabels[dataset][week]}
+                {dateLabels[dataset][week]}
               </div>
           </div>
-          
+          <p></p>
           <RangeSlider
             defaultValue={weekRange}
             value={weekRange}
@@ -211,12 +221,7 @@ function Timeline(props: TimelineProps) {
             thumbSize={sizingProps?.thumb}
             labelAlwaysOn={false}
             onChange={(v) => { setWeekRange(v)}}
-            onChangeEnd={() => { checkIfReversed()}}
-            styles={() => ({
-              thumb: {
-                backgroundColor: "green",
-              },
-            })}
+            onChangeEnd={(v) => { checkIfReversed(v[0], v[1])}}
           />
         </Grid.Col>
       </Grid>
