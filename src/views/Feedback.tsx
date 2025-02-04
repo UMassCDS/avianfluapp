@@ -42,10 +42,25 @@ function FeedbackForm(this: any) {
     }
   }
 
+  const Plans = (
+    <div>
+        <h2>Future Plans</h2>
+        <ul>
+          <li>Automate daily outbreak updates.</li>
+          <li>Option to show historic outbreak data (beyond one year ago).</li>
+          <li>Ability to Download Data.</li>
+          <li>Plot bird data over time for a single location.</li>
+          <li>Add marker for today on the timeline.</li>
+          <li>Improve accessibility issues.</li>
+        </ul> 
+    </div>
+  );
+
   return (
     <div className="DefaultPage" style={{marginLeft:50, marginRight:50}}>
-        <h1 style={{textAlign: "center"}}>Avian Influenza Feedback</h1>  
         <Link to="/">Return to App</Link>
+        {Plans}
+        <h2>Feedback</h2>
         <TextInput
           style={{width:300, marginTop:20}}
           label="Provide your email to receive a response."
