@@ -3,7 +3,9 @@ import { CheckIcon, MantineSize, Radio, Stack, Tooltip } from '@mantine/core';
 import { MapContainer, TileLayer, ImageOverlay } from 'react-leaflet';
 import { forwardRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { IconInfoCircle, IconWriting } from '@tabler/icons-react';
+import { IconInfoCircle, IconTestPipe, IconWriting } from '@tabler/icons-react';
+import 'leaflet/dist/leaflet.css';
+import axios from 'axios';
 import { imageURL, getScalingFilename, dataInfo} from '../hooks/dataUrl';
 import taxa from '../assets/taxa.json';
 import Timeline from '../components/Timeline';
@@ -11,7 +13,7 @@ import Legend from '../components/Legend';
 import {OutbreakMarkers, loadOutbreaks, OutbreakLegend} from '../components/OutbreakPoints'
 import {dateToWeek, MIN_WEEK, MAX_WEEK} from '../utils/utils'
 import '../styles/Home.css';
-import 'leaflet/dist/leaflet.css';
+// const express = require('express');
 
 
 const MIN_REG_WINDOW_WIDTH = 600;
@@ -47,6 +49,23 @@ const HomePage = () => {
   const [isMonitor, setIsMonitor] = useState<boolean>(true);
 
 
+  function runTest() {
+    console.log("Pam's test code");
+    axios.get('http://localhost:8000/echo', {params: {text: "Tiggy Rules"}})
+      .then(function (response) {
+        // handle success
+        console.log(response.data);
+      })
+      .catch(function (error) {
+        // handle error
+        console.log(error);
+      })
+      .finally(function () {
+        // always executed
+      }
+    );
+  }
+  
   function handleWindowSizeChange() {
     if (window.innerWidth <  MIN_REG_WINDOW_WIDTH) {
       // small window
@@ -280,7 +299,12 @@ const HomePage = () => {
         <ControlBar/>
         <OutbreakLegend/>
       </div>
-      <div className="about"> 
+      <div className="about">
+        <Tooltip label='Test RestAPI'>
+            <ActionIcon style={{margin:12}} size={iconSize} onClick={() => { runTest()}}>
+              <IconTestPipe/>
+            </ActionIcon>
+        </Tooltip> 
         <Tooltip label='Leave feedback and suggestions.'>
             <ActionIcon style={{margin:12}} size={iconSize} onClick={() => { navigate("/feedback")}}>
               <IconWriting/>
