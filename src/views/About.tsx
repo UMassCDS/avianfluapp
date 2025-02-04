@@ -29,7 +29,6 @@ function About(this: any) {
     const Data = (
         <div>
             <h2>Data</h2>
-
             <h3>Abundance</h3>
             <p>Abundance is derived from eBird weekly relative abundance (Fink et al. 2022) combined with population estimates 
                 from Partners in Flight (2020). The units are in birds per km^2.  The resolution of the data is 100 km - each cell 
@@ -59,15 +58,13 @@ function About(this: any) {
         <div>
             <h2>More Information</h2>
             <p><a href="https://birdflow-science.github.io/" target="_blank">BirdFlow</a>
-                &nbsp; is a joint project between the
-                &nbsp;<a href="https://www.cics.umass.edu/" target="_blank">University of Massachusetts Amherst</a>
-                &nbsp;and the 
-                &nbsp;<a href="https://www.birds.cornell.edu/home" target="_blank">Cornell Lab of Ornithology</a> funded by the 
-                &nbsp;<a href="https://www.nsf.gov" target="_blank">US National Science Foundation</a>.
+                &nbsp;is a joint project between the <a href="https://www.cics.umass.edu/" target="_blank">University of Massachusetts Amherst</a>
+                &nbsp;and the <a href="https://www.birds.cornell.edu/home" target="_blank">Cornell Lab of Ornithology</a> 
+                &nbsp;funded by the <a href="https://www.nsf.gov" target="_blank">US National Science Foundation</a>.
             </p>
             <p> <a href="https://birdflow-science.github.io/BirdFlowR/" target="_blank">BirdFlowR</a>
                 &nbsp;package was used to develop movement data and can be used to make predictions 
-                programmatically from BirdFlow models. Its documentation includes a page giving an &nbsp;
+                programmatically from BirdFlow models. Its documentation includes a page giving an&nbsp;
                 <a href="https://birdflow-science.github.io/BirdFlowR/articles/BirdFlowOverview.html" target="_blank">
                 Overview of the Uses and Limititations of BirdFlow models</a>.
             </p>
@@ -81,7 +78,7 @@ function About(this: any) {
     const Disclaimer = (
         <div>
             <h2>Disclaimer</h2>
-            <p>This material uses data from the eBird Status and Trends Project at the Cornell Lab of Ornithology, 
+            <p>This material uses data from the eBird Status and Trends Project at the Cornell Lab of Ornithology,
             &nbsp;<a href="https://ebird.org" target="_blank">eBird.org</a>. Any opinions, findings, and conclusions or 
             recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the Cornell Lab of Ornithology.</p>
         </div>
@@ -116,6 +113,17 @@ function About(this: any) {
         </div>
     );
 
+    const Outbreaks = (
+        <div>
+            <h2>Outbreaks</h2>
+            <p> The highly pathogenic avian influenza (HPAI) outbreak markers are based on the USDA Animal 
+                and Plant Health Inspection Service (APHIS) outbreak available for download at:&nbsp;
+                <a href="https://www.aphis.usda.gov/livestock-poultry-disease/avian/avian-influenza/hpai-detections/commercial-backyard-flocks" target="_blank">
+                Confirmations of HPAI in Commercial and Backyard Flocks</a>. This app is updated periodically, link has the most up to date outbreak information.
+            </p>
+        </div>
+    );
+
     return (
     <div className="DefaultPage">
         <h1 style={{textAlign:"center"}}>Avian Influenza</h1>
@@ -123,6 +131,7 @@ function About(this: any) {
         {HowTo}
         {Data}
         {Species}
+        {Outbreaks}
         {MoreInformation}
         {Disclaimer}
         {Citations}        
