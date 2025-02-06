@@ -44,7 +44,7 @@ function Timeline(props: TimelineProps) {
 
   // weekRange are the values on the RangeSlider. weekRange[0] is always the first one,
   // and weekRange[1] is always the second one.  So to reverse the order, use isYearWrap.
-  const [weekRange, setWeekRange] = useState<[number,number]>([week, (week+5)%MAX_WEEK]);
+  const [weekRange, setWeekRange] = useState<[number,number]>([MIN_WEEK, MAX_WEEK]);
   const [isYearWrap, setIsYearWrap] = useState<boolean>(false);
   // text indicating month on the timeline
   const [marks, setMarks] = useState<Array<Array<markProps>>>([[],[]]);
