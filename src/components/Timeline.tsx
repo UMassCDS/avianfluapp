@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { ActionIcon, Grid, RangeSlider } from '@mantine/core';
 import { useMove } from '@mantine/hooks';
-import { IconPlayerPlayFilled, IconPlayerPauseFilled } from '@tabler/icons-react';
+import { IconCaretDownFilled, IconPlayerPlayFilled, IconPlayerPauseFilled } from '@tabler/icons-react';
 import ab_dates from '../assets/abundance_dates.json';
 import mv_dates from '../assets/movement_dates.json';
-import {MIN_WEEK, MAX_WEEK} from '../utils/utils'
+import {dateToWeek, MIN_WEEK, MAX_WEEK, WEEKS_PER_YEAR} from '../utils/utils'
 
 // The Timeline includes three values the user can set.
 // 1. the currently displayed week of a year.  This is done with a separate 'thumb' above the range slider.
@@ -19,7 +19,7 @@ interface TimelineProps {
   week: number;
   dataset: number;
   isMonitor: boolean; // True for monitor, false for smartphone or tablet
-  onChangeWeek: (val: number) => void;
+  onChangeWeek: (week: number) => Promise<void>;
 }
 
 // text for the increments on the year slider
@@ -41,7 +41,8 @@ function Timeline(props: TimelineProps) {
   const { week, dataset, isMonitor, onChangeWeek } = props;
   // sizingProps are for things that change depending on if it is a smartPhone or monitor
   const [sizingProps, setSizingProps] = useState<sliderProps>();
-
+  // need the adjustWeek code to handle the keypresses because it doesn't really handle variables well
+  const [adjustWeek, setAdjustWeek] = useState(0);
   // weekRange are the values on the RangeSlider. weekRange[0] is always the first one,
   // and weekRange[1] is always the second one.  So to reverse the order, use isYearWrap.
   const [weekRange, setWeekRange] = useState<[number,number]>([MIN_WEEK, MAX_WEEK]);
@@ -51,9 +52,12 @@ function Timeline(props: TimelineProps) {
   // the date label that shows up on the 'thumbs'
   const [dateLabels, setDateLabels] = useState<Array<Array<string>>>([[],[]]);
 
-  // value and ref are for the extra 'thumb' indicating the displayed week
-  const [value, setValue] = useState(week);
-  const { ref } = useMove(({ x }) => setValue(x));
+  // sliderValue and ref are for the extra 'thumb' indicating the displayed week
+  const [sliderValue, setSliderValue] = useState(week/WEEKS_PER_YEAR);
+  const { ref } = useMove(({ x }) => { 
+    console.log("useMove");
+    onChangeWeek(Math.floor(x*WEEKS_PER_YEAR))
+  });
 
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [playNext, setPlayNext] = useState<boolean>(false);
@@ -89,7 +93,48 @@ function Timeline(props: TimelineProps) {
       }
     }
     setMarks(local_marks);
+
+    // determine current week 
+    console.log("Init timeline")
+    onChangeWeek(dateToWeek(new Date()));
+    // attach keystrokes to timeline
+    document.addEventListener('keydown', handleSelection);
+    return () => {
+      document.removeEventListener('keydown', handleSelection);
+    };
   }, []);
+
+  /* Allows the user to use the front and back arrow keys to control the week number 
+    and which image files are being displayed. It is set with the values at the time 
+    of addListener and does not get updated state variables. */ 
+    const handleSelection = (event: KeyboardEvent) => {
+    if (event.key === 'ArrowRight') {
+      event.preventDefault();
+      setAdjustWeek(1);
+    } else if (event.key === 'ArrowLeft') {
+      event.preventDefault();
+      setAdjustWeek(-1);
+    }
+  }
+  
+  useEffect(() => {
+    if (adjustWeek === 0) {
+      return;
+    }
+    if (adjustWeek > 0) {
+      // increments active index (wraps around when at end of year)
+      let temp = week + 1;
+      if (temp > MAX_WEEK) temp = MIN_WEEK;
+      onChangeWeek(temp);
+    } else {
+      // decrements active index (wraps around when at beginning of year)
+      let temp = week - 1;
+      if (temp < MIN_WEEK) temp = MAX_WEEK;
+      onChangeWeek(temp);
+    }
+    setAdjustWeek(0);
+  }, [adjustWeek]);
+
 
   useEffect(() => {
     // At init or when window size changes, 
@@ -103,16 +148,10 @@ function Timeline(props: TimelineProps) {
     setSizingProps(sProps);
   }, [marks, isMonitor]);
 
-  // handle displayThumb change
-  useEffect(() => {
-    // slider value is 0 to 1. Convert that to a week index.
-    onChangeWeek(Math.floor(value*MAX_WEEK));
-  }, [value])
-
-  // change displayThumb if week changes
+  // update slider if week changes due to playback or keyboard
   useEffect(() => {
     // convert week index to a slider location value
-    setValue(week/MAX_WEEK);
+    setSliderValue(week/MAX_WEEK);
   }, [week])
 
   // return thumb label for the given week and the current dataset
@@ -120,7 +159,7 @@ function Timeline(props: TimelineProps) {
     return dateLabels[dataset][labelIndex];
   };
   
-  // handle wrapping playback
+  // handle wrapping the time range over the end of year
   function checkIfReversed(start:number,end:number) {
     if (end < start) {
       // toggle isYearWrap
@@ -130,11 +169,19 @@ function Timeline(props: TimelineProps) {
     }
   };
   
-  function playbackClick() {
+  async function playbackClick() {
     if (isPlaying) {
       // stop playback
       clearInterval(playbackId);
     } else {
+      console.log("Play");
+      // initialize week to beginning of playback range
+      if (isYearWrap) {
+        await onChangeWeek(weekRange[1]);
+      } else {
+        console.log("start at ", weekRange[0]);
+        await onChangeWeek(weekRange[0]);
+      }
       // trigger playback every 0.4 sec
       // remember whatever function is called will use the variables w/ their values now, 
       // and not notice any updates
@@ -150,9 +197,11 @@ function Timeline(props: TimelineProps) {
   useEffect(() => {
     // PLAYBACK - update the display for the next week
     if (playNext) {
+      console.log("playback before week?", week);
       var next_week:number = week+1;
       // check if at end of the range 
       if ((!isYearWrap) && (next_week > weekRange[1])) {
+        console.log("not inverted, end of range")
         next_week = weekRange[0];
       } else if (isYearWrap) { 
         // if it is a yearWrap it's a little more complicated. 
@@ -160,10 +209,10 @@ function Timeline(props: TimelineProps) {
         // 52 = weeks per year
         next_week = next_week%52;
         if ((next_week < weekRange[1]) && (next_week > weekRange[0])) {
+          console.log("inverted end of range")
           next_week = weekRange[1];
         }     
       }
-      // goes back to Home to update the map
       onChangeWeek(next_week);
       setPlayNext(false);
     }
@@ -197,14 +246,17 @@ function Timeline(props: TimelineProps) {
             <div
               style={{
                 position: 'absolute',
-                left: `calc(${value * 100}% - ${'8px'})`,
+                left: `calc(${sliderValue * 100}% - ${'8px'})`,
                 top: 0,
                 width: '16',
-                height: '16',
-                backgroundColor: "white",
+                height: '10',
+                marginBottom:0,
               }} >
-                {dateLabels[dataset][week]}
-              </div>
+                <div style={{backgroundColor: "white"}}>
+                  {dateLabels[dataset][week]}
+                </div>
+                <IconCaretDownFilled viewBox='0, 5, 24, 24' />
+            </div>
           </div>
           <p></p>
           <RangeSlider

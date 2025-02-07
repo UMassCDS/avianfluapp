@@ -9,7 +9,7 @@ import taxa from '../assets/taxa.json';
 import Timeline from '../components/Timeline';
 import Legend from '../components/Legend';
 import {OutbreakMarkers, loadOutbreaks, OutbreakLegend} from '../components/OutbreakPoints'
-import {dateToWeek, MIN_WEEK, MAX_WEEK} from '../utils/utils'
+import {MIN_WEEK} from '../utils/utils'
 import '../styles/Home.css';
 import 'leaflet/dist/leaflet.css';
 
@@ -34,7 +34,6 @@ const HomePage = () => {
   // Sets state for the species type 
   const [speciesIndex, setSpeciesIndex] = useState(0);
   const [week, setWeek] = useState(MIN_WEEK);
-  const [adjustWeek, setAdjustWeek] = useState(0);
   // default state of the map overlay url for the current data displayed.
   const [overlayUrl, setOverlayUrl] = useState("");
   const speciesCombo = useCombobox();
@@ -65,67 +64,41 @@ const HomePage = () => {
     }
   }
 
-  /* Allows the user to use the front and back arrow keys to control the week number 
-     and which image files are being displayed. It is set with the values at the time 
-     of addListener and does not get updated state variables. */ 
-  const handleSelection = (event: KeyboardEvent) => {
-    if (event.key === 'ArrowRight') {
-      event.preventDefault();
-      setAdjustWeek(1);
-    } else if (event.key === 'ArrowLeft') {
-      event.preventDefault();
-      setAdjustWeek(-1);
-    }
-  }
-
-  useEffect(() => {
-    if (adjustWeek === 0) {
-      return;
-    }
-    if (adjustWeek > 0) {
-      // increments active index (wraps around when at end of year)
-      let temp = week + 1;
-      if (temp > MAX_WEEK) temp = MIN_WEEK;
-      checkImageAndUpdate(temp);
-    } else {
-      // decrements active index (wraps around when at beginning of year)
-      let temp = week - 1;
-      if (temp < MIN_WEEK) temp = MAX_WEEK;
-      checkImageAndUpdate(temp);
-    }
-    setAdjustWeek(0);
-  }, [adjustWeek]);
-
   // Called once on startup. Adds a listener for user keyboard events. 
   // Note: it appears this is not called when using Firefox on the iPhone PM 11/9/2024
   useEffect(() => {
     loadOutbreaks();
-    // determine current week 
-    checkImageAndUpdate(dateToWeek(new Date()));
     handleWindowSizeChange();
-    document.addEventListener('keydown', handleSelection);
     window.addEventListener('resize', handleWindowSizeChange);
     return () => {
-      document.removeEventListener('keydown', handleSelection);
       window.removeEventListener('resize', handleWindowSizeChange);
     };
   }, []);
 
-  async function checkImageAndUpdate(this_week: number) {
+  async function checkImage(this_week: number): Promise<boolean>{
     var image_url = imageURL(dataIndex, speciesIndex, this_week);
     var response = await fetch(image_url);
     if (!response.ok) {
       console.debug(response);
       var message = "The .png for week "+this_week+" on "+dataInfo[dataIndex].label+" of "+taxa[speciesIndex].label+" is missing.";
       alert(message);
-      return;
+      return false;
     }
-    setWeek(this_week);
     setOverlayUrl(image_url);
+    return true;
+  }
+
+  async function checkImageAndUpdate(this_week: number) {
+    var response = await checkImage(this_week);
+    if (response) {
+      console.log("HOME: onChangeWeek: ",this_week);
+      setWeek(this_week);
+    }
   }
 
   useEffect(() => {
-    checkImageAndUpdate(week);
+    console.log("dataIndex and species change", week);
+    checkImage(week);
   }, [dataIndex, speciesIndex]);
 
   async function checkInputTypes(d_index: number, s_index: number) {

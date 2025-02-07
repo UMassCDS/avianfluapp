@@ -2,8 +2,9 @@ import { useMediaQuery } from '@mantine/hooks';
 import { em } from '@mantine/core';
 
 const MSEC_TO_WEEK = 7*24*60*60*1000;
+export const WEEKS_PER_YEAR = 52;
 export const MIN_WEEK = 0;   // week index
-export const MAX_WEEK = 51;  
+export const MAX_WEEK = WEEKS_PER_YEAR -1;  
 
 export function isMobile():boolean|undefined {
     return useMediaQuery(`(max-width: ${em(750)})`);
