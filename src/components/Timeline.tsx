@@ -252,7 +252,7 @@ function Timeline(props: TimelineProps) {
                 top: 0,
               }} >
                 {/* SLIDER BUTTON - NEED TO BE REWORKED */}
-                <div style={{backgroundColor: "white", padding: "3px", border: "3px solid black"}}>
+                <div style={{backgroundColor: "white", padding: "3px"}}>
                   {dateLabels[dataset][week]}
                 </div>
                 {/* <IconCaretDownFilled viewBox='0, 5, 24, 24' /> */}

@@ -48,8 +48,13 @@
         align-items: center;
     }
 
-    .slider-button:hover {
+    .slider-button > div:nth-child(1) {
+        border: 2px solid black;
+    }
+
+    .slider-button:hover > div:nth-child(1) {
         color: blue;
         font-weight: bold;
+        border: 3px solid black;
     }
 }
