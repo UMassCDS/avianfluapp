@@ -238,24 +238,25 @@ function Timeline(props: TimelineProps) {
           <div
             ref={ref}
             style={{
-              height: 16,
+              height: 25,
               position: 'relative',
+              zIndex: 1000,
             }}
           >
             {/* Thumb  - TODO use icon w/ pointy bit at the bottom*/}
             <div
+              className='slider-button'
               style={{
                 position: 'absolute',
                 left: `calc(${sliderValue * 100}% - ${'8px'})`,
                 top: 0,
-                width: '16',
-                height: '10',
-                marginBottom:0,
               }} >
-                <div style={{backgroundColor: "white"}}>
+                {/* SLIDER BUTTON - NEED TO BE REWORKED */}
+                <div style={{backgroundColor: "white", padding: "3px", border: "3px solid black"}}>
                   {dateLabels[dataset][week]}
                 </div>
-                <IconCaretDownFilled viewBox='0, 5, 24, 24' />
+                {/* <IconCaretDownFilled viewBox='0, 5, 24, 24' /> */}
+                <div style={{backgroundColor: "black", width: "3px", height: "23px"}}></div>
             </div>
           </div>
           <p></p>

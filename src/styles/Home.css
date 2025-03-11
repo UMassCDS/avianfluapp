@@ -41,4 +41,15 @@
         transform: translate(-50%, -50%);
     }
 
+    .slider-button {
+        margin-bottom: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .slider-button:hover {
+        color: blue;
+        font-weight: bold;
+    }
 }
