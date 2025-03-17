@@ -243,6 +243,10 @@ const HomePage = () => {
     </div>
   ));
 
+  const AddressBar = () => (
+    <div>Address Bar</div>
+  );
+
   // species selection, type selection and about button
   const ControlBar = () => (
     <div>
@@ -256,6 +260,12 @@ const HomePage = () => {
           {/* Dropdown for data type */}
           <Tooltip label='Types of data sets'>
             <DataTypeComponent />
+          </Tooltip>
+        </Grid.Col>
+        <Grid.Col span={{ base: 4, md: 2, lg: 2 }}>
+          {/* Dropdown for data type */}
+          <Tooltip label='Types of data sets'>
+            <AddressBar />
           </Tooltip>
         </Grid.Col>
         <Grid.Col span={{ base: 6, md: 4, lg: 3 }}>
