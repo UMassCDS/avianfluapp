@@ -86,6 +86,18 @@ const HomePage = () => {
   // Called once on startup. Adds a listener for user keyboard events. 
   // Note: it appears this is not called when using Firefox on the iPhone PM 11/9/2024
   useEffect(() => {
+    // THIS PART IS FOR TESTING IF REACT APPLICATION CAN ACCESS THE R BACKEND
+    const testRApi = async () => {
+      try {
+        const response = await axios.get("http://localhost:8000/echo");
+        console.log(response.data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+    testRApi();
+    // TESTING ENDS HERE
+
     loadOutbreaks();
     handleWindowSizeChange();
     window.addEventListener('resize', handleWindowSizeChange);
