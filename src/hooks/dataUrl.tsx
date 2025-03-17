@@ -17,6 +17,16 @@ export var dataInfo: {
     label:'Movement',
     units: 'Birds/km/week',
   },
+  {
+    datatype: 'inflow',
+    label:'Inflow',
+    units: 'Birds/km/week',
+  },
+  {
+    datatype: 'outflow', 
+    label:'Outflow',
+    units: 'Birds/km/week',
+  },
 ];
 
 

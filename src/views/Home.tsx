@@ -1,5 +1,5 @@
 import { ActionIcon, Combobox, ComboboxStore, Grid, Input, InputBase, useCombobox } from '@mantine/core';
-import { CheckIcon, MantineSize, Radio, Stack, Tooltip } from '@mantine/core';
+import { CheckIcon, MantineSize, Radio, Stack, Tooltip, Select } from '@mantine/core';
 import { MapContainer, TileLayer, ImageOverlay } from 'react-leaflet';
 import { forwardRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -138,25 +138,45 @@ const HomePage = () => {
   };
 
   // maps data types (abundance, movement etc) to radio buttons
-  const dataTypeRadio = dataInfo.map((dt, index) => (
-    <Radio 
-      icon={CheckIcon} 
-      key={dt.label}
-      checked={dataIndex===index} 
-      onChange={() => {
-        checkInputTypes(index, speciesIndex)}
-      } 
-      size={textSize}
-      label={dt.label} 
-    />
-  ));
+  // const dataTypeRadio = dataInfo.map((dt, index) => (
+  //   <Radio 
+  //     icon={CheckIcon} 
+  //     key={dt.label}
+  //     checked={dataIndex===index} 
+  //     onChange={() => {
+  //       checkInputTypes(index, speciesIndex)}
+  //     } 
+  //     size={textSize}
+  //     label={dt.label} 
+  //   />
+  // ));
+
+  const dataToIndex = {
+    "abundance": 0,
+    "movement": 1,
+    "inflow": 2,
+    "outflow": 3
+  };
+
+  const indexToData = ["abundance", "movement", "inflow", "outflow"];
   
   // creates component surrounding the data type widgets to add tool tip
   const DataTypeComponent = forwardRef<HTMLDivElement>((props, ref) => (
     <div ref={ref} {...props}>
-      <Stack>
+      {/* <Stack>
         {dataTypeRadio}
-      </Stack>
+      </Stack> */}
+      <Select
+        data = {dataInfo.map((dt) => ({value: dt.datatype, label: dt.label}))}
+        value = {indexToData[dataIndex]}
+        onChange = {(dataType) => {
+          if (dataType !== null) {
+            checkInputTypes(dataToIndex[dataType as keyof typeof dataToIndex], speciesIndex);
+          } else {
+            console.log("dataType is null (abundance, movement, inflow, outflow). This shouldn't be happening!");
+          }
+        }}
+      />
     </div>
   ));
 
