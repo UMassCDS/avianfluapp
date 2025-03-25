@@ -15,6 +15,7 @@ import {MIN_WEEK} from '../utils/utils'
 import '../styles/Home.css';
 // const express = require('express');
 import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
+import 'leaflet-geosearch/dist/geosearch.css';
 
 
 const MIN_REG_WINDOW_WIDTH = 600;
