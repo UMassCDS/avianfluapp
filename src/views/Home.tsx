@@ -1,6 +1,6 @@
 import { ActionIcon, Combobox, ComboboxStore, Grid, Input, InputBase, useCombobox } from '@mantine/core';
 import { CheckIcon, MantineSize, Radio, Stack, Tooltip, Select } from '@mantine/core';
-import { MapContainer, TileLayer, ImageOverlay } from 'react-leaflet';
+import { MapContainer, TileLayer, ImageOverlay, useMap } from 'react-leaflet';
 import { forwardRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IconInfoCircle, IconTestPipe, IconWriting } from '@tabler/icons-react';
@@ -14,6 +14,8 @@ import {OutbreakMarkers, loadOutbreaks, OutbreakLegend} from '../components/Outb
 import {MIN_WEEK} from '../utils/utils'
 import '../styles/Home.css';
 // const express = require('express');
+import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
+import 'leaflet-geosearch/dist/geosearch.css';
 
 
 const MIN_REG_WINDOW_WIDTH = 600;
@@ -87,15 +89,15 @@ const HomePage = () => {
   // Note: it appears this is not called when using Firefox on the iPhone PM 11/9/2024
   useEffect(() => {
     // THIS PART IS FOR TESTING IF REACT APPLICATION CAN ACCESS THE R BACKEND
-    const testRApi = async () => {
-      try {
-        const response = await axios.get("http://localhost:8000/echo");
-        console.log(response.data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-    testRApi();
+    // const testRApi = async () => {
+    //   try {
+    //     const response = await axios.get("http://localhost:8000/echo");
+    //     console.log(response.data);
+    //   } catch (error) {
+    //     console.error("Error fetching data:", error);
+    //   }
+    // };
+    // testRApi();
     // TESTING ENDS HERE
 
     loadOutbreaks();
@@ -243,6 +245,23 @@ const HomePage = () => {
     </div>
   ));
 
+  const SearchField = () => {
+    const provider = new OpenStreetMapProvider();
+  
+    // @ts-ignore
+    const searchControl = new GeoSearchControl({
+      provider: provider,
+    });
+  
+    const map = useMap();
+    useEffect(() => {
+      map.addControl(searchControl);
+      return () => map.removeControl(searchControl);
+    }, []);
+  
+    return null;
+  };
+
   // species selection, type selection and about button
   const ControlBar = () => (
     <div>
@@ -283,6 +302,7 @@ const HomePage = () => {
         keyboard={false}
         maxBounds={imageBounds}
       >
+        <SearchField />
        {/* Adds the attributions to the map */}
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
