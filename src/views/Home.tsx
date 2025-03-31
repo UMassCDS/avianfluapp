@@ -16,6 +16,7 @@ import '../styles/Home.css';
 // const express = require('express');
 import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
 import 'leaflet-geosearch/dist/geosearch.css';
+import InflowOutflowTimeline from '../components/InflowOutflowTimeline';
 
 
 const MIN_REG_WINDOW_WIDTH = 600;
@@ -344,7 +345,7 @@ const HomePage = () => {
       {/* Calls the custom legend component with the data type and species type as parameters. */}
       <Legend dataTypeIndex={dataIndex} speciesIndex={speciesIndex} />
       {/* Calls the custom timeline component with the current week onChange function as parameters */}
-      <Timeline week={week} dataset={dataIndex} isMonitor={isMonitor} onChangeWeek={checkImageAndUpdate} />
+      <InflowOutflowTimeline week={week} dataset={dataIndex} isMonitor={isMonitor} onChangeWeek={checkImageAndUpdate} duration={3} />
     </div>
   );
 }
