@@ -5,6 +5,7 @@ import { IconCaretDownFilled, IconPlayerPlayFilled, IconPlayerPauseFilled } from
 import ab_dates from '../assets/abundance_dates.json';
 import mv_dates from '../assets/movement_dates.json';
 import {dateToWeek, MIN_WEEK, MAX_WEEK, WEEKS_PER_YEAR} from '../utils/utils';
+import { circle } from 'leaflet';
 
 // The Timeline includes three values the user can set.
 // 1. the currently displayed week of a year.  This is done with a separate 'thumb' above the range slider.
@@ -221,6 +222,32 @@ function InflowOutflowTimeline(props: TimelineProps) {
     }
   }, [playNext, weekRange, week])
 
+  // This is the circle thumb that will be used for the slider
+  const circleThumb = (
+    <div
+      style={{
+        width: '24px',
+        height: '24px',
+        borderRadius: '50%',
+        backgroundColor: 'white',
+        boxShadow: '0 0 0 3px #228be6', // mimic default Mantine outline
+      }}
+    />
+  );
+
+  // This is the arrow thumb that will be used for the slider
+  const arrowThumb = (
+    <div
+      style={{
+        width: 0,
+        height: 0,
+        borderTop: '16px solid transparent',
+        borderBottom: '16px solid transparent',
+        borderLeft: '24px solid #228be6', // blue arrow
+      }}
+    />
+  );
+
   // handleChange is used to handle slider behavior for inflow/outflow (aka. fixed length and wraps to beginning of next year when exceed the end of current year)
   const handleChange = (values:[number, number]) => {
     const [oldLeft, oldRight] = weekRange;
@@ -235,17 +262,24 @@ function InflowOutflowTimeline(props: TimelineProps) {
       }
     }
 
-    console.log(activeThumbRef.current);
-
+    // console.log(activeThumbRef.current);
 
     if (activeThumbRef.current === 'left') {
       newRight = newLeft + duration;
+      if (newRight > MAX_WEEK) {
+        newRight = newRight - MAX_WEEK;
+        setIsYearWrap(false);
+      } else setIsYearWrap(false);
     }
     if (activeThumbRef.current === 'right') {
       newLeft = newRight - duration;
+      if (newLeft < MIN_WEEK) {
+        newLeft = newLeft + MAX_WEEK;
+        setIsYearWrap(false);
+      } else setIsYearWrap(false);
     }
     
-    console.log(`Old range: [${oldLeft}, ${oldRight}] New range: [${newLeft}, ${newRight}]`);
+    // console.log(`Old range: [${oldLeft}, ${oldRight}] New range: [${newLeft}, ${newRight}]`);
     setWeekRange([newLeft, newRight]);
   };
 
@@ -307,27 +341,8 @@ function InflowOutflowTimeline(props: TimelineProps) {
             }}
             thumbSize={24}
             thumbChildren={[
-              // Left thumb: manually render the default circular look
-              <div
-                style={{
-                  width: '24px',
-                  height: '24px',
-                  borderRadius: '50%',
-                  backgroundColor: 'white',
-                  boxShadow: '0 0 0 3px #228be6', // mimic default Mantine outline
-                }}
-              />,
-              
-              // Right thumb: filled arrow pointing right
-              <div
-                style={{
-                  width: 0,
-                  height: 0,
-                  borderTop: '16px solid transparent',
-                  borderBottom: '16px solid transparent',
-                  borderLeft: '24px solid #228be6', // blue arrow
-                }}
-              />,
+              circleThumb,
+              arrowThumb,
             ]}
             defaultValue={weekRange}
             value={weekRange}
@@ -342,7 +357,6 @@ function InflowOutflowTimeline(props: TimelineProps) {
             labelAlwaysOn={false}
             onChange={handleChange}
             onChangeEnd={handleChangeEnd}
-            // onChangeEnd={(v) => { checkIfReversed(v[0], v[1])}}
           />
 
           {/* Slider for abundance and movement */}
