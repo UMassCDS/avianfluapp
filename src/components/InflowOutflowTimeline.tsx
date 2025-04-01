@@ -1,11 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ActionIcon, Grid, RangeSlider, Slider } from '@mantine/core';
 import { useMove } from '@mantine/hooks';
 import { IconCaretDownFilled, IconPlayerPlayFilled, IconPlayerPauseFilled } from '@tabler/icons-react';
 import ab_dates from '../assets/abundance_dates.json';
 import mv_dates from '../assets/movement_dates.json';
 import {dateToWeek, MIN_WEEK, MAX_WEEK, WEEKS_PER_YEAR} from '../utils/utils';
-import { IconArrowBigRightFilled, IconHeart } from '@tabler/icons-react';
 
 // The Timeline includes three values the user can set.
 // 1. the currently displayed week of a year.  This is done with a separate 'thumb' above the range slider.
@@ -65,6 +64,8 @@ function InflowOutflowTimeline(props: TimelineProps) {
   const [playNext, setPlayNext] = useState<boolean>(false);
   const [playbackId, setPlaybackId] = useState<ReturnType<typeof setInterval>>();
 
+  // This is for knowing which slider thumb is being moved
+  const activeThumbRef = useRef<"left" | "right" | null>(null);
 
   // The dates are slightly different for each dataset, so this initializes both 
   // sets of dateLabels so they don't have to be determined later.
@@ -221,7 +222,37 @@ function InflowOutflowTimeline(props: TimelineProps) {
   }, [playNext, weekRange, week])
 
   // handleChange is used to handle slider behavior for inflow/outflow (aka. fixed length and wraps to beginning of next year when exceed the end of current year)
-  const handleChange = () => {};
+  const handleChange = (values:[number, number]) => {
+    const [oldLeft, oldRight] = weekRange;
+    let [newLeft, newRight] = values;
+
+    if (activeThumbRef.current === null) {
+      if (newLeft !== oldLeft) {
+        activeThumbRef.current = "left";
+      }
+      if (newRight !== oldRight) {
+        activeThumbRef.current = "right";
+      }
+    }
+
+    console.log(activeThumbRef.current);
+
+
+    if (activeThumbRef.current === 'left') {
+      newRight = newLeft + duration;
+    }
+    if (activeThumbRef.current === 'right') {
+      newLeft = newRight - duration;
+    }
+    
+    console.log(`Old range: [${oldLeft}, ${oldRight}] New range: [${newLeft}, ${newRight}]`);
+    setWeekRange([newLeft, newRight]);
+  };
+
+  // Reset activeThumb to null when the user releases the thumb
+  const handleChangeEnd = (_:[number, number]) => {
+    activeThumbRef.current = null;
+  }
 
   return (
     <div className="Timeline">
@@ -308,9 +339,9 @@ function InflowOutflowTimeline(props: TimelineProps) {
             marks={sizingProps?.marks}
             inverted={isYearWrap}
             size={sizingProps?.size}
-            // thumbSize={sizingProps?.thumb}
             labelAlwaysOn={false}
-            onChange={(v) => { setWeekRange(v)}}
+            onChange={handleChange}
+            onChangeEnd={handleChangeEnd}
             // onChangeEnd={(v) => { checkIfReversed(v[0], v[1])}}
           />
 
