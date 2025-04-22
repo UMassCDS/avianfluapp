@@ -50,9 +50,9 @@ function InflowOutflowTimeline(props: TimelineProps) {
   const [weekRange, setWeekRange] = useState<[number,number]>([MIN_WEEK, MAX_WEEK]);
   const [isYearWrap, setIsYearWrap] = useState<boolean>(false);
   // text indicating month on the timeline
-  const [marks, setMarks] = useState<Array<Array<markProps>>>([[],[]]);
+  const [marks, setMarks] = useState<Array<Array<markProps>>>(Array.from({ length: 4 }, () => []));
   // the date label that shows up on the 'thumbs'
-  const [dateLabels, setDateLabels] = useState<Array<Array<string>>>([[],[]]);
+  const [dateLabels, setDateLabels] = useState<Array<Array<string>>>(Array.from({ length: 4 }, () => []));
 
   // sliderValue and ref are for the extra 'thumb' indicating the displayed week
   const [sliderValue, setSliderValue] = useState(week/WEEKS_PER_YEAR);
@@ -73,27 +73,35 @@ function InflowOutflowTimeline(props: TimelineProps) {
   useEffect(() => {
     // initialize labels[dataset][week]
     // The order of the labels needs to match the order of datasets in dataUrl.tsx/dataInfo[]
-    let datasets = [ab_dates, mv_dates]
-    let local_dates: Array<Array<string>> = [[],[]];
-    for (var i =0; i < datasets.length; i += 1) {
+    
+    // let datasets = [ab_dates, mv_dates]
+
+    // Needs more for inflow/outflow
+    let datasets = [ab_dates, mv_dates, ab_dates, ab_dates];
+
+    let local_dates: Array<Array<string>> = Array.from({ length: datasets.length }, () => []);
+    for (var i = 0; i < datasets.length; i += 1) {
+      console.log(i);
       datasets[i].map((info) => (
         local_dates[i].push(info.label)
       ))
     }
     setDateLabels(local_dates);
+    console.log(dateLabels);
 
+    // NOT NEEDED FOR INFLOW/OUTFLOW SLIDER
     // initialize which timesteps get a month marker
-    let local_marks:Array<Array<markProps>> =[[],[]]
-    for (var i =0; i < datasets.length; i += 1) {
-      for (var month of monthLabels){
-        const result = datasets[i].find(({ label }) => label.includes(month));
-        if (result !== undefined) {
-          const thisMark: markProps = {value: result.index, label: month};
-          local_marks[i].push(thisMark);
-        }
-      }
-    }
-    setMarks(local_marks);
+    // let local_marks:Array<Array<markProps>> =[[],[]]
+    // for (var i =0; i < datasets.length; i += 1) {
+    //   for (var month of monthLabels){
+    //     const result = datasets[i].find(({ label }) => label.includes(month));
+    //     if (result !== undefined) {
+    //       const thisMark: markProps = {value: result.index, label: month};
+    //       local_marks[i].push(thisMark);
+    //     }
+    //   }
+    // }
+    // setMarks(local_marks);
 
     // determine current week 
     console.log("Init timeline")

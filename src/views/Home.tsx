@@ -370,12 +370,17 @@ const HomePage = () => {
             </ActionIcon>
         </Tooltip>
       </div>
-      {/* Calls the custom legend component with the data type and species type as parameters. */}
-      {/* <Legend dataTypeIndex={dataIndex} speciesIndex={speciesIndex} /> */}
       
-      {/* Calls the custom timeline component with the current week onChange function as parameters */}
-      {/* <Timeline week={week} dataset={dataIndex} isMonitor={isMonitor} onChangeWeek={checkImageAndUpdate} /> */}
-      <InflowOutflowTimeline week={week} dataset={dataIndex} isMonitor={isMonitor} onChangeWeek={flowUpdate} duration={25} />
+      {/* If dataIndex >= 2, then it's currently inflow/outflow */}
+      {dataIndex < 2 && (
+          <Legend dataTypeIndex={dataIndex} speciesIndex={speciesIndex} />
+      )}
+
+      {/* Show this slider for abundance and movement */}
+      {dataIndex < 2 && <Timeline week={week} dataset={dataIndex} isMonitor={isMonitor} onChangeWeek={checkImageAndUpdate} />}
+
+      {/* Show this slider for inflow and outflow */}
+      {dataIndex >= 2 && <InflowOutflowTimeline week={week} dataset={dataIndex} isMonitor={isMonitor} onChangeWeek={flowUpdate} duration={25} />}
     </div>
   );
 }
