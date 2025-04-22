@@ -4,8 +4,8 @@ import { useMove } from '@mantine/hooks';
 import { IconCaretDownFilled, IconPlayerPlayFilled, IconPlayerPauseFilled } from '@tabler/icons-react';
 import ab_dates from '../assets/abundance_dates.json';
 import mv_dates from '../assets/movement_dates.json';
-import {dateToWeek, MIN_WEEK, MAX_WEEK, WEEKS_PER_YEAR} from '../utils/utils';
-import { circle } from 'leaflet';
+import {dateToWeek, MIN_WEEK, MAX_WEEK, WEEKS_PER_YEAR} from '../utils/utils'
+import { duration } from 'moment';
 
 // The Timeline includes three values the user can set.
 // 1. the currently displayed week of a year.  This is done with a separate 'thumb' above the range slider.
@@ -20,8 +20,8 @@ interface TimelineProps {
   week: number;
   dataset: number;
   isMonitor: boolean; // True for monitor, false for smartphone or tablet
-  onChangeWeek: (week: number) => Promise<void>;
-  duration: number; // This prop is for specifying the length that the inflow/outflow timeline should display ("duration" should be passed from an external input element to this timeline component). Duration is in weeks.
+  onChangeWeek: (week: number) => void;
+  duration: number,
 }
 
 // text for the increments on the year slider
@@ -57,7 +57,6 @@ function InflowOutflowTimeline(props: TimelineProps) {
   // sliderValue and ref are for the extra 'thumb' indicating the displayed week
   const [sliderValue, setSliderValue] = useState(week/WEEKS_PER_YEAR);
   const { ref } = useMove(({ x }) => { 
-    console.log("useMove");
     onChangeWeek(Math.floor(x*WEEKS_PER_YEAR))
   });
 
@@ -65,8 +64,6 @@ function InflowOutflowTimeline(props: TimelineProps) {
   const [playNext, setPlayNext] = useState<boolean>(false);
   const [playbackId, setPlaybackId] = useState<ReturnType<typeof setInterval>>();
 
-  // This is for knowing which slider thumb is being moved
-  const activeThumbRef = useRef<"left" | "right" | null>(null);
 
   // The dates are slightly different for each dataset, so this initializes both 
   // sets of dateLabels so they don't have to be determined later.
@@ -222,72 +219,6 @@ function InflowOutflowTimeline(props: TimelineProps) {
     }
   }, [playNext, weekRange, week])
 
-  // This is the circle thumb that will be used for the slider
-  const circleThumb = (
-    <div
-      style={{
-        width: '24px',
-        height: '24px',
-        borderRadius: '50%',
-        backgroundColor: 'white',
-        boxShadow: '0 0 0 3px #228be6', // mimic default Mantine outline
-      }}
-    />
-  );
-
-  // This is the arrow thumb that will be used for the slider
-  const arrowThumb = (
-    <div
-      style={{
-        width: 0,
-        height: 0,
-        borderTop: '16px solid transparent',
-        borderBottom: '16px solid transparent',
-        borderLeft: '24px solid #228be6', // blue arrow
-      }}
-    />
-  );
-
-  // handleChange is used to handle slider behavior for inflow/outflow (aka. fixed length and wraps to beginning of next year when exceed the end of current year)
-  const handleChange = (values:[number, number]) => {
-    const [oldLeft, oldRight] = weekRange;
-    let [newLeft, newRight] = values;
-
-    if (activeThumbRef.current === null) {
-      if (newLeft !== oldLeft) {
-        activeThumbRef.current = "left";
-      }
-      if (newRight !== oldRight) {
-        activeThumbRef.current = "right";
-      }
-    }
-
-    // console.log(activeThumbRef.current);
-
-    if (activeThumbRef.current === 'left') {
-      newRight = newLeft + duration;
-      if (newRight > MAX_WEEK) {
-        newRight = newRight - MAX_WEEK;
-        setIsYearWrap(false);
-      } else setIsYearWrap(false);
-    }
-    if (activeThumbRef.current === 'right') {
-      newLeft = newRight - duration;
-      if (newLeft < MIN_WEEK) {
-        newLeft = newLeft + MAX_WEEK;
-        setIsYearWrap(false);
-      } else setIsYearWrap(false);
-    }
-    
-    // console.log(`Old range: [${oldLeft}, ${oldRight}] New range: [${newLeft}, ${newRight}]`);
-    setWeekRange([newLeft, newRight]);
-  };
-
-  // Reset activeThumb to null when the user releases the thumb
-  const handleChangeEnd = (_:[number, number]) => {
-    activeThumbRef.current = null;
-  }
-
   return (
     <div className="Timeline">
       <Grid align='stretch'>
@@ -330,78 +261,163 @@ function InflowOutflowTimeline(props: TimelineProps) {
             </div>
           </div>
           <p></p>
-          {/* Slider for inflow/outflow */}
-          <RangeSlider
-            styles={{
-              thumb: {
-                backgroundColor: 'transparent', // remove base background
-                border: 'none',
-                boxShadow: 'none',
-              },
-            }}
-            thumbSize={24}
-            thumbChildren={[
-              circleThumb,
-              arrowThumb,
-            ]}
-            defaultValue={weekRange}
-            value={weekRange}
-            label={showLabel}
-            min={MIN_WEEK}
-            max={MAX_WEEK}
-            step={1}
-            minRange={minRange}
-            marks={sizingProps?.marks}
-            inverted={isYearWrap}
-            size={sizingProps?.size}
-            labelAlwaysOn={false}
-            onChange={handleChange}
-            onChangeEnd={handleChangeEnd}
-          />
-
-          {/* Slider for abundance and movement */}
-          {/* <RangeSlider
-            defaultValue={weekRange}
-            value={weekRange}
-            label={showLabel}
-            min={MIN_WEEK}
-            max={MAX_WEEK}
-            step={1}
-            minRange={minRange}
-            marks={sizingProps?.marks}
-            inverted={isYearWrap}
-            size={sizingProps?.size}
-            // thumbSize={sizingProps?.thumb}
-            labelAlwaysOn={false}
-            onChange={(v) => { setWeekRange(v)}}
-            onChangeEnd={(v) => { checkIfReversed(v[0], v[1])}}
-          /> */}
+          <CustomFixedRangeSlider  min={MIN_WEEK} max={MAX_WEEK} offset={duration} realValue={weekRange[0]} setRealValue={(val:number) => {setWeekRange([val, val + duration])}} />
         </Grid.Col>
       </Grid>
     </div>
   );
 }
 
-  // if you want to put regular slider back in
-      // <Slider
-      //   defaultValue={week}
-      //   value={week}
-      //   label={showLabel}
-      //   min={MIN_WEEK}
-      //   max={MAX_WEEK}
-      //   color="light gray"
-      //   marks={sizingProps?.marks}
-      //   size={sizingProps?.size}
-      //   thumbSize={sizingProps?.thumb}
-      //   labelAlwaysOn={sizingProps?.showLabel}
-      //   onChange={(v) => { onChangeWeek(v)}}
-      //   styles={() => ({
-      //     track: {backgroundColor: "pink"},
-      //     mark: {borderColor: "light gray"},
-      //     markFilled: {
-      //       borderColor: "purple",
-      //     },
-      //   })}
-      // />
+function CustomFixedRangeSlider({ min, max, offset, realValue, setRealValue }: { min: number; max: number; offset: number; realValue: number; setRealValue: (val: number) => void }) {
+  // Real thumb values (draggable): realValue, setRealValue (state lifted up to parent component)
+  // const [realValue, setRealValue] = useState(min);
+  const range = max - min + 1;
+
+  // Compute fake thumb value with wrap-around
+  const fakeValue = ((realValue - min + offset) % range) + min;
+
+  // Ref and useMove for track handling
+  const { ref } = useMove(({ x }) => {
+    // x is normalized (0 to 1)
+    const newValue = min + x * (max - min);
+    
+    console.log("Dragging value for inflow/outflow:", Math.round(newValue), Math.round(newValue) + offset);
+
+    setRealValue(Math.round(newValue));
+  });
+
+  // Compute percentage positions for styling
+  const realPercent = ((realValue - min) / (max - min)) * 100;
+  const fakePercent = ((fakeValue - min) / (max - min)) * 100;
+
+  // Build a custom gradient for the filled bar
+  // For a wrap-around, fill from 0 to fakePercent and from realPercent to 100%
+  // Otherwise, fill from realPercent to fakePercent.
+  const isWrapped = realValue > fakeValue;
+  const filledStyle = isWrapped 
+    ? { background: `linear-gradient(to right,
+        #228be6 0%, #228be6 ${fakePercent}%,
+          transparent ${fakePercent}%,
+          transparent ${realPercent}%,
+        #228be6 ${realPercent}%,
+        #228be6 100%)` }
+    : { background: `linear-gradient(to right,
+          transparent 0%,
+          transparent ${realPercent}%,
+        #228be6 ${realPercent}%,
+        #228be6 ${fakePercent}%,
+          transparent ${fakePercent}%,
+          transparent 100%)` };
+
+  const allMarks = Array.from({ length: range }, (_, i) => min + i);
+
+  return (
+    <div style={{ position: 'relative', width: '100%', height: "12px", background: '#dee2e6', border: "1px solid black"}}>
+      {/* Custom filled bar */}
+      <div style={{ ...filledStyle, position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }} />
+      
+      {allMarks.map(markValue => {
+        const markPercent = ((markValue - min) / (max - min)) * 100;
+        if (markValue === min || markValue === max) return null;
+        return (
+          <div
+            key={markValue}
+            style={{
+              position: 'absolute',
+              left: `${markPercent}%`,
+              top: 3,
+              width: 4,
+              height: 4,
+              borderRadius: '50%',
+              backgroundColor: 'white',
+            }}
+          />
+        );
+      })}
+
+      {/* Real draggable thumb (hollow circle) */}
+      <div
+        style={{
+          position: 'absolute',
+          top: -8,
+          left: `calc(${realPercent}% - 12px)`,
+          width: 24,
+          height: 24,
+          borderRadius: '50%',
+          backgroundColor: 'white',
+          border: '2px solid #228be6',
+          cursor: 'pointer',
+        }}
+        // Attach pointer events via the track useMove
+      />
+
+      {/* Real draggable thumb (filled circle) */}
+      {/* <div
+        style={{
+          position: 'absolute',
+          top: -8,
+          left: `calc(${realPercent}% - 12px)`,
+          width: 24,
+          height: 24,
+          borderRadius: '50%',
+          backgroundColor: '#228be6',
+          cursor: 'pointer',
+        }}
+        // Attach pointer events via the track useMove
+      /> */}
+
+
+      {/* Fake thumb for display only (filled arrow) */}
+      <div
+        style={{
+          position: 'absolute',
+          top: '50%', // vertical center of the track
+          // Center the arrow horizontally relative to its computed percentage position:
+          left: `calc(${fakePercent}% - 12px)`, // Adjust by half arrow "width"
+          transform: 'translateY(-50%)',
+          width: 0,
+          height: 0,
+          borderTop: '12px solid transparent',
+          borderBottom: '12px solid transparent',
+          borderLeft: `24px solid #228be6`,
+          pointerEvents: 'none', // Ensure the fake thumb does not capture mouse events
+        }}
+      />
+
+      {/* Fake thumb for display only (hollow arrow) */}
+      {/* <div
+        style={{
+          position: 'absolute',
+          left: `calc(${fakePercent}% - 12px)`,
+          top: '50%',
+          transform: 'translateY(-50%)',
+          pointerEvents: 'none', // decorative only
+          width: 28,
+          height: 28,
+        }}
+      >
+        <HollowArrowThumb />
+      </div> */}
+
+      {/* Transparent overlay to capture pointer events from useMove */}
+      <div ref={ref} style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, cursor: 'pointer' }} />
+    </div>
+  );
+}
+
+function HollowArrowThumb() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 24 24">
+      <path 
+        d="M0 0 L0 24 L20 12 Z" 
+        fill="white" 
+        stroke="#228be6" 
+        strokeWidth="2.5" 
+        strokeLinejoin="round"
+        vectorEffect="non-scaling-stroke"  // Keeps stroke width consistent during scaling
+      />
+    </svg>
+  );
+}
 
 export default InflowOutflowTimeline;
