@@ -272,6 +272,8 @@ const HomePage = () => {
     const searchControl = new GeoSearchControl({
       provider: provider,
       style: 'button',
+      showPopup: true,
+      retainZoomLevel: true,
       notFoundMessage: 'Sorry, that address could not be found.',
     });
   
