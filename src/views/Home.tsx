@@ -16,6 +16,7 @@ import '../styles/Home.css';
 // const express = require('express');
 import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
 import 'leaflet-geosearch/dist/geosearch.css';
+import InflowOutflowTimeline from '../components/InflowOutflowTimeline';
 
 
 const MIN_REG_WINDOW_WIDTH = 600;
@@ -109,15 +110,15 @@ const HomePage = () => {
   }, []);
 
   async function checkImage(this_week: number): Promise<boolean>{
-    var image_url = imageURL(dataIndex, speciesIndex, this_week);
-    var response = await fetch(image_url);
-    if (!response.ok) {
-      console.debug(response);
-      var message = "The .png for week "+this_week+" on "+dataInfo[dataIndex].label+" of "+taxa[speciesIndex].label+" is missing.";
-      alert(message);
-      return false;
-    }
-    setOverlayUrl(image_url);
+    // var image_url = imageURL(dataIndex, speciesIndex, this_week);
+    // var response = await fetch(image_url);
+    // if (!response.ok) {
+    //   console.debug(response);
+    //   var message = "The .png for week "+this_week+" on "+dataInfo[dataIndex].label+" of "+taxa[speciesIndex].label+" is missing.";
+    //   alert(message);
+    //   return false;
+    // }
+    // setOverlayUrl(image_url);
     return true;
   }
 
@@ -129,12 +130,26 @@ const HomePage = () => {
     }
   }
 
+  function flowUpdate(this_week: number) {
+    console.log("flowUpdate: ",this_week);
+    setWeek(this_week);
+  }
+
   useEffect(() => {
     console.log("dataIndex and species change", week);
     checkImage(week);
   }, [dataIndex, speciesIndex]);
 
   async function checkInputTypes(d_index: number, s_index: number) {
+    // THIS CODE IS NEEDED BECAUSE BACKEND FOR INFLOW/OUTFLOW IS NOT READY
+    if (d_index === 2 || d_index === 3) {
+      speciesCombo.selectedOptionIndex = s_index;
+      setDataIndex(d_index);
+      setSpeciesIndex(s_index);
+      return;
+    }
+    // END
+
     // check required legend file is available. 
     var response;
     if ((d_index !== dataIndex) || (s_index !== speciesIndex)) {
@@ -153,7 +168,7 @@ const HomePage = () => {
 
   // maps data types (abundance, movement etc) to radio buttons
   // const dataTypeRadio = dataInfo.map((dt, index) => (
-  //   <Radio 
+  //   <Radio
   //     icon={CheckIcon} 
   //     key={dt.label}
   //     checked={dataIndex===index} 
@@ -251,12 +266,26 @@ const HomePage = () => {
     // @ts-ignore
     const searchControl = new GeoSearchControl({
       provider: provider,
+      style: 'button',
+      notFoundMessage: 'Sorry, that address could not be found.',
     });
   
     const map = useMap();
     useEffect(() => {
       map.addControl(searchControl);
-      return () => map.removeControl(searchControl);
+      
+      map.on('geosearch/showlocation', (result: any) => {
+        console.log('Search result:', result.location);
+        // {
+        //   x: longitude,
+        //   y: latitude,
+        // }
+      });
+  
+      return () => {
+        map.removeControl(searchControl);
+        map.off('geosearch/showlocation'); // Clean up listener
+      };
     }, []);
   
     return null;
@@ -341,10 +370,17 @@ const HomePage = () => {
             </ActionIcon>
         </Tooltip>
       </div>
-      {/* Calls the custom legend component with the data type and species type as parameters. */}
-      <Legend dataTypeIndex={dataIndex} speciesIndex={speciesIndex} />
-      {/* Calls the custom timeline component with the current week onChange function as parameters */}
-      <Timeline week={week} dataset={dataIndex} isMonitor={isMonitor} onChangeWeek={checkImageAndUpdate} />
+      
+      {/* If dataIndex >= 2, then it's currently inflow/outflow */}
+      {dataIndex < 2 && (
+          <Legend dataTypeIndex={dataIndex} speciesIndex={speciesIndex} />
+      )}
+
+      {/* Show this slider for abundance and movement */}
+      {dataIndex < 2 && <Timeline week={week} dataset={dataIndex} isMonitor={isMonitor} onChangeWeek={checkImageAndUpdate} />}
+
+      {/* Show this slider for inflow and outflow */}
+      {dataIndex >= 2 && <InflowOutflowTimeline week={week} dataset={dataIndex} isMonitor={isMonitor} onChangeWeek={flowUpdate} duration={25} />}
     </div>
   );
 }
