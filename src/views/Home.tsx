@@ -50,6 +50,7 @@ const HomePage = () => {
   const [titleSize, setTitleSize] = useState<number>(40);
   const [isMonitor, setIsMonitor] = useState<boolean>(true);
 
+  const showSearch = dataIndex >= 2;
 
   function runTest() {
     console.log("Pam's test code");
@@ -260,7 +261,11 @@ const HomePage = () => {
     </div>
   ));
 
-  const SearchField = () => {
+  interface SearchFieldProps {
+    enabled: boolean;
+  }
+  
+  const SearchField: React.FC<SearchFieldProps> = ({ enabled }) => {
     const provider = new OpenStreetMapProvider();
   
     // @ts-ignore
@@ -272,6 +277,10 @@ const HomePage = () => {
   
     const map = useMap();
     useEffect(() => {
+      console.log("SearchField: enabled: ", enabled);
+      if (!enabled) return;    // nothing to do
+      console.log("dog")
+
       map.addControl(searchControl);
       
       map.on('geosearch/showlocation', (result: any) => {
@@ -286,7 +295,7 @@ const HomePage = () => {
         map.removeControl(searchControl);
         map.off('geosearch/showlocation'); // Clean up listener
       };
-    }, []);
+    }, [enabled, map]);
   
     return null;
   };
@@ -331,7 +340,7 @@ const HomePage = () => {
         keyboard={false}
         maxBounds={imageBounds}
       >
-        <SearchField />
+        <SearchField enabled={showSearch} />
        {/* Adds the attributions to the map */}
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
