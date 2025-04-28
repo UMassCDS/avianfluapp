@@ -93,7 +93,7 @@ const HomePage = () => {
     // THIS PART IS FOR TESTING IF REACT APPLICATION CAN ACCESS THE R BACKEND
     // const testRApi = async () => {
     //   try {
-    //     const response = await axios.get("http://localhost:8000/echo");
+        // const response = await axios.get(`http://localhost:8000/${functionName}?loc=${loc}&week=${week}&taxa=${taxa}&n={n_f_low_weeks}`);
     //     console.log(response.data);
     //   } catch (error) {
     //     console.error("Error fetching data:", error);
