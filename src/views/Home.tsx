@@ -193,7 +193,7 @@ const HomePage = () => {
   return (
     <div className="Home">
       {/* Creates a map using the leaflet component */}
-      <MapView overlayUrl={overlayUrl} week={week} />
+      <MapView overlayUrl={overlayUrl} week={week} dataIndex={dataIndex} />
       <div className="widgets"> 
         <ControlBar 
           dataIndex={dataIndex}

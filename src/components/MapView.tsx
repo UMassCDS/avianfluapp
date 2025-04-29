@@ -11,26 +11,34 @@ const imageBounds = [
 interface MapViewProps {
   overlayUrl: string;
   week: number;
+  dataIndex: number;
 }
 
-export default function MapView({ overlayUrl, week }: MapViewProps): JSX.Element {
+export default function MapView({ overlayUrl, week, dataIndex }: MapViewProps): JSX.Element {
   const position = {
     lat: 45,
     lng: -95,
   };
+  const showSearch = dataIndex >= 2;
 
-  const SearchField = () => {
+  const SearchField = ({ enabled }: { enabled: boolean }) => {
     const provider = new OpenStreetMapProvider();
   
     // @ts-ignore
     const searchControl = new GeoSearchControl({
       provider: provider,
       style: 'button',
+      showPopup: true,
+      retainZoomLevel: true,
       notFoundMessage: 'Sorry, that address could not be found.',
     });
   
     const map = useMap();
     useEffect(() => {
+      console.log("SearchField: enabled: ", enabled);
+      if (!enabled) return;    // nothing to do
+      console.log("dog")
+
       map.addControl(searchControl);
       
       map.on('geosearch/showlocation', (result: any) => {
@@ -45,7 +53,7 @@ export default function MapView({ overlayUrl, week }: MapViewProps): JSX.Element
         map.removeControl(searchControl);
         map.off('geosearch/showlocation'); // Clean up listener
       };
-    }, []);
+    }, [enabled, map]);
   
     return null;
   };
@@ -61,7 +69,7 @@ export default function MapView({ overlayUrl, week }: MapViewProps): JSX.Element
       keyboard={false}
       maxBounds={imageBounds}
     >
-      <SearchField />
+      <SearchField enabled={showSearch} />
       {/* Adds the attributions to the map */}
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
