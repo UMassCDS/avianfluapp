@@ -17,6 +17,8 @@ import '../styles/Home.css';
 import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
 import 'leaflet-geosearch/dist/geosearch.css';
 import InflowOutflowTimeline from '../components/InflowOutflowTimeline';
+import MapView from '../components/MapView';
+import ControlBar from '../components/ControlBar';
 
 
 const MIN_REG_WINDOW_WIDTH = 600;
@@ -110,15 +112,21 @@ const HomePage = () => {
   }, []);
 
   async function checkImage(this_week: number): Promise<boolean>{
-    // var image_url = imageURL(dataIndex, speciesIndex, this_week);
-    // var response = await fetch(image_url);
-    // if (!response.ok) {
-    //   console.debug(response);
-    //   var message = "The .png for week "+this_week+" on "+dataInfo[dataIndex].label+" of "+taxa[speciesIndex].label+" is missing.";
-    //   alert(message);
-    //   return false;
-    // }
-    // setOverlayUrl(image_url);
+    // Does nothing when it's inflow/outflow
+    if (dataIndex >= 2) {
+      setOverlayUrl("");
+      return Promise.resolve(true);
+    }
+
+    var image_url = imageURL(dataIndex, speciesIndex, this_week);
+    var response = await fetch(image_url);
+    if (!response.ok) {
+      console.debug(response);
+      var message = "The .png for week "+this_week+" on "+dataInfo[dataIndex].label+" of "+taxa[speciesIndex].label+" is missing.";
+      alert(message);
+      return false;
+    }
+    setOverlayUrl(image_url);
     return true;
   }
 
@@ -260,97 +268,49 @@ const HomePage = () => {
     </div>
   ));
 
-  const SearchField = () => {
-    const provider = new OpenStreetMapProvider();
-  
-    // @ts-ignore
-    const searchControl = new GeoSearchControl({
-      provider: provider,
-      style: 'button',
-      notFoundMessage: 'Sorry, that address could not be found.',
-    });
-  
-    const map = useMap();
-    useEffect(() => {
-      map.addControl(searchControl);
-      
-      map.on('geosearch/showlocation', (result: any) => {
-        console.log('Search result:', result.location);
-        // {
-        //   x: longitude,
-        //   y: latitude,
-        // }
-      });
-  
-      return () => {
-        map.removeControl(searchControl);
-        map.off('geosearch/showlocation'); // Clean up listener
-      };
-    }, []);
-  
-    return null;
-  };
-
   // species selection, type selection and about button
-  const ControlBar = () => (
-    <div>
-      <Grid justify='center' align='stretch'>
-        { /* top row Title */ }
-        <Grid.Col span={12}>
-          <div style={{textAlign:"center", fontSize:titleSize, fontWeight:"bold"}}>Avian Influenza</div>
-        </Grid.Col>
-        { /* 2nd row */ }
-        <Grid.Col span={{ base: 4, md: 2, lg: 2 }}>
-          {/* Dropdown for data type */}
-          <Tooltip label='Types of data sets'>
-            <DataTypeComponent />
-          </Tooltip>
-        </Grid.Col>
-        <Grid.Col span={{ base: 6, md: 4, lg: 3 }}>
-          {/* The dropdown for the species type */}
-          <Tooltip label='Wild bird species that potentially carry Avian Influenza'>
-            <SpeciesComponent />
-          </Tooltip>
-        </Grid.Col>
-      </Grid>
-    </div>
-  );
+  // const ControlBar = () => (
+  //   <div>
+  //     <Grid justify='center' align='stretch'>
+  //       { /* top row Title */ }
+  //       <Grid.Col span={12}>
+  //         <div style={{textAlign:"center", fontSize:titleSize, fontWeight:"bold"}}>Avian Influenza</div>
+  //       </Grid.Col>
+  //       { /* 2nd row */ }
+  //       <Grid.Col span={{ base: 4, md: 2, lg: 2 }}>
+  //         {/* Dropdown for data type */}
+  //         <Tooltip label='Types of data sets'>
+  //           <DataTypeComponent />
+  //         </Tooltip>
+  //       </Grid.Col>
+  //       <Grid.Col span={{ base: 6, md: 4, lg: 3 }}>
+  //         {/* The dropdown for the species type */}
+  //         <Tooltip label='Wild bird species that potentially carry Avian Influenza'>
+  //           <SpeciesComponent />
+  //         </Tooltip>
+  //       </Grid.Col>
+  //     </Grid>
+  //   </div>
+  // );
 
 
   // Here is where you list the components and elements that you want rendered. 
   return (
     <div className="Home">
       {/* Creates a map using the leaflet component */}
-      <MapContainer
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        center={position}
-        zoom={3.5}
-        style={{ height: '100vh', width: '100%' }}
-        className="Map"
-        keyboard={false}
-        maxBounds={imageBounds}
-      >
-        <SearchField />
-       {/* Adds the attributions to the map */}
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          attribution='Abundance data provided by <a target="_blank" href="https://ebird.org/science/status-and-trends ">Cornell Lab of Ornithology - eBird</a> | <a target="_blank" href="https://birdflow-science.github.io/"> BirdFlow </a>'
-        />
-        { /* Overlays an image that contains the data to be displayed on top of the map */}
-        <ImageOverlay
-          url={overlayUrl}
-          bounds={imageBounds}
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          opacity={0.7}
-        />
-        {OutbreakMarkers(week)}
-      </MapContainer>
+      <MapView overlayUrl={overlayUrl} week={week} />
       <div className="widgets"> 
-        <ControlBar/>
+        <ControlBar 
+          dataIndex={dataIndex}
+          speciesIndex={speciesIndex}
+          checkInputTypes={checkInputTypes}
+          titleSize={titleSize}
+          speciesCombo={speciesCombo}
+          checkSpecies={checkSpecies}
+          taxa={taxa}
+          textSize={textSize}
+          speciesOptions={speciesOptions}
+        />
         <OutbreakLegend/>
       </div>
       <div className="about">
