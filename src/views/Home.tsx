@@ -17,6 +17,10 @@ import '../styles/Home.css';
 import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
 import 'leaflet-geosearch/dist/geosearch.css';
 import InflowOutflowTimeline from '../components/InflowOutflowTimeline';
+import MapView from '../components/MapView';
+import ControlBar from '../components/ControlBar';
+import About from './About';
+import AboutButtons from '../components/AboutButtons';
 
 
 const MIN_REG_WINDOW_WIDTH = 600;
@@ -42,8 +46,6 @@ const HomePage = () => {
   // default state of the map overlay url for the current data displayed.
   const [overlayUrl, setOverlayUrl] = useState("");
   const speciesCombo = useCombobox();
-  // useNavigate is used to switch pages
-  const navigate = useNavigate();
   const [iconSize, setIconSize] = useState<MantineSize>('xl');
   const [textSize, setTextSize] = useState<MantineSize>('md');
   const [fontHeight, setFontHeight] = useState<number>(14);
@@ -111,15 +113,21 @@ const HomePage = () => {
   }, []);
 
   async function checkImage(this_week: number): Promise<boolean>{
-    // var image_url = imageURL(dataIndex, speciesIndex, this_week);
-    // var response = await fetch(image_url);
-    // if (!response.ok) {
-    //   console.debug(response);
-    //   var message = "The .png for week "+this_week+" on "+dataInfo[dataIndex].label+" of "+taxa[speciesIndex].label+" is missing.";
-    //   alert(message);
-    //   return false;
-    // }
-    // setOverlayUrl(image_url);
+    // Does nothing when it's inflow/outflow
+    if (dataIndex >= 2) {
+      setOverlayUrl("");
+      return Promise.resolve(true);
+    }
+
+    var image_url = imageURL(dataIndex, speciesIndex, this_week);
+    var response = await fetch(image_url);
+    if (!response.ok) {
+      console.debug(response);
+      var message = "The .png for week "+this_week+" on "+dataInfo[dataIndex].label+" of "+taxa[speciesIndex].label+" is missing.";
+      alert(message);
+      return false;
+    }
+    setOverlayUrl(image_url);
     return true;
   }
 
@@ -167,79 +175,6 @@ const HomePage = () => {
     setSpeciesIndex(s_index);
   };
 
-  // maps data types (abundance, movement etc) to radio buttons
-  // const dataTypeRadio = dataInfo.map((dt, index) => (
-  //   <Radio
-  //     icon={CheckIcon} 
-  //     key={dt.label}
-  //     checked={dataIndex===index} 
-  //     onChange={() => {
-  //       checkInputTypes(index, speciesIndex)}
-  //     } 
-  //     size={textSize}
-  //     label={dt.label} 
-  //   />
-  // ));
-
-  const dataToIndex = {
-    "abundance": 0,
-    "movement": 1,
-    "inflow": 2,
-    "outflow": 3
-  };
-
-  const indexToData = ["abundance", "movement", "inflow", "outflow"];
-  
-  // creates component surrounding the data type widgets to add tool tip
-  const DataTypeComponent = forwardRef<HTMLDivElement>((props, ref) => (
-    <div ref={ref} {...props}>
-      {/* <Stack>
-        {dataTypeRadio}
-      </Stack> */}
-      <Select
-        data = {dataInfo.map((dt) => ({value: dt.datatype, label: dt.label}))}
-        value = {indexToData[dataIndex]}
-        onChange = {(dataType) => {
-          if (dataType !== null) {
-            checkInputTypes(dataToIndex[dataType as keyof typeof dataToIndex], speciesIndex);
-          } else {
-            console.log("dataType is null (abundance, movement, inflow, outflow). This shouldn't be happening!");
-          }
-        }}
-      />
-    </div>
-  ));
-
-  function genericCombo(ref_combo: ComboboxStore, onSubmit: Function, label: string, options: JSX.Element[]) {
-    return (
-      <Combobox
-        store={ref_combo}
-        onOptionSubmit={(val) => {
-          onSubmit(val, ref_combo); 
-        }}
-        size={textSize}
-      >
-        <Combobox.Target>
-          <InputBase
-            component="button"
-            type="button"
-            pointer
-            leftSection={<Combobox.Chevron />}
-            onClick={() => ref_combo.toggleDropdown()}
-            leftSectionPointerEvents="none"
-            size={textSize}
-            multiline={true}
-          >
-            {label || <Input.Placeholder>Pick value</Input.Placeholder>}
-          </InputBase>
-        </Combobox.Target>
-        <Combobox.Dropdown>
-          <Combobox.Options>{options}</Combobox.Options>
-        </Combobox.Dropdown>
-      </Combobox>      
-    );
-  }
-
   // Maps the species from the taxa file provided to a dropdown with options. 
   const speciesOptions = taxa.map((t, index) => (
     <Combobox.Option value={index.toString()} key={t.value} style={{fontSize:fontHeight}}>
@@ -254,133 +189,26 @@ const HomePage = () => {
     ref_combo.closeDropdown();
   }
 
-  // Species combo box
-  const SpeciesComponent = forwardRef<HTMLDivElement>((props, ref) => (
-    <div ref={ref} {...props}>
-      {genericCombo(speciesCombo, checkSpecies, taxa[speciesIndex].label, speciesOptions)}
-    </div>
-  ));
-
-  interface SearchFieldProps {
-    enabled: boolean;
-  }
-  
-  const SearchField: React.FC<SearchFieldProps> = ({ enabled }) => {
-    const provider = new OpenStreetMapProvider();
-  
-    // @ts-ignore
-    const searchControl = new GeoSearchControl({
-      provider: provider,
-      style: 'button',
-      showPopup: true,
-      retainZoomLevel: true,
-      notFoundMessage: 'Sorry, that address could not be found.',
-    });
-  
-    const map = useMap();
-    useEffect(() => {
-      console.log("SearchField: enabled: ", enabled);
-      if (!enabled) return;    // nothing to do
-      console.log("dog")
-
-      map.addControl(searchControl);
-      
-      map.on('geosearch/showlocation', (result: any) => {
-        console.log('Search result:', result.location);
-        // {
-        //   x: longitude,
-        //   y: latitude,
-        // }
-      });
-  
-      return () => {
-        map.removeControl(searchControl);
-        map.off('geosearch/showlocation'); // Clean up listener
-      };
-    }, [enabled, map]);
-  
-    return null;
-  };
-
-  // species selection, type selection and about button
-  const ControlBar = () => (
-    <div>
-      <Grid justify='center' align='stretch'>
-        { /* top row Title */ }
-        <Grid.Col span={12}>
-          <div style={{textAlign:"center", fontSize:titleSize, fontWeight:"bold"}}>Avian Influenza</div>
-        </Grid.Col>
-        { /* 2nd row */ }
-        <Grid.Col span={{ base: 4, md: 2, lg: 2 }}>
-          {/* Dropdown for data type */}
-          <Tooltip label='Types of data sets'>
-            <DataTypeComponent />
-          </Tooltip>
-        </Grid.Col>
-        <Grid.Col span={{ base: 6, md: 4, lg: 3 }}>
-          {/* The dropdown for the species type */}
-          <Tooltip label='Wild bird species that potentially carry Avian Influenza'>
-            <SpeciesComponent />
-          </Tooltip>
-        </Grid.Col>
-      </Grid>
-    </div>
-  );
-
-
   // Here is where you list the components and elements that you want rendered. 
   return (
     <div className="Home">
       {/* Creates a map using the leaflet component */}
-      <MapContainer
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        center={position}
-        zoom={3.5}
-        style={{ height: '100vh', width: '100%' }}
-        className="Map"
-        keyboard={false}
-        maxBounds={imageBounds}
-      >
-        <SearchField enabled={showSearch} />
-       {/* Adds the attributions to the map */}
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          attribution='Abundance data provided by <a target="_blank" href="https://ebird.org/science/status-and-trends ">Cornell Lab of Ornithology - eBird</a> | <a target="_blank" href="https://birdflow-science.github.io/"> BirdFlow </a>'
-        />
-        { /* Overlays an image that contains the data to be displayed on top of the map */}
-        <ImageOverlay
-          url={overlayUrl}
-          bounds={imageBounds}
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          opacity={0.7}
-        />
-        {OutbreakMarkers(week)}
-      </MapContainer>
+      <MapView overlayUrl={overlayUrl} week={week} dataIndex={dataIndex} />
       <div className="widgets"> 
-        <ControlBar/>
+        <ControlBar 
+          dataIndex={dataIndex}
+          speciesIndex={speciesIndex}
+          checkInputTypes={checkInputTypes}
+          titleSize={titleSize}
+          speciesCombo={speciesCombo}
+          checkSpecies={checkSpecies}
+          taxa={taxa}
+          textSize={textSize}
+          speciesOptions={speciesOptions}
+        />
         <OutbreakLegend/>
       </div>
-      <div className="about">
-        <Tooltip label='Test RestAPI'>
-            <ActionIcon style={{margin:12}} size={iconSize} onClick={() => { runTest()}}>
-              <IconTestPipe/>
-            </ActionIcon>
-        </Tooltip> 
-        <Tooltip label='Leave feedback and suggestions.'>
-            <ActionIcon style={{margin:12}} size={iconSize} onClick={() => { navigate("/feedback")}}>
-              <IconWriting/>
-            </ActionIcon>
-        </Tooltip>
-        <Tooltip label='About page'>
-            <ActionIcon size={iconSize} onClick={() => { navigate("/about")}}>
-              <IconInfoCircle/>
-            </ActionIcon>
-        </Tooltip>
-      </div>
+      <AboutButtons iconSize={iconSize} runTest={runTest} />
       
       {/* If dataIndex >= 2, then it's currently inflow/outflow */}
       {dataIndex < 2 && (
