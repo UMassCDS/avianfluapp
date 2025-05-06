@@ -38,16 +38,6 @@ const imageBounds = [
 /* This is the main page and only page of the application. 
    Here, the map renders as well as all the AvianFluApp feature controls */
 const HomePage = () => {  
-  // Sets the default position for the map.
-  const position = {
-    lat: 45,
-    lng: -95,
-  };
-  // Initialize data type - so far this is abundance or netmovement
-  // const [dataIndex, setDataIndex] = useState(0);
-  // Sets state for the species type 
-  // Define the type of your Redux state
-  
   const dispatch = useDispatch();
   const speciesIndex = useSelector((state: RootState) => state.species.speciesIndex);
   const dataIndex = useSelector((state: RootState) => state.species.dataIndex);
@@ -210,14 +200,9 @@ const HomePage = () => {
       <MapView overlayUrl={overlayUrl} week={week} dataIndex={dataIndex} />
       <div className="widgets"> 
         <ControlBar 
-          dataIndex={dataIndex}
-          speciesIndex={speciesIndex}
           checkInputTypes={checkInputTypes}
-          titleSize={titleSize}
           speciesCombo={speciesCombo}
           checkSpecies={checkSpecies}
-          taxa={taxa}
-          textSize={textSize}
           speciesOptions={speciesOptions}
         />
         <OutbreakLegend/>
