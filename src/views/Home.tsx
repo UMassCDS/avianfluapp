@@ -1,17 +1,12 @@
-import { ActionIcon, Combobox, ComboboxStore, Grid, Input, InputBase, useCombobox } from '@mantine/core';
-import { CheckIcon, MantineSize, Radio, Stack, Tooltip, Select } from '@mantine/core';
-import { MapContainer, TileLayer, ImageOverlay, useMap } from 'react-leaflet';
-import { forwardRef, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { IconInfoCircle, IconTestPipe, IconWriting } from '@tabler/icons-react';
+import { Combobox, ComboboxStore, useCombobox } from '@mantine/core';
+import { useEffect } from 'react';
 import 'leaflet/dist/leaflet.css';
 import axios from 'axios';
 import { imageURL, getScalingFilename, dataInfo} from '../hooks/dataUrl';
 import taxa from '../assets/taxa.json';
 import Timeline from '../components/Timeline';
 import Legend from '../components/Legend';
-import {OutbreakMarkers, loadOutbreaks, OutbreakLegend} from '../components/OutbreakPoints'
-import {MIN_WEEK} from '../utils/utils'
+import {loadOutbreaks, OutbreakLegend} from '../components/OutbreakPoints'
 import '../styles/Home.css';
 // const express = require('express');
 import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
@@ -19,9 +14,13 @@ import 'leaflet-geosearch/dist/geosearch.css';
 import InflowOutflowTimeline from '../components/InflowOutflowTimeline';
 import MapView from '../components/MapView';
 import ControlBar from '../components/ControlBar';
-import About from './About';
 import AboutButtons from '../components/AboutButtons';
-
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../store/store'; // Adjust the path to your store file
+import { setDataIndex, setSpeciesIndex } from '../store/slices/speciesSlice';
+import { setWeek } from '../store/slices/timelineSlice';
+import { setFontHeight, setIconSize, setIsMonitor, setTextSize, setTitleSize } from '../store/slices/uiSlice';
+import { setOverlayUrl } from '../store/slices/mapSlice';
 
 const MIN_REG_WINDOW_WIDTH = 600;
 // the lat/long bounds of the data image provided by the backend
@@ -33,26 +32,23 @@ const imageBounds = [
 /* This is the main page and only page of the application. 
    Here, the map renders as well as all the AvianFluApp feature controls */
 const HomePage = () => {  
-  // Sets the default position for the map.
-  const position = {
-    lat: 45,
-    lng: -95,
-  };
-  // Initialize data type - so far this is abundance or netmovement
-  const [dataIndex, setDataIndex] = useState(0);
-  // Sets state for the species type 
-  const [speciesIndex, setSpeciesIndex] = useState(0);
-  const [week, setWeek] = useState(MIN_WEEK);
-  // default state of the map overlay url for the current data displayed.
-  const [overlayUrl, setOverlayUrl] = useState("");
-  const speciesCombo = useCombobox();
-  const [iconSize, setIconSize] = useState<MantineSize>('xl');
-  const [textSize, setTextSize] = useState<MantineSize>('md');
-  const [fontHeight, setFontHeight] = useState<number>(14);
-  const [titleSize, setTitleSize] = useState<number>(40);
-  const [isMonitor, setIsMonitor] = useState<boolean>(true);
+  const dispatch = useDispatch();
+  const speciesIndex = useSelector((state: RootState) => state.species.speciesIndex);
+  const dataIndex = useSelector((state: RootState) => state.species.dataIndex);
 
-  const showSearch = dataIndex >= 2;
+  // const [week, setWeek] = useState(MIN_WEEK);
+  const week = useSelector((state: RootState) => state.timeline.week);
+
+  // default state of the map overlay url for the current data displayed.
+  const overlayUrl = useSelector((state: RootState) => state.map.overlayUrl);
+  const speciesCombo = useCombobox();
+
+  const isMonitor = useSelector((state: RootState) => state.ui.isMonitor);
+  const iconSize = useSelector((state: RootState) => state.ui.iconSize);
+  const textSize = useSelector((state: RootState) => state.ui.textSize);
+  const fontHeight = useSelector((state: RootState) => state.ui.fontHeight);
+  const titleSize = useSelector((state: RootState) => state.ui.titleSize);
+
 
   function runTest() {
     console.log("Pam's test code");
@@ -74,18 +70,18 @@ const HomePage = () => {
   function handleWindowSizeChange() {
     if (window.innerWidth <  MIN_REG_WINDOW_WIDTH) {
       // small window
-      setTextSize('xs');
-      setFontHeight(10);
-      setIconSize('xl');
-      setTitleSize(20);
-      setIsMonitor(false);
+      dispatch(setTextSize('xs'));
+      dispatch(setFontHeight(10));
+      dispatch(setIconSize('xl'));
+      dispatch(setTitleSize(20));
+      dispatch(setIsMonitor(false));
     } else {
       // reg window
-      setTextSize('md');
-      setFontHeight(14);
-      setIconSize('xl');
-      setTitleSize(40);
-      setIsMonitor(true);
+      dispatch(setTextSize('md'));
+      dispatch(setFontHeight(14));
+      dispatch(setIconSize('xl'));
+      dispatch(setTitleSize(40));
+      dispatch(setIsMonitor(true));
     }
   }
 
@@ -115,7 +111,7 @@ const HomePage = () => {
   async function checkImage(this_week: number): Promise<boolean>{
     // Does nothing when it's inflow/outflow
     if (dataIndex >= 2) {
-      setOverlayUrl("");
+      dispatch(setOverlayUrl(""));
       return Promise.resolve(true);
     }
 
@@ -127,7 +123,7 @@ const HomePage = () => {
       alert(message);
       return false;
     }
-    setOverlayUrl(image_url);
+    dispatch(setOverlayUrl(image_url));
     return true;
   }
 
@@ -135,13 +131,13 @@ const HomePage = () => {
     var response = await checkImage(this_week);
     if (response) {
       console.log("HOME: onChangeWeek: ",this_week);
-      setWeek(this_week);
+      dispatch(setWeek(this_week));
     }
   }
 
   function flowUpdate(this_week: number) {
     console.log("flowUpdate: ",this_week);
-    setWeek(this_week);
+    dispatch(setWeek(this_week));
   }
 
   useEffect(() => {
@@ -153,8 +149,9 @@ const HomePage = () => {
     // THIS CODE IS NEEDED BECAUSE BACKEND FOR INFLOW/OUTFLOW IS NOT READY
     if (d_index === 2 || d_index === 3) {
       speciesCombo.selectedOptionIndex = s_index;
-      setDataIndex(d_index);
-      setSpeciesIndex(s_index);
+      dispatch(setDataIndex(d_index));
+      // setSpeciesIndex(s_index);
+      dispatch(setSpeciesIndex(s_index));
       return;
     }
     // END
@@ -171,8 +168,9 @@ const HomePage = () => {
       }
     }
     speciesCombo.selectedOptionIndex = s_index;
-    setDataIndex(d_index);
-    setSpeciesIndex(s_index);
+    dispatch(setDataIndex(d_index));
+    // setSpeciesIndex(s_index);
+    dispatch(setSpeciesIndex(s_index));
   };
 
   // Maps the species from the taxa file provided to a dropdown with options. 
@@ -193,33 +191,28 @@ const HomePage = () => {
   return (
     <div className="Home">
       {/* Creates a map using the leaflet component */}
-      <MapView overlayUrl={overlayUrl} week={week} dataIndex={dataIndex} />
+      <MapView week={week} dataIndex={dataIndex} />
       <div className="widgets"> 
         <ControlBar 
-          dataIndex={dataIndex}
-          speciesIndex={speciesIndex}
           checkInputTypes={checkInputTypes}
-          titleSize={titleSize}
           speciesCombo={speciesCombo}
           checkSpecies={checkSpecies}
-          taxa={taxa}
-          textSize={textSize}
           speciesOptions={speciesOptions}
         />
         <OutbreakLegend/>
       </div>
-      <AboutButtons iconSize={iconSize} runTest={runTest} />
+      <AboutButtons runTest={runTest} />
       
       {/* If dataIndex >= 2, then it's currently inflow/outflow */}
       {dataIndex < 2 && (
-          <Legend dataTypeIndex={dataIndex} speciesIndex={speciesIndex} />
+          <Legend />
       )}
 
       {/* Show this slider for abundance and movement */}
       {dataIndex < 2 && <Timeline week={week} dataset={dataIndex} isMonitor={isMonitor} onChangeWeek={checkImageAndUpdate} />}
 
       {/* Show this slider for inflow and outflow */}
-      {dataIndex >= 2 && <InflowOutflowTimeline week={week} dataset={dataIndex} isMonitor={isMonitor} onChangeWeek={flowUpdate} duration={25} />}
+      {dataIndex >= 2 && <InflowOutflowTimeline onChangeWeek={flowUpdate} duration={25} />}
     </div>
   );
 }

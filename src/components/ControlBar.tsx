@@ -1,15 +1,13 @@
 import { Combobox, ComboboxStore, Grid, Input, InputBase, Select, Tooltip } from "@mantine/core";
 import { dataInfo } from "../hooks/dataUrl";
 import { forwardRef } from "react";
+import { useSelector } from "react-redux";
+import { RootState } from "../store/store";
+import taxa from "../assets/taxa.json";
 
-// creates component surrounding the data type widgets to add tool tip
-interface DataTypeComponentProps {
-  dataIndex: number;
-  speciesIndex: number;
-  checkInputTypes: (dataIndex: number, speciesIndex: number) => void;
-}
+function genericCombo(ref_combo: ComboboxStore, onSubmit: Function, label: string, options: JSX.Element[]) {
+  const textSize = useSelector((state: RootState) => state.ui.textSize);
 
-function genericCombo(ref_combo: ComboboxStore, onSubmit: Function, label: string, textSize: string, options: JSX.Element[]) {  
   return (
     <Combobox
       store={ref_combo}
@@ -39,8 +37,16 @@ function genericCombo(ref_combo: ComboboxStore, onSubmit: Function, label: strin
   );
 }
 
+// creates component surrounding the data type widgets to add tool tip
+interface DataTypeComponentProps {
+  checkInputTypes: (dataIndex: number, speciesIndex: number) => void;
+}
+
 const DataTypeComponent = forwardRef<HTMLDivElement, DataTypeComponentProps>((props, ref) => {
-  const { dataIndex, speciesIndex, checkInputTypes } = props;
+  const { checkInputTypes } = props;
+  const speciesIndex = useSelector((state: RootState) => state.species.speciesIndex);
+  const dataIndex = useSelector((state: RootState) => state.species.dataIndex);
+  
   const indexToData = ["abundance", "movement", "inflow", "outflow"];
   const dataToIndex = {
     "abundance": 0,
@@ -70,36 +76,32 @@ const DataTypeComponent = forwardRef<HTMLDivElement, DataTypeComponentProps>((pr
 interface SpeciesComponentProps {
   speciesCombo: ComboboxStore;
   checkSpecies: (value: string, combo: ComboboxStore) => void;
-  taxa: { label: string }[];
-  textSize: string;
   speciesOptions: JSX.Element[];
-  speciesIndex: number;
 }
 
 const SpeciesComponent = forwardRef<HTMLDivElement, SpeciesComponentProps>((props, ref) => {
-  const { speciesCombo, checkSpecies, taxa, textSize, speciesOptions, speciesIndex, ...rest } = props;
+  const { speciesCombo, checkSpecies, speciesOptions, ...rest } = props;
+
+  const speciesIndex = useSelector((state: RootState) => state.species.speciesIndex);
 
   return (
     <div ref={ref} {...rest}>
-      {genericCombo(speciesCombo, checkSpecies, taxa[speciesIndex].label, textSize, speciesOptions)}
+      {genericCombo(speciesCombo, checkSpecies, taxa[speciesIndex].label, speciesOptions)}
     </div>
   );
 });
 
 interface ControlBarProps {
-  dataIndex: number;
-  speciesIndex: number;
   checkInputTypes: (dataIndex: number, speciesIndex: number) => void;
-  titleSize: string | number;
   speciesCombo: ComboboxStore;
   checkSpecies: (value: string, combo: ComboboxStore) => void;
-  taxa: { label: string }[];
-  textSize: string;
   speciesOptions: JSX.Element[];
 }
 
 export default function ControlBar(props: ControlBarProps) {
-  const { dataIndex, speciesIndex, checkInputTypes, titleSize, speciesCombo, checkSpecies, taxa, textSize, speciesOptions } = props;
+  const {checkInputTypes, speciesCombo, checkSpecies, speciesOptions } = props;
+
+  const titleSize = useSelector((state: RootState) => state.ui.titleSize);
 
   return (
     <div>
@@ -112,13 +114,13 @@ export default function ControlBar(props: ControlBarProps) {
         <Grid.Col span={{ base: 4, md: 2, lg: 2 }}>
           {/* Dropdown for data type */}
           <Tooltip label='Types of data sets'>
-            <DataTypeComponent dataIndex={dataIndex} speciesIndex={speciesIndex} checkInputTypes={checkInputTypes} />
+            <DataTypeComponent checkInputTypes={checkInputTypes} />
           </Tooltip>
         </Grid.Col>
         <Grid.Col span={{ base: 6, md: 4, lg: 3 }}>
           {/* The dropdown for the species type */}
           <Tooltip label='Wild bird species that potentially carry Avian Influenza'>
-            <SpeciesComponent speciesCombo={speciesCombo} checkSpecies={checkSpecies} taxa={taxa} textSize={textSize} speciesOptions={speciesOptions} speciesIndex={speciesIndex} />
+            <SpeciesComponent speciesCombo={speciesCombo} checkSpecies={checkSpecies} speciesOptions={speciesOptions} />
           </Tooltip>
         </Grid.Col>
       </Grid>

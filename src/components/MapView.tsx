@@ -2,6 +2,7 @@ import { ImageOverlay, MapContainer, TileLayer, useMap } from "react-leaflet";
 import { OutbreakMarkers } from "./OutbreakPoints";
 import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
 import { useEffect } from "react";
+import { useSelector } from "react-redux";
 
 const imageBounds = [
   [9.622994, -170.291626],
@@ -9,16 +10,18 @@ const imageBounds = [
 ];
 
 interface MapViewProps {
-  overlayUrl: string;
   week: number;
   dataIndex: number;
 }
 
-export default function MapView({ overlayUrl, week, dataIndex }: MapViewProps): JSX.Element {
+export default function MapView({ week, dataIndex }: MapViewProps): JSX.Element {
   const position = {
     lat: 45,
     lng: -95,
   };
+
+  const overlayUrl = useSelector((state: any) => state.map.overlayUrl);
+
   const showSearch = dataIndex >= 2;
 
   const SearchField = ({ enabled }: { enabled: boolean }) => {
