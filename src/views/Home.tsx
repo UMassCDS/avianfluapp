@@ -207,7 +207,7 @@ const HomePage = () => {
         />
         <OutbreakLegend/>
       </div>
-      <AboutButtons iconSize={iconSize} runTest={runTest} />
+      <AboutButtons runTest={runTest} />
       
       {/* If dataIndex >= 2, then it's currently inflow/outflow */}
       {dataIndex < 2 && (
