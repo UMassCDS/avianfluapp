@@ -21,7 +21,12 @@ import MapView from '../components/MapView';
 import ControlBar from '../components/ControlBar';
 import About from './About';
 import AboutButtons from '../components/AboutButtons';
-
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../store/store'; // Adjust the path to your store file
+import { setDataIndex, setSpeciesIndex } from '../store/slices/speciesSlice';
+import { setWeek } from '../store/slices/timelineSlice';
+import { setFontHeight, setIconSize, setIsMonitor, setTextSize, setTitleSize } from '../store/slices/uiSlice';
+import { setOverlayUrl } from '../store/slices/mapSlice';
 
 const MIN_REG_WINDOW_WIDTH = 600;
 // the lat/long bounds of the data image provided by the backend
@@ -39,20 +44,27 @@ const HomePage = () => {
     lng: -95,
   };
   // Initialize data type - so far this is abundance or netmovement
-  const [dataIndex, setDataIndex] = useState(0);
+  // const [dataIndex, setDataIndex] = useState(0);
   // Sets state for the species type 
-  const [speciesIndex, setSpeciesIndex] = useState(0);
-  const [week, setWeek] = useState(MIN_WEEK);
-  // default state of the map overlay url for the current data displayed.
-  const [overlayUrl, setOverlayUrl] = useState("");
-  const speciesCombo = useCombobox();
-  const [iconSize, setIconSize] = useState<MantineSize>('xl');
-  const [textSize, setTextSize] = useState<MantineSize>('md');
-  const [fontHeight, setFontHeight] = useState<number>(14);
-  const [titleSize, setTitleSize] = useState<number>(40);
-  const [isMonitor, setIsMonitor] = useState<boolean>(true);
+  // Define the type of your Redux state
+  
+  const dispatch = useDispatch();
+  const speciesIndex = useSelector((state: RootState) => state.species.speciesIndex);
+  const dataIndex = useSelector((state: RootState) => state.species.dataIndex);
 
-  const showSearch = dataIndex >= 2;
+  // const [week, setWeek] = useState(MIN_WEEK);
+  const week = useSelector((state: RootState) => state.timeline.week);
+
+  // default state of the map overlay url for the current data displayed.
+  const overlayUrl = useSelector((state: RootState) => state.map.overlayUrl);
+  const speciesCombo = useCombobox();
+
+  const isMonitor = useSelector((state: RootState) => state.ui.isMonitor);
+  const iconSize = useSelector((state: RootState) => state.ui.iconSize);
+  const textSize = useSelector((state: RootState) => state.ui.textSize);
+  const fontHeight = useSelector((state: RootState) => state.ui.fontHeight);
+  const titleSize = useSelector((state: RootState) => state.ui.titleSize);
+
 
   function runTest() {
     console.log("Pam's test code");
@@ -74,18 +86,18 @@ const HomePage = () => {
   function handleWindowSizeChange() {
     if (window.innerWidth <  MIN_REG_WINDOW_WIDTH) {
       // small window
-      setTextSize('xs');
-      setFontHeight(10);
-      setIconSize('xl');
-      setTitleSize(20);
-      setIsMonitor(false);
+      dispatch(setTextSize('xs'));
+      dispatch(setFontHeight(10));
+      dispatch(setIconSize('xl'));
+      dispatch(setTitleSize(20));
+      dispatch(setIsMonitor(false));
     } else {
       // reg window
-      setTextSize('md');
-      setFontHeight(14);
-      setIconSize('xl');
-      setTitleSize(40);
-      setIsMonitor(true);
+      dispatch(setTextSize('md'));
+      dispatch(setFontHeight(14));
+      dispatch(setIconSize('xl'));
+      dispatch(setTitleSize(40));
+      dispatch(setIsMonitor(true));
     }
   }
 
@@ -115,7 +127,7 @@ const HomePage = () => {
   async function checkImage(this_week: number): Promise<boolean>{
     // Does nothing when it's inflow/outflow
     if (dataIndex >= 2) {
-      setOverlayUrl("");
+      dispatch(setOverlayUrl(""));
       return Promise.resolve(true);
     }
 
@@ -127,7 +139,7 @@ const HomePage = () => {
       alert(message);
       return false;
     }
-    setOverlayUrl(image_url);
+    dispatch(setOverlayUrl(image_url));
     return true;
   }
 
@@ -135,13 +147,13 @@ const HomePage = () => {
     var response = await checkImage(this_week);
     if (response) {
       console.log("HOME: onChangeWeek: ",this_week);
-      setWeek(this_week);
+      dispatch(setWeek(this_week));
     }
   }
 
   function flowUpdate(this_week: number) {
     console.log("flowUpdate: ",this_week);
-    setWeek(this_week);
+    dispatch(setWeek(this_week));
   }
 
   useEffect(() => {
@@ -153,8 +165,9 @@ const HomePage = () => {
     // THIS CODE IS NEEDED BECAUSE BACKEND FOR INFLOW/OUTFLOW IS NOT READY
     if (d_index === 2 || d_index === 3) {
       speciesCombo.selectedOptionIndex = s_index;
-      setDataIndex(d_index);
-      setSpeciesIndex(s_index);
+      dispatch(setDataIndex(d_index));
+      // setSpeciesIndex(s_index);
+      dispatch(setSpeciesIndex(s_index));
       return;
     }
     // END
@@ -171,8 +184,9 @@ const HomePage = () => {
       }
     }
     speciesCombo.selectedOptionIndex = s_index;
-    setDataIndex(d_index);
-    setSpeciesIndex(s_index);
+    dispatch(setDataIndex(d_index));
+    // setSpeciesIndex(s_index);
+    dispatch(setSpeciesIndex(s_index));
   };
 
   // Maps the species from the taxa file provided to a dropdown with options. 
