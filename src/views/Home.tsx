@@ -1,17 +1,12 @@
-import { ActionIcon, Combobox, ComboboxStore, Grid, Input, InputBase, useCombobox } from '@mantine/core';
-import { CheckIcon, MantineSize, Radio, Stack, Tooltip, Select } from '@mantine/core';
-import { MapContainer, TileLayer, ImageOverlay, useMap } from 'react-leaflet';
-import { forwardRef, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { IconInfoCircle, IconTestPipe, IconWriting } from '@tabler/icons-react';
+import { Combobox, ComboboxStore, useCombobox } from '@mantine/core';
+import { useEffect } from 'react';
 import 'leaflet/dist/leaflet.css';
 import axios from 'axios';
 import { imageURL, getScalingFilename, dataInfo} from '../hooks/dataUrl';
 import taxa from '../assets/taxa.json';
 import Timeline from '../components/Timeline';
 import Legend from '../components/Legend';
-import {OutbreakMarkers, loadOutbreaks, OutbreakLegend} from '../components/OutbreakPoints'
-import {MIN_WEEK} from '../utils/utils'
+import {loadOutbreaks, OutbreakLegend} from '../components/OutbreakPoints'
 import '../styles/Home.css';
 // const express = require('express');
 import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
@@ -19,7 +14,6 @@ import 'leaflet-geosearch/dist/geosearch.css';
 import InflowOutflowTimeline from '../components/InflowOutflowTimeline';
 import MapView from '../components/MapView';
 import ControlBar from '../components/ControlBar';
-import About from './About';
 import AboutButtons from '../components/AboutButtons';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store/store'; // Adjust the path to your store file
@@ -218,7 +212,7 @@ const HomePage = () => {
       {dataIndex < 2 && <Timeline week={week} dataset={dataIndex} isMonitor={isMonitor} onChangeWeek={checkImageAndUpdate} />}
 
       {/* Show this slider for inflow and outflow */}
-      {dataIndex >= 2 && <InflowOutflowTimeline week={week} dataset={dataIndex} isMonitor={isMonitor} onChangeWeek={flowUpdate} duration={25} />}
+      {dataIndex >= 2 && <InflowOutflowTimeline onChangeWeek={flowUpdate} duration={25} />}
     </div>
   );
 }

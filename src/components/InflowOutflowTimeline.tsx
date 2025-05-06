@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { ActionIcon, Grid, RangeSlider, Slider } from '@mantine/core';
 import { useMove } from '@mantine/hooks';
-import { IconCaretDownFilled, IconPlayerPlayFilled, IconPlayerPauseFilled } from '@tabler/icons-react';
+import { IconPlayerPlayFilled, IconPlayerPauseFilled } from '@tabler/icons-react';
 import ab_dates from '../assets/abundance_dates.json';
 import mv_dates from '../assets/movement_dates.json';
 import {dateToWeek, MIN_WEEK, MAX_WEEK, WEEKS_PER_YEAR} from '../utils/utils'
 import { duration } from 'moment';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store/store';
 
 // The Timeline includes three values the user can set.
 // 1. the currently displayed week of a year.  This is done with a separate 'thumb' above the range slider.
@@ -17,9 +19,6 @@ const monthLabels: Array<string> = [
 
 // Keeps track of the props and prop type going into the component (look up interfaces in TypeScript)
 interface TimelineProps {
-  week: number;
-  dataset: number;
-  isMonitor: boolean; // True for monitor, false for smartphone or tablet
   onChangeWeek: (week: number) => void;
   duration: number,
 }
@@ -40,7 +39,12 @@ const minRange = -51;  // makes it so end can be before start - supports playbac
 
 /* Creates a custom timeline slider that updates what week number of the year the user is currently on. */
 function InflowOutflowTimeline(props: TimelineProps) {
-  const { week, dataset, isMonitor, onChangeWeek, duration } = props;
+  const week = useSelector((state: RootState) => state.timeline.week);
+  const { onChangeWeek, duration } = props;
+
+  const isMonitor = useSelector((state: RootState) => state.ui.isMonitor);
+  const dataIndex = useSelector((state: RootState) => state.species.dataIndex);
+
   // sizingProps are for things that change depending on if it is a smartPhone or monitor
   const [sizingProps, setSizingProps] = useState<sliderProps>();
   // need the adjustWeek code to handle the keypresses because it doesn't really handle variables well
@@ -150,7 +154,7 @@ function InflowOutflowTimeline(props: TimelineProps) {
     // set props for both sliders
     var sProps: sliderProps ;
     if (isMonitor) {
-      sProps = {size:'md', thumb:20, showLabel:true, marks:marks[dataset]}
+      sProps = {size:'md', thumb:20, showLabel:true, marks:marks[dataIndex]}
     } else {
       sProps = {size:'sm', thumb:12, showLabel:false, marks:[]}
     }
@@ -163,9 +167,9 @@ function InflowOutflowTimeline(props: TimelineProps) {
     setSliderValue(week/MAX_WEEK);
   }, [week])
 
-  // return thumb label for the given week and the current dataset
+  // return thumb label for the given week and the current dataIndex
   function showLabel(labelIndex: number) {
-    return dateLabels[dataset][labelIndex];
+    return dateLabels[dataIndex][labelIndex];
   };
   
   // handle wrapping the time range over the end of year
@@ -262,21 +266,21 @@ function InflowOutflowTimeline(props: TimelineProps) {
               }} >
                 {/* SLIDER BUTTON - NEED TO BE REWORKED */}
                 <div style={{backgroundColor: "white", padding: "3px"}}>
-                  {dateLabels[dataset][week]}
+                  {dateLabels[dataIndex][week]}
                 </div>
                 {/* <IconCaretDownFilled viewBox='0, 5, 24, 24' /> */}
                 <div style={{backgroundColor: "black", width: "3px", height: "23px"}}></div>
             </div>
           </div>
           <p></p>
-          <CustomFixedRangeSlider  min={MIN_WEEK} max={MAX_WEEK} offset={duration} realValue={weekRange[0]} setRealValue={(val:number) => {setWeekRange([val, val + duration])}} />
+          <CustomFixedRangeSlider  min={MIN_WEEK} max={MAX_WEEK} offset={duration} realValue={weekRange[0]} setRealValue={(val:number) => {setWeekRange([val, val + duration])}} showInflow={dataIndex == 2} />
         </Grid.Col>
       </Grid>
     </div>
   );
 }
 
-function CustomFixedRangeSlider({ min, max, offset, realValue, setRealValue }: { min: number; max: number; offset: number; realValue: number; setRealValue: (val: number) => void }) {
+function CustomFixedRangeSlider({ min, max, offset, realValue, setRealValue, showInflow }: { min: number; max: number; offset: number; realValue: number; setRealValue: (val: number) => void; showInflow: boolean }) {
   // Real thumb values (draggable): realValue, setRealValue (state lifted up to parent component)
   // const [realValue, setRealValue] = useState(min);
   const range = max - min + 1;
@@ -343,69 +347,73 @@ function CustomFixedRangeSlider({ min, max, offset, realValue, setRealValue }: {
         );
       })}
 
-      {/* Real draggable thumb (hollow circle) */}
-      <div
-        style={{
-          position: 'absolute',
-          top: -8,
-          left: `calc(${realPercent}% - 12px)`,
-          width: 24,
-          height: 24,
-          borderRadius: '50%',
-          backgroundColor: 'white',
-          border: '2px solid #228be6',
-          cursor: 'pointer',
-        }}
-        // Attach pointer events via the track useMove
-      />
+      {showInflow && <>
+        {/* Real draggable thumb (filled circle) */}
+        <div
+          style={{
+            position: 'absolute',
+            top: -8,
+            left: `calc(${realPercent}% - 12px)`,
+            width: 24,
+            height: 24,
+            borderRadius: '50%',
+            backgroundColor: '#228be6',
+            cursor: 'pointer',
+          }}
+          // Attach pointer events via the track useMove
+        />
 
-      {/* Real draggable thumb (filled circle) */}
-      {/* <div
-        style={{
-          position: 'absolute',
-          top: -8,
-          left: `calc(${realPercent}% - 12px)`,
-          width: 24,
-          height: 24,
-          borderRadius: '50%',
-          backgroundColor: '#228be6',
-          cursor: 'pointer',
-        }}
-        // Attach pointer events via the track useMove
-      /> */}
+        {/* Fake thumb for display only (hollow arrow) */}
+        <div
+          style={{
+            position: 'absolute',
+            left: `calc(${fakePercent}% - 12px)`,
+            top: '50%',
+            transform: 'translateY(-50%)',
+            pointerEvents: 'none', // decorative only
+            width: 28,
+            height: 28,
+          }}
+        >
+          <HollowArrowThumb />
+        </div>
+      </>
+      }
 
+      {!showInflow && <>
+        {/* Real draggable thumb (hollow circle) */}
+        <div
+          style={{
+            position: 'absolute',
+            top: -8,
+            left: `calc(${realPercent}% - 12px)`,
+            width: 24,
+            height: 24,
+            borderRadius: '50%',
+            backgroundColor: 'white',
+            border: '2px solid #228be6',
+            cursor: 'pointer',
+          }}
+          // Attach pointer events via the track useMove
+        />
 
-      {/* Fake thumb for display only (filled arrow) */}
-      <div
-        style={{
-          position: 'absolute',
-          top: '50%', // vertical center of the track
-          // Center the arrow horizontally relative to its computed percentage position:
-          left: `calc(${fakePercent}% - 12px)`, // Adjust by half arrow "width"
-          transform: 'translateY(-50%)',
-          width: 0,
-          height: 0,
-          borderTop: '12px solid transparent',
-          borderBottom: '12px solid transparent',
-          borderLeft: `24px solid #228be6`,
-          pointerEvents: 'none', // Ensure the fake thumb does not capture mouse events
-        }}
-      />
-
-      {/* Fake thumb for display only (hollow arrow) */}
-      {/* <div
-        style={{
-          position: 'absolute',
-          left: `calc(${fakePercent}% - 12px)`,
-          top: '50%',
-          transform: 'translateY(-50%)',
-          pointerEvents: 'none', // decorative only
-          width: 28,
-          height: 28,
-        }}
-      >
-        <HollowArrowThumb />
-      </div> */}
+        {/* Fake thumb for display only (filled arrow) */}
+        <div
+          style={{
+            position: 'absolute',
+            top: '50%', // vertical center of the track
+            // Center the arrow horizontally relative to its computed percentage position:
+            left: `calc(${fakePercent}% - 12px)`, // Adjust by half arrow "width"
+            transform: 'translateY(-50%)',
+            width: 0,
+            height: 0,
+            borderTop: '12px solid transparent',
+            borderBottom: '12px solid transparent',
+            borderLeft: `24px solid #228be6`,
+            pointerEvents: 'none', // Ensure the fake thumb does not capture mouse events
+          }}
+        />
+      </>}
 
       {/* Transparent overlay to capture pointer events from useMove */}
       <div ref={ref} style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, cursor: 'pointer' }} />
