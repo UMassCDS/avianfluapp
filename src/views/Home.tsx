@@ -205,7 +205,7 @@ const HomePage = () => {
       
       {/* If dataIndex >= 2, then it's currently inflow/outflow */}
       {dataIndex < 2 && (
-          <Legend dataTypeIndex={dataIndex} speciesIndex={speciesIndex} />
+          <Legend />
       )}
 
       {/* Show this slider for abundance and movement */}

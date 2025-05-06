@@ -3,15 +3,14 @@ import { useEffect, useState } from 'react';
 import { Grid, Stack, Tooltip } from '@mantine/core';
 import { getScalingFilename, dataInfo} from '../hooks/dataUrl';
 import { isMobile } from '../utils/utils';
-// Interface for the Legend 
-interface LegendProps {
-  dataTypeIndex: number;
-  speciesIndex: number;
-}
+import { useSelector } from 'react-redux';
+import { RootState } from '../store/store';
 
 /* Creates a custom legend component based on the species scale values. */
-function Legend(props: LegendProps) {
-  const { dataTypeIndex, speciesIndex } = props;
+function Legend() {
+  const dataIndex = useSelector((state: RootState) => state.species.dataIndex);
+  const speciesIndex = useSelector((state: RootState) => state.species.speciesIndex);
+
   const [colorScale, setColorScale] = useState<string>();
   const [lowLabel, setLowLabel] = useState<number>(0);
   const [midLabel, setMidLabel] = useState<number>(50);
@@ -30,7 +29,7 @@ function Legend(props: LegendProps) {
 
   // Every time the dataTypeIndex or speciesIndex is changed by the user, the legend updates
   useEffect(() => {
-    const u = getScalingFilename(dataTypeIndex, speciesIndex);
+    const u = getScalingFilename(dataIndex, speciesIndex);
     getJSON(u)
       .then((d) => {
         const pushed: any[] = [];
@@ -46,10 +45,10 @@ function Legend(props: LegendProps) {
       .catch((error) => {
         alert(error);
       });
-  }, [dataTypeIndex, speciesIndex]);
+  }, [dataIndex, speciesIndex]);
 
   function stackedUnits() {
-    let units: string[] = dataInfo[dataTypeIndex].units.split('/');
+    let units: string[] = dataInfo[dataIndex].units.split('/');
     return units.join('/\n')
   }
 
@@ -94,7 +93,7 @@ function Legend(props: LegendProps) {
             </Grid.Col>
           </Grid>
           <Tooltip label='Average of 10 years of data.'>
-            <div style={{textAlign:"center"}}>{dataInfo[dataTypeIndex].units}</div>
+            <div style={{textAlign:"center"}}>{dataInfo[dataIndex].units}</div>
           </Tooltip>
       </div>
     }
