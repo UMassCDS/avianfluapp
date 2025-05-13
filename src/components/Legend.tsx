@@ -6,7 +6,27 @@ import { isMobile } from '../utils/utils';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
 
-/* Creates a custom legend component based on the species scale values. */
+/**
+ * Creates a custom legend component that displays a color scale and value labels
+ * based on the currently selected species and data index.
+ *
+ * The legend updates dynamically whenever the user changes the data type or species,
+ * fetching the appropriate color scale and value range from the backend.
+ * 
+ * - On mobile devices, the legend is rendered in a compact vertical layout.
+ * - On desktop, the legend is rendered with a color bar and value labels aligned using a grid.
+ * - Units and a tooltip with additional information are displayed below the legend.
+ *
+ * Uses Redux to access the current data and species indices.
+ *
+ * @component
+ * @returns {JSX.Element} The rendered legend component.
+ */
+
+/*
+- Right now, the legend only shows up for abundance and movement data types.
+- Legend for inflow and outflow data types are not implemented.
+*/
 function Legend() {
   const dataIndex = useSelector((state: RootState) => state.species.dataIndex);
   const speciesIndex = useSelector((state: RootState) => state.species.speciesIndex);

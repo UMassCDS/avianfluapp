@@ -8,6 +8,16 @@ interface AboutButtonsProps {
   runTest: () => void;
 }
 
+/**
+ * Renders a set of action buttons for the About section, including:
+ * - A button to run a test REST API call.
+ * - A button to navigate to the feedback page.
+ * - A button to navigate to the about page.
+ *
+ * @param runTest - Callback function to execute when the test button is clicked.
+ *
+ * The component uses Redux to determine the icon size and React Router for navigation.
+ */
 export default function AboutButtions({runTest }: AboutButtonsProps) {
   const navigate = useNavigate();
 
