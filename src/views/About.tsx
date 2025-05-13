@@ -2,6 +2,21 @@ import { Link } from 'react-router-dom';
 import '../styles/Default.css';
 
 
+/**
+ * Renders the About page for the Avian Influenza application.
+ *
+ * This component provides detailed information and documentation about the application, including:
+ * - Instructions on how to use the site
+ * - Data sources and methodology for abundance and movement data
+ * - Information about the species included in the model
+ * - Details about avian influenza outbreak data
+ * - Additional resources and links for further information
+ * - Disclaimer regarding data usage and opinions
+ * - Citations for all referenced data and publications
+ *
+ * @component
+ * @returns {JSX.Element} The About page content as a React element.
+ */
 function About(this: any) {
 
     const HowTo = (

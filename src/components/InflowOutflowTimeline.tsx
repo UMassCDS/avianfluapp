@@ -37,7 +37,31 @@ interface sliderProps {
 }
 const minRange = -51;  // makes it so end can be before start - supports playback over end of year
 
-/* Creates a custom timeline slider that updates what week number of the year the user is currently on. */
+/**
+ * InflowOutflowTimeline is a React functional component that renders a timeline slider
+ * for visualizing inflow and outflow data over a range of weeks. It provides interactive
+ * controls for selecting weeks, playing through the timeline, and adjusting the displayed
+ * week range. The component supports keyboard navigation using arrow keys.
+ *
+ * @component
+ * @param {TimelineProps} props - The properties for the timeline, including:
+ *   - onChangeWeek: Callback function to update the selected week.
+ *   - duration: The duration (in weeks) for the range slider.
+ *
+ * @returns {JSX.Element} The rendered timeline component, including play/pause controls,
+ * a custom slider with week labels, and support for inflow/outflow visualization.
+ *
+ * @remarks
+ * - Uses Redux selectors to access timeline, UI, and species state.
+ * - Handles keyboard events for week navigation.
+ * - Supports playback functionality to automatically advance weeks.
+ * - Dynamically generates date labels and slider marks based on dataset.
+ * - Designed to be responsive for different device types.
+ */
+
+/*
+- This is a custom slider component that I copied over from Pam's timeline component and customized it to work with the demands of inflow/outflow
+- Unlike Pam's builtin component, I have separated the Timeline component and the "customized slider part" (the component known as CustomFixedRangeSlider(), which makes it more scalable and perhaps easier to understand) */
 function InflowOutflowTimeline(props: TimelineProps) {
   const week = useSelector((state: RootState) => state.timeline.week);
   const { onChangeWeek, duration } = props;
@@ -236,7 +260,8 @@ function InflowOutflowTimeline(props: TimelineProps) {
       <Grid align='stretch'>
         <Grid.Col span={1}>
           {/* show Play or Pause button*/}
-          {isPlaying?
+          {/* PLAY OR PAUSE FUNCTIONALITY NOT YET IMPLEMENTED FOR INFLOW/OUTFLOW. NEEDS BACKEND INTEGRATION */}
+          {/* {isPlaying?
             <ActionIcon size={'xl'} onClick={() => { playbackClick() }}>
               <IconPlayerPauseFilled/>
             </ActionIcon>
@@ -244,7 +269,7 @@ function InflowOutflowTimeline(props: TimelineProps) {
             <ActionIcon size={'xl'} onClick={() => { playbackClick() }}>
               <IconPlayerPlayFilled/>
             </ActionIcon>
-          }
+          } */}
         </Grid.Col>
         <Grid.Col span={11}>
           {/* slider with only the thumb marker */}
@@ -280,6 +305,24 @@ function InflowOutflowTimeline(props: TimelineProps) {
   );
 }
 
+/**
+ * A custom fixed-range slider component with wrap-around and dual-thumb visualization.
+ *
+ * This slider displays a draggable "real" thumb and a "fake" thumb for visualizing offset or wrap-around behavior.
+ * It supports both inflow and outflow modes, changing the thumb and arrow styles accordingly.
+ *
+ * @param min - The minimum value of the slider range.
+ * @param max - The maximum value of the slider range.
+ * @param offset - The offset applied to the fake thumb for wrap-around visualization.
+ * @param realValue - The current value of the real (draggable) thumb.
+ * @param setRealValue - Callback to update the realValue when the slider is moved.
+ * @param showInflow - If true, displays inflow styling (filled thumb and hollow arrow); otherwise, outflow styling (hollow thumb and filled arrow).
+ *
+ * @remarks
+ * - The slider visually fills the track between the real and fake thumbs, handling wrap-around cases.
+ * - The real thumb is draggable, while the fake thumb is for display only.
+ * - Designed for use cases where a circular or offset range visualization is needed (e.g., inflow/outflow timelines).
+ */
 function CustomFixedRangeSlider({ min, max, offset, realValue, setRealValue, showInflow }: { min: number; max: number; offset: number; realValue: number; setRealValue: (val: number) => void; showInflow: boolean }) {
   // Real thumb values (draggable): realValue, setRealValue (state lifted up to parent component)
   // const [realValue, setRealValue] = useState(min);
@@ -421,6 +464,14 @@ function CustomFixedRangeSlider({ min, max, offset, realValue, setRealValue, sho
   );
 }
 
+/**
+ * Renders a hollow arrow-shaped SVG thumb component.
+ *
+ * This component displays a right-pointing arrow with a white fill and a blue (#228be6) stroke.
+
+ *
+ * @returns {JSX.Element} The SVG element representing the hollow arrow thumb.
+ */
 function HollowArrowThumb() {
   return (
     <svg width="28" height="28" viewBox="0 0 24 24">

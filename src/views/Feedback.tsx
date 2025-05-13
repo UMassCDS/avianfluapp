@@ -8,6 +8,20 @@ import '../styles/Default.css';
 
 const EMAIL_REGEX = new RegExp(/^[^\s;]+@[^\s;]+\.[^\s;]*$/)
 
+/**
+ * Renders a feedback form allowing users to submit feedback and optionally provide their email address for a response.
+ * 
+ * The form includes:
+ * - An email input field (optional, validated for email format if provided)
+ * - A feedback textarea (required)
+ * - A submit button that sends the feedback via emailjs and disables itself while sending
+ * - A section listing future plans for the application
+ * 
+ * On successful submission, the user is notified and redirected to the main page.
+ * 
+ * @component
+ * @returns {JSX.Element} The rendered feedback form component.
+ */
 function FeedbackForm(this: any) {
   const [email, setEmail] = useState("");
   const [text, setText] = useState("");

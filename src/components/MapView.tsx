@@ -14,6 +14,31 @@ interface MapViewProps {
   dataIndex: number;
 }
 
+/**
+ * MapView component renders an interactive map with optional search functionality,
+ * data overlays, and outbreak markers.
+ *
+ * @param week - The current week to display outbreak markers for.
+ * @param dataIndex - Index indicating which dataset is currently selected; controls search field visibility.
+ * @returns JSX.Element representing the map view with overlays and controls.
+ *
+ * Features:
+ * - Displays a map centered at a default position.
+ * - Shows an image overlay based on the Redux state `overlayUrl`.
+ * - Conditionally renders a search field for geolocation when `dataIndex >= 2` (i.e. when inflow or outflow is selected).
+ * - Adds outbreak markers for the specified week.
+ *
+ * Dependencies:
+ * - Uses `react-redux`'s `useSelector` to access overlay URL from state.
+ * - Uses `react-leaflet` for map rendering and controls.
+ * - Integrates `leaflet-geosearch` for address search functionality.
+ */
+
+/*
+- SearchField component: a builtin search bar provided by leaflet-geosearch (https://smeijer.github.io/leaflet-geosearch/)
+- TileLayer component: a tile layer that provides the base map (i.e. this is the "world" map you see)
+- ImageOverlay component: an image overlay that provides the data to be displayed on top of the map (this is the "heatmap" you see when you select a week)
+*/
 export default function MapView({ week, dataIndex }: MapViewProps): JSX.Element {
   const position = {
     lat: 45,
