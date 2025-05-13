@@ -24,6 +24,7 @@ import { RootState } from '../store/store';
  */
 
 /*
+- This is the Birds/km^2 (or Birds/km/week) Legend on the bottom left of the screen.
 - Right now, the legend only shows up for abundance and movement data types.
 - Legend for inflow and outflow data types are not implemented.
 */

@@ -29,8 +29,23 @@ const imageBounds = [
   [79.98956, -49.783429],
 ];
 
-/* This is the main page and only page of the application. 
-   Here, the map renders as well as all the AvianFluApp feature controls */
+/**
+ * HomePage component is the main view for the application, responsible for rendering the interactive map,
+ * control widgets, and timeline sliders for visualizing avian flu data. It manages state related to species,
+ * data type, week selection, and UI preferences using Redux selectors and dispatchers.
+ *
+ * Features:
+ * - Loads outbreak data and adjusts UI based on window size.
+ * - Handles species and data type selection, including validation of required resources.
+ * - Dynamically updates map overlays and legends based on user input.
+ * - Provides timeline controls for abundance, movement, inflow, and outflow datasets.
+ * - Integrates with backend APIs for testing connectivity.
+ *
+ * @component
+ * @returns {JSX.Element} The rendered HomePage component.
+ */
+
+/* Right now, HomePage() component is where most of the logic lives (for example, things like play/pause button to display data every week over the range provided by timeline slider) */
 const HomePage = () => {  
   const dispatch = useDispatch();
   const speciesIndex = useSelector((state: RootState) => state.species.speciesIndex);

@@ -36,7 +36,8 @@ interface sliderProps {
 }
 const minRange = -51;  // makes it so end can be before start - supports playback over end of year
 
-/* Creates a custom timeline slider that updates what week number of the year the user is currently on. */
+
+/* This is a timeline component (the week slider) built by Pam. This will be displayed when "abundance" or "movement" is selected */
 function Timeline(props: TimelineProps) {
   const { week, dataset, isMonitor, onChangeWeek } = props;
   // sizingProps are for things that change depending on if it is a smartPhone or monitor
@@ -282,26 +283,4 @@ function Timeline(props: TimelineProps) {
   );
 }
 
-/* if you want to put regular slider back in
-          <Slider
-            defaultValue={week}
-            value={week}
-            label={showLabel}
-            min={MIN_WEEK}
-            max={MAX_WEEK}
-            color="light gray"
-            marks={sizingProps?.marks}
-            size={sizingProps?.size}
-            thumbSize={sizingProps?.thumb}
-            labelAlwaysOn={sizingProps?.showLabel}
-            onChange={(v) => { onChangeWeek(v)}}
-            styles={() => ({
-              track: {backgroundColor: "pink"},
-              mark: {borderColor: "light gray"},
-              markFilled: {
-                borderColor: "purple",
-              },
-            })}
-          />
-*/
 export default Timeline;

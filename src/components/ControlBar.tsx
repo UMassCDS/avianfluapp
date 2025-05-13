@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import taxa from "../assets/taxa.json";
 
+/* This is Pam's component. She uses builtin components from Mantine Core to implement the dropdown used for Species dropdown menu */
 function genericCombo(ref_combo: ComboboxStore, onSubmit: Function, label: string, options: JSX.Element[]) {
   const textSize = useSelector((state: RootState) => state.ui.textSize);
 
@@ -42,6 +43,22 @@ interface DataTypeComponentProps {
   checkInputTypes: (dataIndex: number, speciesIndex: number) => void;
 }
 
+/**
+ * `DataTypeComponent` is a React forwardRef component that renders a selectable dropdown
+ * for choosing a data type (e.g., "abundance", "movement", "inflow", "outflow").
+ * It uses Redux selectors to obtain the current species and data indices from the application state.
+ * When a new data type is selected, it invokes the `checkInputTypes` callback with the
+ * corresponding data type index and the current species index.
+ *
+ * @param props - The props for the component.
+ * @param props.checkInputTypes - A callback function that is called when the data type changes,
+ *   receiving the new data type index and the current species index.
+ * @param ref - A React ref forwarded to the root div element.
+ *
+ * @returns A React element containing a dropdown for selecting the data type.
+ */
+
+/* Also Pam's component. I think forwardRef is used to pass control over DataTypeComponent to its child, but I'm not sure how Pam is using it yet. */
 const DataTypeComponent = forwardRef<HTMLDivElement, DataTypeComponentProps>((props, ref) => {
   const { checkInputTypes } = props;
   const speciesIndex = useSelector((state: RootState) => state.species.speciesIndex);
@@ -79,6 +96,22 @@ interface SpeciesComponentProps {
   speciesOptions: JSX.Element[];
 }
 
+/**
+ * A React forwardRef component that renders a species selection combo box.
+ *
+ * @param props - The props for the SpeciesComponent.
+ * @param props.speciesCombo - The current value or state for the species combo box.
+ * @param props.checkSpecies - Callback function to handle species selection changes.
+ * @param props.speciesOptions - Array of available species options for selection.
+ * @param rest - Additional props passed to the root div element.
+ * @param ref - Ref forwarded to the root div element.
+ *
+ * @returns A div containing the species dropdown menu, utilizing the `genericCombo` component.
+ *
+ * @remarks
+ * Uses Redux's `useSelector` to access the current species index from the store.
+ * The combo box is rendered using the `genericCombo` function, with the label determined by the selected species.
+ */
 const SpeciesComponent = forwardRef<HTMLDivElement, SpeciesComponentProps>((props, ref) => {
   const { speciesCombo, checkSpecies, speciesOptions, ...rest } = props;
 
