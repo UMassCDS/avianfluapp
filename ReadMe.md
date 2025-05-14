@@ -33,11 +33,18 @@ This application provides an interactive visualization platform for avian influe
      - Controls for abundance and movement data visualization
      - Week selection and playback functionality
      - Month labels and date navigation
+     - Detailed Notes:
+       - This timeline slider was built using Mantine's builtin RangeSlider() component.
+       - There are also many functionalities that Pam jampacked into this single file (Timeline.tsx) that I'm not too sure of, but the main ones I've noticed are: update image overlays, playback/pause button, and draggable date picker.
+       - The draggable date picker is actually a separate component from RangeSlider(). This picker is implemented internally by Pam using useMove() hook (which is also what I used to implement custom fixed range slider for inflow/outflow).
 
    - **InflowOutflowTimeline (`src/components/InflowOutflowTimeline.tsx`)**
      - Specialized timeline for inflow/outflow data
      - Custom range slider for week selection
-     - Playback controls for data visualization
+     - Detailed Notes:
+       - The main difference of InflowOutflow slider compared to Timeline slider is that it only allows a fixed distance between the left and right thumb.
+       - Left thumb is the "real" thumb that can move, right thumb is just there for decorative purpose, to let users know what the end date for prediction is.
+       - The custom slider is implemented using the useMove() hook taken from the Mantine library. Put simply, the way it works is that when the user clicks anywhere on the parent container, useMove() will update its own internal state value, and this value is what you use to update the slider thumb's position.
 
 4. **ControlBar (`src/components/ControlBar.tsx`)**
    - Data type selection dropdown (abundance/movement/inflow/outflow)
