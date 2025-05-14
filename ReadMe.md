@@ -48,7 +48,6 @@ This application provides an interactive visualization platform for avian influe
 1. **Legend (`src/components/Legend.tsx`)**
 
    - Displays data scale and color coding legend (bottom left)
-   - Provides context for map visualization
 
 2. **OutbreakPoints (`src/components/OutbreakPoints.tsx`)**
 
