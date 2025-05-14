@@ -23,11 +23,6 @@ import { setFontHeight, setIconSize, setIsMonitor, setTextSize, setTitleSize } f
 import { setOverlayUrl } from '../store/slices/mapSlice';
 
 const MIN_REG_WINDOW_WIDTH = 600;
-// the lat/long bounds of the data image provided by the backend
-const imageBounds = [
-  [9.622994, -170.291626],
-  [79.98956, -49.783429],
-];
 
 /**
  * HomePage component is the main view for the application, responsible for rendering the interactive map,
@@ -103,18 +98,6 @@ const HomePage = () => {
   // Called once on startup. Adds a listener for user keyboard events. 
   // Note: it appears this is not called when using Firefox on the iPhone PM 11/9/2024
   useEffect(() => {
-    // THIS PART IS FOR TESTING IF REACT APPLICATION CAN ACCESS THE R BACKEND
-    // const testRApi = async () => {
-    //   try {
-        // const response = await axios.get(`http://localhost:8000/${functionName}?loc=${loc}&week=${week}&taxa=${taxa}&n={n_f_low_weeks}`);
-    //     console.log(response.data);
-    //   } catch (error) {
-    //     console.error("Error fetching data:", error);
-    //   }
-    // };
-    // testRApi();
-    // TESTING ENDS HERE
-
     loadOutbreaks();
     handleWindowSizeChange();
     window.addEventListener('resize', handleWindowSizeChange);
@@ -208,13 +191,17 @@ const HomePage = () => {
       {/* Creates a map using the leaflet component */}
       <MapView week={week} dataIndex={dataIndex} />
       <div className="widgets"> 
-        <ControlBar 
-          checkInputTypes={checkInputTypes}
-          speciesCombo={speciesCombo}
-          checkSpecies={checkSpecies}
-          speciesOptions={speciesOptions}
-        />
-        <OutbreakLegend/>
+        <div style={{ display: 'flex', flexDirection: 'row', gap: '1rem' }}>
+          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center' }}>
+            <OutbreakLegend/>
+          </div>
+          <ControlBar 
+            checkInputTypes={checkInputTypes}
+            speciesCombo={speciesCombo}
+            checkSpecies={checkSpecies}
+            speciesOptions={speciesOptions}
+          />
+        </div>
       </div>
       <AboutButtons runTest={runTest} />
       

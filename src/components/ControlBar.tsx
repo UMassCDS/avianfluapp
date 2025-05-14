@@ -1,4 +1,4 @@
-import { Combobox, ComboboxStore, Grid, Input, InputBase, Select, Tooltip } from "@mantine/core";
+import { Combobox, ComboboxStore, Grid, Input, InputBase, Select, Stack, Tooltip } from "@mantine/core";
 import { dataInfo } from "../hooks/dataUrl";
 import { forwardRef } from "react";
 import { useSelector } from "react-redux";
@@ -15,7 +15,6 @@ function genericCombo(ref_combo: ComboboxStore, onSubmit: Function, label: strin
       onOptionSubmit={(val) => {
         onSubmit(val, ref_combo); 
       }}
-      size={textSize}
     >
       <Combobox.Target>
         <InputBase
@@ -25,7 +24,7 @@ function genericCombo(ref_combo: ComboboxStore, onSubmit: Function, label: strin
           leftSection={<Combobox.Chevron />}
           onClick={() => ref_combo.toggleDropdown()}
           leftSectionPointerEvents="none"
-          size={textSize}
+          size="xs"
           multiline={true}
         >
           {label || <Input.Placeholder>Pick value</Input.Placeholder>}
@@ -143,18 +142,18 @@ export default function ControlBar(props: ControlBarProps) {
         <Grid.Col span={12}>
           <div style={{textAlign:"center", fontSize: titleSize, fontWeight:"bold"}}>Avian Influenza</div>
         </Grid.Col>
-        { /* 2nd row */ }
-        <Grid.Col span={{ base: 4, md: 2, lg: 2 }}>
-          {/* Dropdown for data type */}
-          <Tooltip label='Types of data sets'>
-            <DataTypeComponent checkInputTypes={checkInputTypes} />
-          </Tooltip>
-        </Grid.Col>
-        <Grid.Col span={{ base: 6, md: 4, lg: 3 }}>
-          {/* The dropdown for the species type */}
-          <Tooltip label='Wild bird species that potentially carry Avian Influenza'>
-            <SpeciesComponent speciesCombo={speciesCombo} checkSpecies={checkSpecies} speciesOptions={speciesOptions} />
-          </Tooltip>
+        { /* Components stacked vertically */ }
+        <Grid.Col span={12}>
+          <Stack>
+            {/* Dropdown for data type */}
+            <Tooltip label='Types of data sets'>
+              <DataTypeComponent checkInputTypes={checkInputTypes} />
+            </Tooltip>
+            {/* The dropdown for the species type */}
+            <Tooltip label='Wild bird species that potentially carry Avian Influenza'>
+              <SpeciesComponent speciesCombo={speciesCombo} checkSpecies={checkSpecies} speciesOptions={speciesOptions} />
+            </Tooltip>
+          </Stack>
         </Grid.Col>
       </Grid>
     </div>
