@@ -65,16 +65,75 @@ This application provides an interactive visualization platform for avian influe
    - Navigation controls for About and Feedback pages
    - Test API functionality
 
-## State Management
+# Redux Store Documentation
 
-The application uses Redux for global state management with the following slices:
+This directory contains the Redux store configuration and slices for the Avian Flu Application.
 
-- `uiSlice`: Manages UI preferences and responsive design
-- `speciesSlice`: Handles species and data type selection
-- `timelineSlice`: Controls timeline state and week selection
-- `mapSlice`: Manages map overlay and visualization state
+## Redux Store Structure
 
-Local state management is used with React builtin state management (i.e. useState)
+The store is configured using Redux Toolkit and consists of the following slices:
+
+### UI Slice (`uiSlice.tsx`)
+
+Manages UI-related state:
+
+- `isMonitor`: Boolean flag for monitor mode
+- `iconSize`: Mantine size for icons
+- `textSize`: Mantine size for text
+- `fontHeight`: Font height in pixels
+- `titleSize`: Title size in pixels
+
+### Species Slice (`speciesSlice.tsx`)
+
+Manages species and data-related (abundance/movement/inflow/outflow) state and data.
+
+### Timeline Slice (`timelineSlice.tsx`)
+
+Manages timeline-related state and data.
+
+### Map Slice (`mapSlice.tsx`)
+
+Manages map-related state and data.
+
+### Usage
+
+#### Accessing State
+
+```typescript
+import { useSelector } from 'react-redux';
+import { RootState } from './store';
+
+// In your component
+const uiState = useSelector((state: RootState) => state.ui);
+```
+
+#### Dispatching Actions
+
+```typescript
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from './store';
+import { setIsMonitor } from './slices/uiSlice';
+
+// In your component
+const dispatch = useDispatch<AppDispatch>();
+dispatch(setIsMonitor(true));
+```
+
+#### Type Definitions
+
+The store exports two important types:
+
+- `RootState`: Type for the entire Redux state
+- `AppDispatch`: Type for the dispatch function
+
+## Adding New Slices
+
+To add a new slice:
+
+1. Create a new file in the `slices` directory
+2. Define your state interface and initial state
+3. Create the slice using `createSlice`
+4. Add the reducer to the store configuration in `store.ts`
 
 ## Installation
 
