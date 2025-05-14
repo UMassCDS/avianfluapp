@@ -191,13 +191,17 @@ const HomePage = () => {
       {/* Creates a map using the leaflet component */}
       <MapView week={week} dataIndex={dataIndex} />
       <div className="widgets"> 
-        <ControlBar 
-          checkInputTypes={checkInputTypes}
-          speciesCombo={speciesCombo}
-          checkSpecies={checkSpecies}
-          speciesOptions={speciesOptions}
-        />
-        <OutbreakLegend/>
+        <div style={{ display: 'flex', flexDirection: 'row', gap: '1rem' }}>
+          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center' }}>
+            <OutbreakLegend/>
+          </div>
+          <ControlBar 
+            checkInputTypes={checkInputTypes}
+            speciesCombo={speciesCombo}
+            checkSpecies={checkSpecies}
+            speciesOptions={speciesOptions}
+          />
+        </div>
       </div>
       <AboutButtons runTest={runTest} />
       
