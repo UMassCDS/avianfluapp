@@ -139,20 +139,7 @@ export default function MapView({ week, dataIndex, onLocationSelect }: MapViewPr
     <div style={{ position: "relative" }}>
       {/* Toggle Button */}
       {isInflowOutflowView && (
-        <button
-          onClick={toggleMode}
-          style={{
-            position: "absolute",
-            zIndex: 1000,
-            top: 40,
-            left: 60,
-            padding: "6px 12px",
-            backgroundColor: "#fff",
-            border: "1px solid #ccc",
-            borderRadius: "4px",
-            cursor: "pointer"
-          }}
-        >
+        <button className="toggle-button" onClick={toggleMode}>
           {useSearchMode ? "Switch to Click Mode" : "Switch to Search Mode"}
         </button>
       )}
