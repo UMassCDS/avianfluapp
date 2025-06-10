@@ -9,9 +9,9 @@ import Legend from '../components/Legend';
 import {loadOutbreaks, OutbreakLegend} from '../components/OutbreakPoints'
 import '../styles/Home.css';
 // const express = require('express');
-import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
 import 'leaflet-geosearch/dist/geosearch.css';
 import InflowOutflowTimeline from '../components/InflowOutflowTimeline';
+import InflowOutflowCalculateButton from '../components/InflowOutflowCalculateButton';
 import MapView from '../components/MapView';
 import ControlBar from '../components/ControlBar';
 import AboutButtons from '../components/AboutButtons';
@@ -23,6 +23,7 @@ import { setFontHeight, setIconSize, setIsMonitor, setTextSize, setTitleSize } f
 import { setOverlayUrl } from '../store/slices/mapSlice';
 
 const MIN_REG_WINDOW_WIDTH = 600;
+const N_FLOW_WEEKS = 20; // can be made configurable later
 
 /**
  * HomePage component is the main view for the application, responsible for rendering the interactive map,
@@ -213,6 +214,20 @@ const HomePage = () => {
             speciesOptions={speciesOptions}
           />
         </div>
+        {/* Show `Calculate` button for inflow and outflow */}
+        {dataIndex >= 2 && (
+          <div className="calculate-button">
+            <InflowOutflowCalculateButton
+              dataIndex={dataIndex}
+              week={week}
+              speciesIndex={speciesIndex}
+              location={location}
+              nFlowWeeks={N_FLOW_WEEKS}
+              speciesOptions={taxa}
+              disabled={location.length === 0}
+            />
+          </div>
+)}
       </div>
       <AboutButtons runTest={runTest} />
       
