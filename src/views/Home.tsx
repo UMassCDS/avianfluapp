@@ -1,5 +1,5 @@
 import { Combobox, ComboboxStore, useCombobox } from '@mantine/core';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import 'leaflet/dist/leaflet.css';
 import axios from 'axios';
 import { imageURL, getScalingFilename, dataInfo} from '../hooks/dataUrl';
@@ -59,6 +59,12 @@ const HomePage = () => {
   const fontHeight = useSelector((state: RootState) => state.ui.fontHeight);
   const titleSize = useSelector((state: RootState) => state.ui.titleSize);
 
+  const [location, setLocation] = useState<string[]>([]);
+
+  // Callback passed to MapView
+  const handleLocationSelect = (latLon: string | null) => {
+    setLocation(latLon ? [latLon] : []); // For now, just one point; supports multiple later
+  };
 
   function runTest() {
     console.log("Pam's test code");
@@ -189,7 +195,12 @@ const HomePage = () => {
   return (
     <div className="Home">
       {/* Creates a map using the leaflet component */}
-      <MapView week={week} dataIndex={dataIndex} />
+      <MapView
+        week={week}
+        dataIndex={dataIndex}
+        onLocationSelect={handleLocationSelect}
+      />
+
       <div className="widgets"> 
         <div style={{ display: 'flex', flexDirection: 'row', gap: '1rem' }}>
           <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center' }}>
