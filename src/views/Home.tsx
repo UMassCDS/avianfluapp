@@ -1,5 +1,6 @@
 import { Combobox, ComboboxStore, useCombobox } from '@mantine/core';
 import { useEffect, useState } from 'react';
+import 'leaflet/dist/leaflet.css';
 import axios from 'axios';
 import { imageURL, getScalingFilename, dataInfo} from '../hooks/dataUrl';
 import taxa from '../assets/taxa.json';
@@ -31,23 +32,6 @@ L.Icon.Default.mergeOptions({
     shadowUrl: require('leaflet/dist/images/marker-shadow.png').default
 });
 //
-
-// fix: resolve missing Leaflet marker icons in production (AWS Amplify) by importing and configuring marker image paths explicitly
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-
-// Import marker images
-import markerIcon from 'leaflet/dist/images/marker-icon.png';
-import markerShadow from 'leaflet/dist/images/marker-shadow.png';
-
-// Fix for missing marker icon in production
-delete L.Icon.Default.prototype._getIconUrl;
-
-L.Icon.Default.mergeOptions({
-  iconUrl: markerIcon,
-  shadowUrl: markerShadow,
-});
-//---
 
 const MIN_REG_WINDOW_WIDTH = 600;
 const N_FLOW_WEEKS = 20; // can be made configurable later
