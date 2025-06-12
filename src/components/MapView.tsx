@@ -137,6 +137,16 @@ export default function MapView({ week, dataIndex, onLocationSelect }: MapViewPr
     onLocationSelect(null);
   };
 
+  // clear the marker and search result when isInflowOutflowView becomes false
+  useEffect(() => {
+  if (!isInflowOutflowView) {
+    setMarkerPosition(null);
+    searchControl.markers.clearLayers();
+    searchControl.clearResults()
+    onLocationSelect(null);
+  }
+}, [isInflowOutflowView]);
+
   return (
     <div style={{ position: "relative" }}>
       {/* Toggle Button */}
