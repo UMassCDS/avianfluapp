@@ -20,6 +20,17 @@ import { setDataIndex, setSpeciesIndex } from '../store/slices/speciesSlice';
 import { setWeek } from '../store/slices/timelineSlice';
 import { setFontHeight, setIconSize, setIsMonitor, setTextSize, setTitleSize } from '../store/slices/uiSlice';
 import { setOverlayUrl } from '../store/slices/mapSlice';
+import L from 'leaflet';
+
+// Fix for missing marker icon in production
+delete L.Icon.Default.prototype._getIconUrl;
+
+L.Icon.Default.mergeOptions({
+    iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png').default,
+    iconUrl: require('leaflet/dist/images/marker-icon.png').default,
+    shadowUrl: require('leaflet/dist/images/marker-shadow.png').default
+});
+//
 
 // fix: resolve missing Leaflet marker icons in production (AWS Amplify) by importing and configuring marker image paths explicitly
 import L from 'leaflet';
