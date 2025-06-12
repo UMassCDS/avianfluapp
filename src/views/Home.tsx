@@ -1,5 +1,5 @@
 import { Combobox, ComboboxStore, useCombobox } from '@mantine/core';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import 'leaflet/dist/leaflet.css';
 import axios from 'axios';
 import { imageURL, getScalingFilename, dataInfo} from '../hooks/dataUrl';
@@ -9,9 +9,9 @@ import Legend from '../components/Legend';
 import {loadOutbreaks, OutbreakLegend} from '../components/OutbreakPoints'
 import '../styles/Home.css';
 // const express = require('express');
-import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
 import 'leaflet-geosearch/dist/geosearch.css';
 import InflowOutflowTimeline from '../components/InflowOutflowTimeline';
+import InflowOutflowCalculateButton from '../components/InflowOutflowCalculateButton';
 import MapView from '../components/MapView';
 import ControlBar from '../components/ControlBar';
 import AboutButtons from '../components/AboutButtons';
@@ -23,6 +23,7 @@ import { setFontHeight, setIconSize, setIsMonitor, setTextSize, setTitleSize } f
 import { setOverlayUrl } from '../store/slices/mapSlice';
 
 const MIN_REG_WINDOW_WIDTH = 600;
+const N_FLOW_WEEKS = 20; // can be made configurable later
 
 /**
  * HomePage component is the main view for the application, responsible for rendering the interactive map,
@@ -59,6 +60,12 @@ const HomePage = () => {
   const fontHeight = useSelector((state: RootState) => state.ui.fontHeight);
   const titleSize = useSelector((state: RootState) => state.ui.titleSize);
 
+  const [location, setLocation] = useState<string[]>([]);
+
+  // Callback passed to MapView
+  const handleLocationSelect = (latLon: string | null) => {
+    setLocation(latLon ? [latLon] : []); // For now, just one point; supports multiple later
+  };
 
   function runTest() {
     console.log("Pam's test code");
@@ -189,7 +196,12 @@ const HomePage = () => {
   return (
     <div className="Home">
       {/* Creates a map using the leaflet component */}
-      <MapView week={week} dataIndex={dataIndex} />
+      <MapView
+        week={week}
+        dataIndex={dataIndex}
+        onLocationSelect={handleLocationSelect}
+      />
+
       <div className="widgets"> 
         <div style={{ display: 'flex', flexDirection: 'row', gap: '1rem' }}>
           <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center' }}>
@@ -202,6 +214,20 @@ const HomePage = () => {
             speciesOptions={speciesOptions}
           />
         </div>
+        {/* Show `Calculate` button for inflow and outflow */}
+        {dataIndex >= 2 && (
+          <div className="calculate-button">
+            <InflowOutflowCalculateButton
+              dataIndex={dataIndex}
+              week={week}
+              speciesIndex={speciesIndex}
+              location={location}
+              nFlowWeeks={N_FLOW_WEEKS}
+              speciesOptions={taxa}
+              disabled={location.length === 0}
+            />
+          </div>
+)}
       </div>
       <AboutButtons runTest={runTest} />
       
