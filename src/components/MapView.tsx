@@ -3,6 +3,8 @@ import { OutbreakMarkers } from "./OutbreakPoints";
 import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import 'leaflet/dist/leaflet.css';
+import 'leaflet-geosearch/dist/geosearch.css';
 
 const imageBounds = [
   [9.622994, -170.291626],
