@@ -6,7 +6,8 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "test": "vitest"
+    "test": "vitest",
+    "mock-api": "node ./mock-api/mock-api.js"
   },
   "dependencies": {
     "@emotion/react": "^11.10.6",
@@ -27,7 +28,8 @@
     "react-dom": "^18.2.0",
     "react-leaflet": "^4.2.1",
     "react-redux": "^9.2.0",
-    "react-router-dom": "^6.9.0"
+    "react-router-dom": "^6.9.0",
+    "express": "^4.19.2"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.16.5",
