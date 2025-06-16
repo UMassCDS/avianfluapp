@@ -1,6 +1,9 @@
 const express = require('express');
+const cors = require('cors');
 const app = express();
 const PORT = 9000;
+
+app.use(cors()); // Enable CORS for all origins by default
 
 const baseUrl = 'https://avianinfluenza.s3.us-east-2.amazonaws.com/';
 const abundanceName = 'abundance';
