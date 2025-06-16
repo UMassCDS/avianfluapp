@@ -20,7 +20,7 @@ import { RootState } from '../store/store'; // Adjust the path to your store fil
 import { setDataIndex, setSpeciesIndex } from '../store/slices/speciesSlice';
 import { setWeek } from '../store/slices/timelineSlice';
 import { setFontHeight, setIconSize, setIsMonitor, setTextSize, setTitleSize } from '../store/slices/uiSlice';
-import { setOverlayUrl } from '../store/slices/mapSlice';
+import { setOverlayUrl, clearFlowResults, updateOverlayByWeek } from '../store/slices/mapSlice';
 import L from 'leaflet';
 
 // Fix for missing marker icon in production
@@ -160,11 +160,13 @@ const HomePage = () => {
   function flowUpdate(this_week: number) {
     console.log("flowUpdate: ",this_week);
     dispatch(setWeek(this_week));
+    dispatch(updateOverlayByWeek(this_week));
   }
 
   useEffect(() => {
     console.log("dataIndex and species change", week);
     checkImage(week);
+    dispatch(clearFlowResults());
   }, [dataIndex, speciesIndex]);
 
   async function checkInputTypes(d_index: number, s_index: number) {
@@ -257,7 +259,7 @@ const HomePage = () => {
       {dataIndex < 2 && <Timeline week={week} dataset={dataIndex} isMonitor={isMonitor} onChangeWeek={checkImageAndUpdate} />}
 
       {/* Show this slider for inflow and outflow */}
-      {dataIndex >= 2 && <InflowOutflowTimeline onChangeWeek={flowUpdate} duration={25} />}
+      {dataIndex >= 2 && <InflowOutflowTimeline onChangeWeek={flowUpdate} duration={N_FLOW_WEEKS} />}
     </div>
   );
 }

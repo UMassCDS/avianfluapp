@@ -1,8 +1,10 @@
 import React from 'react';
 import { Button } from '@mantine/core';
 import axios from 'axios';
+import { useDispatch } from 'react-redux';
+import { setFlowResults, updateOverlayByWeek } from '../store/slices/mapSlice';
 
-const BirdflowRApiBaseUrl = "http://localhost:8000"; // BirdflowR REST API base URL
+const BirdflowRApiBaseUrl = "http://localhost:9000"; // BirdflowR REST API base URL
 
 type Props = {
   dataIndex: number; // 2 for inflow, 3 for outflow
@@ -23,6 +25,8 @@ const InflowOutflowCalculateButton: React.FC<Props> = ({
   speciesOptions,
   disabled,
 }) => {
+  const dispatch = useDispatch();
+
   const handleClick = async () => {
     const functionName = dataIndex === 2 ? 'inflow' : 'outflow';
     const taxa = speciesOptions[speciesIndex]?.value || 'total';
@@ -32,6 +36,11 @@ const InflowOutflowCalculateButton: React.FC<Props> = ({
     try {
       const response = await axios.get(url);
       console.log('API Response:', response.data);
+      if (response.data.status === 'success') {
+        const result = response.data.result;
+        dispatch(setFlowResults(result));
+        dispatch(updateOverlayByWeek(week));
+      }
     } catch (error) {
       console.error('API Error:', error);
     }
