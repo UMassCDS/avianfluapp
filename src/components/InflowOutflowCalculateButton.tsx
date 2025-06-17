@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useDispatch } from 'react-redux';
 import { setFlowResults, updateOverlayByWeek } from '../store/slices/mapSlice';
 
-const BirdflowRApiBaseUrl = "http://localhost:9000"; // BirdflowR REST API base URL
+const BirdflowRApiBaseUrl = "http://ec2-3-128-201-24.us-east-2.compute.amazonaws.com:8000/mock"; // BirdflowR REST API base URL
 
 type Props = {
   dataIndex: number; // 2 for inflow, 3 for outflow
