@@ -2,7 +2,9 @@ import { ImageOverlay, MapContainer, Marker, Popup, TileLayer, useMap } from "re
 import { OutbreakMarkers } from "./OutbreakPoints";
 import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { clearFlowResults, clearOverlayUrl } from '../store/slices/mapSlice';
+
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-geosearch/dist/geosearch.css';
 
@@ -119,6 +121,7 @@ function SearchField({ onLocationSelect, setMarkerPosition }: any) {
 - OutbreakMarkers function: Renders disease outbreak markers dynamically for the selected week
 */
 export default function MapView({ week, dataIndex, onLocationSelect }: MapViewProps): JSX.Element {
+  const dispatch = useDispatch();
 
   const overlayUrl = useSelector((state: any) => state.map.overlayUrl);
   const [markerPosition, setMarkerPosition] = useState<{ lat: number, lng: number } | null>(null);
@@ -130,11 +133,19 @@ export default function MapView({ week, dataIndex, onLocationSelect }: MapViewPr
 
   const toggleMode = () => {
     setUseSearchMode((prev) => !prev);
-     // Clears the marker and the location when switching modes
+    // Clear any existing marker on the map
     setMarkerPosition(null);
+
+    // Clear markers and search results from the search control
     searchControl.markers.clearLayers();
-    searchControl.clearResults()
+    searchControl.clearResults();
+
+    // Reset selected location
     onLocationSelect(null);
+
+    // Clear previously fetched flow results and overlay image
+    dispatch(clearFlowResults());
+    dispatch(clearOverlayUrl());
   };
 
   // clear the marker and search result when isInflowOutflowView becomes false

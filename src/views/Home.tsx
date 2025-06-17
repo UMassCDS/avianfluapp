@@ -20,7 +20,7 @@ import { RootState } from '../store/store'; // Adjust the path to your store fil
 import { setDataIndex, setSpeciesIndex } from '../store/slices/speciesSlice';
 import { setWeek } from '../store/slices/timelineSlice';
 import { setFontHeight, setIconSize, setIsMonitor, setTextSize, setTitleSize } from '../store/slices/uiSlice';
-import { setOverlayUrl } from '../store/slices/mapSlice';
+import { setOverlayUrl, clearFlowResults, updateOverlayByWeek } from '../store/slices/mapSlice';
 import L from 'leaflet';
 
 // Fix for missing marker icon in production
@@ -63,6 +63,7 @@ const HomePage = () => {
   const dispatch = useDispatch();
   const speciesIndex = useSelector((state: RootState) => state.species.speciesIndex);
   const dataIndex = useSelector((state: RootState) => state.species.dataIndex);
+  const flowResults = useSelector((state: RootState) => state.map.flowResults);
 
   // const [week, setWeek] = useState(MIN_WEEK);
   const week = useSelector((state: RootState) => state.timeline.week);
@@ -160,11 +161,13 @@ const HomePage = () => {
   function flowUpdate(this_week: number) {
     console.log("flowUpdate: ",this_week);
     dispatch(setWeek(this_week));
+    dispatch(updateOverlayByWeek(this_week));
   }
 
   useEffect(() => {
     console.log("dataIndex and species change", week);
     checkImage(week);
+    dispatch(clearFlowResults());
   }, [dataIndex, speciesIndex]);
 
   async function checkInputTypes(d_index: number, s_index: number) {
@@ -209,6 +212,11 @@ const HomePage = () => {
     ref_combo.closeDropdown();
   }
 
+  // Shows the Legend component if:
+	// - dataIndex < 2 (e.g., for abundance or movement), or
+	// - flowResults is a non-empty array (e.g., for inflow or outflow when results exist).
+  const shouldShowLegend = dataIndex < 2 || (Array.isArray(flowResults) && flowResults.length > 0);
+
   // Here is where you list the components and elements that you want rendered. 
   return (
     <div className="Home">
@@ -248,16 +256,13 @@ const HomePage = () => {
       </div>
       <AboutButtons runTest={runTest} />
       
-      {/* If dataIndex >= 2, then it's currently inflow/outflow */}
-      {dataIndex < 2 && (
-          <Legend />
-      )}
+      {shouldShowLegend && <Legend />}
 
       {/* Show this slider for abundance and movement */}
       {dataIndex < 2 && <Timeline week={week} dataset={dataIndex} isMonitor={isMonitor} onChangeWeek={checkImageAndUpdate} />}
 
       {/* Show this slider for inflow and outflow */}
-      {dataIndex >= 2 && <InflowOutflowTimeline onChangeWeek={flowUpdate} duration={25} />}
+      {dataIndex >= 2 && <InflowOutflowTimeline onChangeWeek={flowUpdate} duration={N_FLOW_WEEKS} />}
     </div>
   );
 }
