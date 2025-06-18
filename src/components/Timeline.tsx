@@ -219,6 +219,26 @@ function Timeline(props: TimelineProps) {
     }
   }, [playNext, weekRange, week])
 
+  useEffect(() => {
+    // Snap the slider window and thumb to the correct anchor when dataset changes
+    const currentWeek = dateToWeek(new Date());
+    const windowSize = 20;
+    let anchorWeek: number;
+    let newWeekRange: [number, number];
+
+    if (dataset === 0) { // inflow/abundance: window is [currentWeek - 19, currentWeek], anchor at end
+      anchorWeek = Math.max(currentWeek, MIN_WEEK);
+      newWeekRange = [Math.max(currentWeek - windowSize + 1, MIN_WEEK), anchorWeek];
+    } else { // outflow/movement: window is [currentWeek, currentWeek + 19], anchor at start
+      anchorWeek = Math.max(currentWeek, MIN_WEEK);
+      newWeekRange = [anchorWeek, Math.min(currentWeek + windowSize - 1, MAX_WEEK)];
+    }
+
+    setWeekRange(newWeekRange);
+    setSliderValue((anchorWeek - MIN_WEEK) / (MAX_WEEK - MIN_WEEK));
+    onChangeWeek(anchorWeek);
+  }, [dataset]);
+
   return (
     <div className="Timeline">
       <Grid align='stretch'>
@@ -274,8 +294,14 @@ function Timeline(props: TimelineProps) {
             size={sizingProps?.size}
             thumbSize={sizingProps?.thumb}
             labelAlwaysOn={false}
-            onChange={(v) => { setWeekRange(v)}}
-            onChangeEnd={(v) => { checkIfReversed(v[0], v[1])}}
+            onChange={(v) => {
+              setWeekRange(v); // Only update the range while dragging
+            }}
+            onChangeEnd={(v) => {
+              checkIfReversed(v[0], v[1]);
+              // Always snap to start of range for all datasets
+              onChangeWeek(v[0]);
+            }}
           />
         </Grid.Col>
       </Grid>
