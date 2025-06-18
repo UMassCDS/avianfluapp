@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
-import { ActionIcon, Grid, RangeSlider, Slider } from '@mantine/core';
+import { ActionIcon, Grid, Tooltip } from '@mantine/core';
 import { useMove } from '@mantine/hooks';
 import { IconPlayerPlayFilled, IconPlayerPauseFilled } from '@tabler/icons-react';
 import ab_dates from '../assets/abundance_dates.json';
 import mv_dates from '../assets/movement_dates.json';
 import {dateToWeek, MIN_WEEK, MAX_WEEK, WEEKS_PER_YEAR} from '../utils/utils'
-import { duration } from 'moment';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store/store';
+import { clearFlowResults } from '../store/slices/mapSlice';
 
 // The Timeline includes three values the user can set.
 // 1. the currently displayed week of a year.  This is done with a separate 'thumb' above the range slider.
@@ -64,11 +64,14 @@ const minRange = -51;  // makes it so end can be before start - supports playbac
 - This is a custom slider component that I copied over from Pam's timeline component and customized it to work with the demands of inflow/outflow
 - Unlike Pam's builtin component, I have separated the Timeline component and the "customized slider part" (the component known as CustomFixedRangeSlider(), which makes it more scalable and perhaps easier to understand) */
 function InflowOutflowTimeline(props: TimelineProps) {
+  const dispatch = useDispatch();
+
   const week = useSelector((state: RootState) => state.timeline.week);
   const { onChangeWeek, duration } = props;
 
   const isMonitor = useSelector((state: RootState) => state.ui.isMonitor);
   const dataIndex = useSelector((state: RootState) => state.species.dataIndex);
+  const flowResults = useSelector((state: RootState) => state.map.flowResults);
 
   // sizingProps are for things that change depending on if it is a smartPhone or monitor
   const [sizingProps, setSizingProps] = useState<sliderProps>();
@@ -94,6 +97,19 @@ function InflowOutflowTimeline(props: TimelineProps) {
   const [playbackId, setPlaybackId] = useState<ReturnType<typeof setInterval>>();
   const [isInflow, setIsInflow] = useState<boolean>(dataIndex == 2);
 
+  const updateWeekRange = () => {
+    if (isInflow) {
+      setWeekRange([week - duration + 1, week + 1]);
+    } else {
+      setWeekRange([week + 1, week + duration + 1]);
+    }
+  };
+
+  const onDoubleClick = () => {
+    updateWeekRange()
+    dispatch(clearFlowResults());
+    
+  };
   useEffect(() => {
     setIsInflow(dataIndex == 2);
   }, [dataIndex]);
@@ -180,7 +196,12 @@ function InflowOutflowTimeline(props: TimelineProps) {
   useEffect(() => {
     // convert week index to a slider location value
     setSliderValue(week / MAX_WEEK);
-  }, [week])
+
+    if (Array.isArray(flowResults) && flowResults.length === 0) {
+      updateWeekRange()
+    }
+
+  }, [week, isInflow, duration, flowResults])
 
   // return thumb label for the given week and the current dataIndex
   function showLabel(labelIndex: number) {
@@ -196,60 +217,69 @@ function InflowOutflowTimeline(props: TimelineProps) {
       setWeekRange([end, start]);
     }
   };
-  
-  async function playbackClick() {
-    if (isPlaying) {
-      clearInterval(playbackId);
-    } else {
-      // Start playback from the selected range
-      await onChangeWeek(isYearWrap ? weekRange[1] : weekRange[0]);
-      // trigger playback every 0.4 sec
-      // remember whatever function is called will use the variables w/ their values now, 
-      // and not notice any updates
-      const id = setInterval(() => setPlayNext(true), 400);
-      setPlaybackId(id);
-      // start it now - this will either pickup where it left off, or start at beginning as needed.
-      setPlayNext(true);
-    }
-    // toggle isPlaying
-    setIsPlaying(prevPlay => !prevPlay);
-  };
 
-  // Advance to next week during playback
   useEffect(() => {
-    if (!playNext) return;
-    let next_week = (week + 1) % WEEKS_PER_YEAR;
+    return () => {
+      if (playbackId) clearInterval(playbackId);
+    };
+  }, [playbackId, dataIndex]);
+
+  const weekRef = useRef(week);
+    useEffect(() => {
+      weekRef.current = week;
+    }, [week]);
+
+  // This is your "tick" function
+  const advanceWeek = () => {
+    let next_week = weekRef.current + 1;
 
     if (!isYearWrap && next_week > weekRange[1]) {
       next_week = weekRange[0];
-    } else if (isYearWrap && next_week > weekRange[0] && next_week < weekRange[1]) {
-      next_week = weekRange[1];
+    } else if (isYearWrap) {
+      next_week = next_week % 52;
+      if (next_week < weekRange[1] && next_week > weekRange[0]) {
+        next_week = weekRange[1];
+      }
     }
 
     onChangeWeek(next_week);
-    setPlayNext(false);
-  }, [playNext, weekRange, week]);
+  };
+
+  async function playbackClick() {
+    if (isPlaying) {
+      clearInterval(playbackId);
+      setPlaybackId(undefined);
+    } else {
+      await onChangeWeek(isYearWrap ? weekRange[1] : weekRange[0]);
+
+      const id = setInterval(() => {
+        advanceWeek(); // Call directly here instead of setting state
+      }, 400);
+
+      setPlaybackId(id);
+    }
+
+    setIsPlaying((prev) => !prev);
+  }
 
   return (
     <div className="Timeline">
       <Grid align='stretch'>
-        <Grid.Col span={1}>
-          {/* show Play or Pause button*/}
-          {/* PLAY OR PAUSE FUNCTIONALITY NOT YET IMPLEMENTED FOR INFLOW/OUTFLOW. NEEDS BACKEND INTEGRATION */}
-          {/* {isPlaying?
-            <ActionIcon size={'xl'} onClick={() => { playbackClick() }}>
-              <IconPlayerPauseFilled/>
-            </ActionIcon>
-          :
-            <ActionIcon size={'xl'} onClick={() => { playbackClick() }}>
-              <IconPlayerPlayFilled/>
-            </ActionIcon>
-          } */}
-        </Grid.Col>
+      <Tooltip label="No flow results to play" disabled={flowResults.length > 0}>
+        <ActionIcon
+          size="xl"
+          onClick={playbackClick}
+          disabled={flowResults.length === 0}
+          variant={flowResults.length === 0 ? 'default' : 'filled'}
+        >
+          {isPlaying ? <IconPlayerPauseFilled /> : <IconPlayerPlayFilled />}
+        </ActionIcon>
+      </Tooltip>
         <Grid.Col span={11}>
           {/* slider with only the thumb marker */}
           <div
             ref={ref}
+            onDoubleClick={onDoubleClick}
             style={{
               height: 25,
               position: 'relative',
@@ -451,7 +481,7 @@ function CustomFixedRangeSlider({ min, max, offset, realValue, setRealValue, sho
       </>}
 
       {/* Transparent overlay to capture pointer events from useMove */}
-      <div ref={ref} style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, cursor: 'pointer' }} />
+      {/* <div ref={ref} style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, cursor: 'pointer' }} /> */}
     </div>
   );
 }
