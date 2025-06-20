@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button, Textarea, TextInput } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
 import { IconSend } from '@tabler/icons-react';
 import emailjs from 'emailjs-com';
 
@@ -31,27 +32,52 @@ function FeedbackForm(this: any) {
 
 
   function sendFeedback() {
-    // checks that feedback was entered and that
-    // if there is an email entered, it resembles email format.
+    // checks that feedback was entered and that email (if present) is valid
     if (text.length === 0) {
-      alert("Please fill in the feedback text box.")
-    } else if ((email.length > 0) && !EMAIL_REGEX.test(email)) {
-      alert("Please enter a valid email.");
+      notifications.show({
+        title: 'Feedback Required',
+        message: 'Please fill in the feedback text box.',
+        color: 'red',
+      });
+    } else if (email.length > 0 && !EMAIL_REGEX.test(email)) {
+      notifications.show({
+        title: 'Invalid Email',
+        message: 'Please enter a valid email address.',
+        color: 'red',
+      });
     } else {
       // Disable button while it is sending the email
-      setButtonText("Sending Feedback...");
+      setButtonText('Sending Feedback...');
       setButtonDisable(true);
-      // @ts-ignore
-      let data = {email_addr:email, message:text}
-      //  the send arguments are: service_id, template_id, feedback_info, account_key
+      const data = { email_addr: email, message: text };
+      // the send arguments are: service_id, template_id, feedback_info, account_key
       // after the send is complete, then show the result and go back to the main page.
-      emailjs.send('service_umass2025', 'template_x0c9ck6', data, 'zhDN63ABiSy7PF_7o')
+      emailjs
+        .send('service_umass2025', 'template_x0c9ck6', data, 'zhDN63ABiSy7PF_7o')
         .then(() => {
-          alert("Feedback message sent");
-          navigate("/")
-        }, (error) => {
-          alert(error.text);
-          navigate("/")
+          notifications.show({
+            title: 'Feedback Sent',
+            message: 'Thank you for your feedback! Redirecting to home...',
+            color: 'green',
+            autoClose: 3000,
+          });
+
+          // Delay navigation by 3 seconds
+          setTimeout(() => {
+            navigate('/');
+          }, 3000);
+        })
+        .catch((error) => {
+          notifications.show({
+            title: 'Sending Failed',
+            message: error.text || 'An error occurred while sending feedback.',
+            color: 'red',
+            autoClose: 6000,
+          });
+
+          setTimeout(() => {
+            navigate('/');
+          }, 6000);
         });
     }
   }
