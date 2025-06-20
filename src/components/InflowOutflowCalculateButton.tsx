@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
 import axios from 'axios';
 import { useDispatch } from 'react-redux';
 import { setFlowResults, updateOverlayByWeek } from '../store/slices/mapSlice';
@@ -35,14 +36,44 @@ const InflowOutflowCalculateButton: React.FC<Props> = ({
 
     try {
       const response = await axios.get(url);
-      console.log('API Response:', response.data);
-      if (response.data.status === 'success') {
-        const result = response.data.result;
+      const data = response.data;
+      console.log('API Response:', data);
+
+      if (data.status === 'success') {
+        const result = data.result;
         dispatch(setFlowResults(result));
         dispatch(updateOverlayByWeek(week));
+        notifications.show({
+          title: 'Outside prediction area',
+          message: 'Selected location is outside the prediction mask. Try another point.',
+          color: 'yellow',
+        });
+      } else if (data.status === 'outside mask') {
+        notifications.show({
+          title: 'Outside prediction area',
+          message: 'Selected location is outside the prediction mask. Try another point.',
+          color: 'yellow',
+        });
+      } else if (data.status === 'error') {
+        notifications.show({
+          title: 'Error from backend',
+          message: 'Something went wrong on the server. Please try again later.',
+          color: 'red',
+        });
+      } else {
+        notifications.show({
+          title: 'Unexpected response',
+          message: `Unknown status received: ${data.status}`,
+          color: 'orange',
+        });
       }
     } catch (error) {
       console.error('API Error:', error);
+      notifications.show({
+        title: 'Connection error',
+        message: 'Unable to contact the server. Please check your internet connection.',
+        color: 'red',
+      });
     }
   };
 

@@ -1,15 +1,19 @@
- import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { MantineProvider } from '@mantine/core';
+import { Notifications } from '@mantine/notifications';
+
 import HomePage from './views/Home';
 import About from './views/About';
 import FeedbackForm from './views/Feedback';
 import NotFound from './views/NotFound';
+
 import '@mantine/core/styles.css';
 import '@mantine/dates/styles.css';
+import '@mantine/notifications/styles.css';
 
-/* The app starts here. The routes control which url path renders which page. 
- * To create a new route, copy the format below and add the path that you wish to add to the url 
- * and the component which you wish to render */
+/**
+ * The main application routes.
+ */
 export function App() {
   return (
     <div className="App">
@@ -23,12 +27,17 @@ export function App() {
   );
 }
 
-/* The React app exists inside two wrappers. MantineProvider allows the app to use Mantine as a component library. 
- * BrowserRouter helps control the Routing in the application.*/
+/**
+ * WrappedApp configures global providers.
+ * - MantineProvider: provides Mantine UI theming
+ * - BrowserRouter: enables routing
+ * - Notifications: enables popup toasts throughout the app
+ */
 export function WrappedApp() {
   return (
     <BrowserRouter>
       <MantineProvider>
+        <Notifications position="top-right" zIndex={1000} />
         <App />
       </MantineProvider>
     </BrowserRouter>
