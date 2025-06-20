@@ -101,7 +101,7 @@ function Legend() {
         background: 'rgba(255, 255, 255, 0.6)',
         borderRadius: 10,
         padding: '6px',
-        maxWidth: isMobile() ? '60px' : '100px',
+        maxWidth: isMobile() ? '60px' : '120px',
       }}
     >
       {isMobile() ? (

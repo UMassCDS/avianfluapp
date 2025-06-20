@@ -1,20 +1,21 @@
 import { useEffect, useRef, useState } from 'react';
-import { ActionIcon, Grid, RangeSlider, Slider } from '@mantine/core';
+import { ActionIcon, Grid, Tooltip } from '@mantine/core';
 import { useMove } from '@mantine/hooks';
 import { IconPlayerPlayFilled, IconPlayerPauseFilled } from '@tabler/icons-react';
 import ab_dates from '../assets/abundance_dates.json';
 import mv_dates from '../assets/movement_dates.json';
 import {dateToWeek, MIN_WEEK, MAX_WEEK, WEEKS_PER_YEAR} from '../utils/utils'
-import { duration } from 'moment';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store/store';
+import { clearFlowResults } from '../store/slices/mapSlice';
 
 // The Timeline includes three values the user can set.
 // 1. the currently displayed week of a year.  This is done with a separate 'thumb' above the range slider.
 // 2 & 3 are on the RangeSlider indicating the start and end weeks for playback are inflow/outflow.
 
 const monthLabels: Array<string> = [
-  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
 ];
 
 // Keeps track of the props and prop type going into the component (look up interfaces in TypeScript)
@@ -63,11 +64,14 @@ const minRange = -51;  // makes it so end can be before start - supports playbac
 - This is a custom slider component that I copied over from Pam's timeline component and customized it to work with the demands of inflow/outflow
 - Unlike Pam's builtin component, I have separated the Timeline component and the "customized slider part" (the component known as CustomFixedRangeSlider(), which makes it more scalable and perhaps easier to understand) */
 function InflowOutflowTimeline(props: TimelineProps) {
+  const dispatch = useDispatch();
+
   const week = useSelector((state: RootState) => state.timeline.week);
   const { onChangeWeek, duration } = props;
 
   const isMonitor = useSelector((state: RootState) => state.ui.isMonitor);
   const dataIndex = useSelector((state: RootState) => state.species.dataIndex);
+  const flowResults = useSelector((state: RootState) => state.map.flowResults);
 
   // sizingProps are for things that change depending on if it is a smartPhone or monitor
   const [sizingProps, setSizingProps] = useState<sliderProps>();
@@ -75,7 +79,7 @@ function InflowOutflowTimeline(props: TimelineProps) {
   const [adjustWeek, setAdjustWeek] = useState(0);
   // weekRange are the values on the RangeSlider. weekRange[0] is always the first one,
   // and weekRange[1] is always the second one.  So to reverse the order, use isYearWrap.
-  const [weekRange, setWeekRange] = useState<[number,number]>([MIN_WEEK, MAX_WEEK]);
+  const [weekRange, setWeekRange] = useState<[number, number]>([MIN_WEEK, MAX_WEEK]);
   const [isYearWrap, setIsYearWrap] = useState<boolean>(false);
   // text indicating month on the timeline
   const [marks, setMarks] = useState<Array<Array<markProps>>>(Array.from({ length: 4 }, () => []));
@@ -83,15 +87,32 @@ function InflowOutflowTimeline(props: TimelineProps) {
   const [dateLabels, setDateLabels] = useState<Array<Array<string>>>(Array.from({ length: 4 }, () => []));
 
   // sliderValue and ref are for the extra 'thumb' indicating the displayed week
-  const [sliderValue, setSliderValue] = useState(week/WEEKS_PER_YEAR);
+  const [sliderValue, setSliderValue] = useState(week / WEEKS_PER_YEAR);
   const { ref } = useMove(({ x }) => { 
-    onChangeWeek(Math.floor(x*WEEKS_PER_YEAR))
+    onChangeWeek(Math.floor(x * WEEKS_PER_YEAR))
   });
 
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [playNext, setPlayNext] = useState<boolean>(false);
   const [playbackId, setPlaybackId] = useState<ReturnType<typeof setInterval>>();
+  const [isInflow, setIsInflow] = useState<boolean>(dataIndex == 2);
 
+  const updateWeekRange = () => {
+    if (isInflow) {
+      setWeekRange([week - duration + 1, week + 1]);
+    } else {
+      setWeekRange([week + 1, week + duration + 1]);
+    }
+  };
+
+  const onDoubleClick = () => {
+    updateWeekRange()
+    dispatch(clearFlowResults());
+    
+  };
+  useEffect(() => {
+    setIsInflow(dataIndex == 2);
+  }, [dataIndex]);
 
   // The dates are slightly different for each dataset, so this initializes both 
   // sets of dateLabels so they don't have to be determined later.
@@ -155,41 +176,32 @@ function InflowOutflowTimeline(props: TimelineProps) {
   }
   
   useEffect(() => {
-    if (adjustWeek === 0) {
-      return;
-    }
-    if (adjustWeek > 0) {
-      // increments active index (wraps around when at end of year)
-      let temp = week + 1;
-      if (temp > MAX_WEEK) temp = MIN_WEEK;
-      onChangeWeek(temp);
-    } else {
-      // decrements active index (wraps around when at beginning of year)
-      let temp = week - 1;
-      if (temp < MIN_WEEK) temp = MAX_WEEK;
-      onChangeWeek(temp);
-    }
+    if (adjustWeek === 0) return;
+    let temp = week + adjustWeek;
+    if (temp > MAX_WEEK) temp = MIN_WEEK;
+    if (temp < MIN_WEEK) temp = MAX_WEEK;
+    onChangeWeek(temp);
     setAdjustWeek(0);
   }, [adjustWeek]);
 
-
+  // Adjust sizing based on screen type
   useEffect(() => {
-    // At init or when window size changes, 
-    // set props for both sliders
-    var sProps: sliderProps ;
-    if (isMonitor) {
-      sProps = {size:'md', thumb:20, showLabel:true, marks:marks[dataIndex]}
-    } else {
-      sProps = {size:'sm', thumb:12, showLabel:false, marks:[]}
-    }
-    setSizingProps(sProps);
+    const props: sliderProps = isMonitor
+      ? { size: 'md', thumb: 20, showLabel: true, marks: marks[dataIndex] }
+      : { size: 'sm', thumb: 12, showLabel: false, marks: [] };
+    setSizingProps(props);
   }, [marks, isMonitor]);
 
   // update slider if week changes due to playback or keyboard
   useEffect(() => {
     // convert week index to a slider location value
-    setSliderValue(week/MAX_WEEK);
-  }, [week])
+    setSliderValue(week / MAX_WEEK);
+
+    if (Array.isArray(flowResults) && flowResults.length === 0) {
+      updateWeekRange()
+    }
+
+  }, [week, isInflow, duration, flowResults])
 
   // return thumb label for the given week and the current dataIndex
   function showLabel(labelIndex: number) {
@@ -205,76 +217,69 @@ function InflowOutflowTimeline(props: TimelineProps) {
       setWeekRange([end, start]);
     }
   };
-  
-  async function playbackClick() {
-    if (isPlaying) {
-      // stop playback
-      clearInterval(playbackId);
-    } else {
-      console.log("Play");
-      // initialize week to beginning of playback range
-      if (isYearWrap) {
-        await onChangeWeek(weekRange[1]);
-      } else {
-        console.log("start at ", weekRange[0]);
-        await onChangeWeek(weekRange[0]);
-      }
-      // trigger playback every 0.4 sec
-      // remember whatever function is called will use the variables w/ their values now, 
-      // and not notice any updates
-      var id = setInterval(() => {setPlayNext(true)}, 400);
-      setPlaybackId(id);
-      // start it now - this will either pickup where it left off, or start at beginning as needed.
-      setPlayNext(true)
-    }
-    // toggle isPlaying
-    setIsPlaying(prevPlay => !prevPlay);
-  };
 
   useEffect(() => {
-    // PLAYBACK - update the display for the next week
-    if (playNext) {
-      console.log("playback before week?", week);
-      var next_week:number = week+1;
-      // check if at end of the range 
-      if ((!isYearWrap) && (next_week > weekRange[1])) {
-        console.log("not inverted, end of range")
-        next_week = weekRange[0];
-      } else if (isYearWrap) { 
-        // if it is a yearWrap it's a little more complicated. 
-        // check if it is before the beginning and reaches the end
-        // 52 = weeks per year
-        next_week = next_week%52;
-        if ((next_week < weekRange[1]) && (next_week > weekRange[0])) {
-          console.log("inverted end of range")
-          next_week = weekRange[1];
-        }     
+    return () => {
+      if (playbackId) clearInterval(playbackId);
+    };
+  }, [playbackId, dataIndex]);
+
+  const weekRef = useRef(week);
+    useEffect(() => {
+      weekRef.current = week;
+    }, [week]);
+
+  // This is your "tick" function
+  const advanceWeek = () => {
+    let next_week = weekRef.current + 1;
+
+    if (!isYearWrap && next_week > weekRange[1]) {
+      next_week = weekRange[0];
+    } else if (isYearWrap) {
+      next_week = next_week % 52;
+      if (next_week < weekRange[1] && next_week > weekRange[0]) {
+        next_week = weekRange[1];
       }
-      onChangeWeek(next_week);
-      setPlayNext(false);
     }
-  }, [playNext, weekRange, week])
+
+    onChangeWeek(next_week);
+  };
+
+  async function playbackClick() {
+    if (isPlaying) {
+      clearInterval(playbackId);
+      setPlaybackId(undefined);
+    } else {
+      await onChangeWeek(isYearWrap ? weekRange[1] : weekRange[0]);
+
+      const id = setInterval(() => {
+        advanceWeek(); // Call directly here instead of setting state
+      }, 400);
+
+      setPlaybackId(id);
+    }
+
+    setIsPlaying((prev) => !prev);
+  }
 
   return (
     <div className="Timeline">
       <Grid align='stretch'>
-        <Grid.Col span={1}>
-          {/* show Play or Pause button*/}
-          {/* PLAY OR PAUSE FUNCTIONALITY NOT YET IMPLEMENTED FOR INFLOW/OUTFLOW. NEEDS BACKEND INTEGRATION */}
-          {/* {isPlaying?
-            <ActionIcon size={'xl'} onClick={() => { playbackClick() }}>
-              <IconPlayerPauseFilled/>
-            </ActionIcon>
-          :
-            <ActionIcon size={'xl'} onClick={() => { playbackClick() }}>
-              <IconPlayerPlayFilled/>
-            </ActionIcon>
-          } */}
-        </Grid.Col>
+      <Tooltip label="No flow results to play" disabled={flowResults.length > 0}>
+        <ActionIcon
+          size="xl"
+          onClick={playbackClick}
+          disabled={flowResults.length === 0}
+          variant={flowResults.length === 0 ? 'default' : 'filled'}
+        >
+          {isPlaying ? <IconPlayerPauseFilled /> : <IconPlayerPlayFilled />}
+        </ActionIcon>
+      </Tooltip>
         <Grid.Col span={11}>
           {/* slider with only the thumb marker */}
           <div
             ref={ref}
+            onDoubleClick={onDoubleClick}
             style={{
               height: 25,
               position: 'relative',
@@ -298,11 +303,27 @@ function InflowOutflowTimeline(props: TimelineProps) {
             </div>
           </div>
           <p></p>
-          <CustomFixedRangeSlider  min={MIN_WEEK} max={MAX_WEEK} offset={duration} realValue={weekRange[0]} setRealValue={(val:number) => {setWeekRange([val, val + duration])}} showInflow={dataIndex == 2} />
+          <CustomFixedRangeSlider
+            min={MIN_WEEK}
+            max={MAX_WEEK}
+            offset={duration}
+            realValue={weekRange[0]}
+            setRealValue={(val:number) => {setWeekRange([val, val + duration])}}
+            showInflow={isInflow}
+          />
         </Grid.Col>
       </Grid>
     </div>
   );
+}
+
+interface CustomFixedRangeSliderProps {
+  min: number;
+  max: number;
+  offset: number;
+  realValue: number;
+  setRealValue: (val: number) => void;
+  showInflow: boolean;
 }
 
 /**
@@ -323,32 +344,33 @@ function InflowOutflowTimeline(props: TimelineProps) {
  * - The real thumb is draggable, while the fake thumb is for display only.
  * - Designed for use cases where a circular or offset range visualization is needed (e.g., inflow/outflow timelines).
  */
-function CustomFixedRangeSlider({ min, max, offset, realValue, setRealValue, showInflow }: { min: number; max: number; offset: number; realValue: number; setRealValue: (val: number) => void; showInflow: boolean }) {
+function CustomFixedRangeSlider({ min, max, offset, realValue, setRealValue, showInflow }: CustomFixedRangeSliderProps) {
   // Real thumb values (draggable): realValue, setRealValue (state lifted up to parent component)
   // const [realValue, setRealValue] = useState(min);
   const range = max - min + 1;
 
+  // Normalize realValue into the [min, max] range safely
+  const normalizedRealValue = realValue < min ? realValue + max : realValue
   // Compute fake thumb value with wrap-around
-  const fakeValue = ((realValue - min + offset) % range) + min;
+  const fakeValue = ((normalizedRealValue - min + offset) % range) + min;
+
+    // Compute percentage positions for styling
+  const realPercent = ((normalizedRealValue - min) / (max - min)) * 100;
+  const fakePercent = ((fakeValue - min) / (max - min)) * 100;
 
   // Ref and useMove for track handling
   const { ref } = useMove(({ x }) => {
     // x is normalized (0 to 1)
     const newValue = min + x * (max - min);
-    
-    console.log("Dragging value for inflow/outflow:", Math.round(newValue), Math.round(newValue) + offset);
-
-    setRealValue(Math.round(newValue));
+    const rounded = Math.round(newValue)
+    console.log("Dragging value for inflow/outflow:", rounded, rounded + offset);
+    setRealValue(rounded);
   });
-
-  // Compute percentage positions for styling
-  const realPercent = ((realValue - min) / (max - min)) * 100;
-  const fakePercent = ((fakeValue - min) / (max - min)) * 100;
 
   // Build a custom gradient for the filled bar
   // For a wrap-around, fill from 0 to fakePercent and from realPercent to 100%
   // Otherwise, fill from realPercent to fakePercent.
-  const isWrapped = realValue > fakeValue;
+  const isWrapped = normalizedRealValue > fakeValue;
   const filledStyle = isWrapped 
     ? { background: `linear-gradient(to right,
         #228be6 0%, #228be6 ${fakePercent}%,
@@ -401,7 +423,7 @@ function CustomFixedRangeSlider({ min, max, offset, realValue, setRealValue, sho
             height: 24,
             borderRadius: '50%',
             backgroundColor: '#228be6',
-            cursor: 'pointer',
+            pointerEvents: 'none', // Ensure the thumb does not capture mouse events
           }}
           // Attach pointer events via the track useMove
         />
@@ -435,7 +457,7 @@ function CustomFixedRangeSlider({ min, max, offset, realValue, setRealValue, sho
             borderRadius: '50%',
             backgroundColor: 'white',
             border: '2px solid #228be6',
-            cursor: 'pointer',
+            pointerEvents: 'none', // Ensure the thumb does not capture mouse events
           }}
           // Attach pointer events via the track useMove
         />
@@ -459,7 +481,7 @@ function CustomFixedRangeSlider({ min, max, offset, realValue, setRealValue, sho
       </>}
 
       {/* Transparent overlay to capture pointer events from useMove */}
-      <div ref={ref} style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, cursor: 'pointer' }} />
+      {/* <div ref={ref} style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, cursor: 'pointer' }} /> */}
     </div>
   );
 }
