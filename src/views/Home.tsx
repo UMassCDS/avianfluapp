@@ -1,4 +1,5 @@
 import { Combobox, ComboboxStore, useCombobox } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
 import { useEffect, useState } from 'react';
 import 'leaflet/dist/leaflet.css';
 import axios from 'axios';
@@ -131,19 +132,24 @@ const HomePage = () => {
     };
   }, []);
 
-  async function checkImage(this_week: number): Promise<boolean>{
-    // Does nothing when it's inflow/outflow
+  async function checkImage(this_week: number): Promise<boolean> {
+    // Skip check for inflow/outflow
     if (dataIndex >= 2) {
       dispatch(setOverlayUrl(""));
       return Promise.resolve(true);
     }
 
-    var image_url = imageURL(dataIndex, speciesIndex, this_week);
-    var response = await fetch(image_url);
+    const image_url = imageURL(dataIndex, speciesIndex, this_week);
+    const response = await fetch(image_url);
+
     if (!response.ok) {
       console.debug(response);
-      var message = "The .png for week "+this_week+" on "+dataInfo[dataIndex].label+" of "+taxa[speciesIndex].label+" is missing.";
-      alert(message);
+      notifications.show({
+        title: 'Missing Image',
+        message: `The .png for week ${this_week} on ${dataInfo[dataIndex].label} of ${taxa[speciesIndex].label} is missing.`,
+        color: 'orange',
+      });
+
       return false;
     }
     dispatch(setOverlayUrl(image_url));
@@ -171,30 +177,31 @@ const HomePage = () => {
   }, [dataIndex, speciesIndex]);
 
   async function checkInputTypes(d_index: number, s_index: number) {
-    // THIS CODE IS NEEDED BECAUSE BACKEND FOR INFLOW/OUTFLOW IS NOT READY
+    // Inflow/Outflow is handled separately via the InflowOutflowCalculateButton button component.
     if (d_index === 2 || d_index === 3) {
       speciesCombo.selectedOptionIndex = s_index;
       dispatch(setDataIndex(d_index));
-      // setSpeciesIndex(s_index);
       dispatch(setSpeciesIndex(s_index));
       return;
     }
     // END
 
-    // check required legend file is available. 
-    var response;
+    // Check if legend (scale) file exists
     if ((d_index !== dataIndex) || (s_index !== speciesIndex)) {
-      response = await fetch(getScalingFilename(d_index, s_index));
+      const response = await fetch(getScalingFilename(d_index, s_index));
       if (!response.ok) {
         console.debug(response);
-        var message = "The scale file for "+dataInfo[d_index].label+" of "+taxa[s_index].label+" is missing.";
-        alert(message);
+        notifications.show({
+          title: 'Missing Scale File',
+          message: `The scale file for ${dataInfo[d_index].label} of ${taxa[s_index].label} is missing.`,
+          color: 'orange',
+        });
+
         return;
       }
     }
     speciesCombo.selectedOptionIndex = s_index;
     dispatch(setDataIndex(d_index));
-    // setSpeciesIndex(s_index);
     dispatch(setSpeciesIndex(s_index));
   };
 
