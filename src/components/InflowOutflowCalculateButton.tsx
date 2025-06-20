@@ -43,11 +43,6 @@ const InflowOutflowCalculateButton: React.FC<Props> = ({
         const result = data.result;
         dispatch(setFlowResults(result));
         dispatch(updateOverlayByWeek(week));
-        notifications.show({
-          title: 'Outside prediction area',
-          message: 'Selected location is outside the prediction mask. Try another point.',
-          color: 'yellow',
-        });
       } else if (data.status === 'outside mask') {
         notifications.show({
           title: 'Outside prediction area',
