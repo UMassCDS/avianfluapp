@@ -5,7 +5,7 @@ import axios from 'axios';
 import { useDispatch } from 'react-redux';
 import { setFlowResults, updateOverlayByWeek } from '../store/slices/mapSlice';
 
-const BirdflowRApiBaseUrl = "https://ec2-3-128-201-24.us-east-2.compute.amazonaws.com/mock"; // BirdflowR REST API base URL
+const BirdflowRApiBaseUrl = "https://www.birdfluapi.com/mock"; // BirdflowR REST API base URL
 
 type Props = {
   dataIndex: number; // 2 for inflow, 3 for outflow
@@ -43,11 +43,6 @@ const InflowOutflowCalculateButton: React.FC<Props> = ({
         const result = data.result;
         dispatch(setFlowResults(result));
         dispatch(updateOverlayByWeek(week));
-        notifications.show({
-          title: 'Outside prediction area',
-          message: 'Selected location is outside the prediction mask. Try another point.',
-          color: 'yellow',
-        });
       } else if (data.status === 'outside mask') {
         notifications.show({
           title: 'Outside prediction area',
