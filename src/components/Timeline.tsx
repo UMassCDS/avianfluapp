@@ -203,24 +203,22 @@ function Timeline(props: TimelineProps) {
             </div>
           </div>
           <p></p>
-          <div style={{ pointerEvents: 'none' }} >
-            <RangeSlider
-              defaultValue={weekRange}
-              value={weekRange}
-              label={showLabel}
-              min={MIN_WEEK}
-              max={MAX_WEEK}
-              step={1}
-              minRange={minRange}
-              marks={sizingProps?.marks}
-              inverted={isYearWrap}
-              size={sizingProps?.size}
-              thumbSize={sizingProps?.thumb}
-              labelAlwaysOn={false}
-              onChange={(v) => setWeekRange(v)}
-              onChangeEnd={(v) => checkIfReversed(v[0], v[1])}
-            />
-          </div>
+          <RangeSlider
+            defaultValue={weekRange}
+            value={weekRange}
+            label={showLabel}
+            min={MIN_WEEK}
+            max={MAX_WEEK}
+            step={1}
+            minRange={minRange}
+            marks={sizingProps?.marks}
+            inverted={isYearWrap}
+            size={sizingProps?.size}
+            thumbSize={sizingProps?.thumb}
+            labelAlwaysOn={false}
+            onChange={(v) => setWeekRange(v)}
+            onChangeEnd={(v) => checkIfReversed(v[0], v[1])}
+          />
         </Grid.Col>
       </Grid>
     </div>
