@@ -21,7 +21,7 @@ import { RootState } from '../store/store'; // Adjust the path to your store fil
 import { setDataIndex, setSpeciesIndex } from '../store/slices/speciesSlice';
 import { setWeek } from '../store/slices/timelineSlice';
 import { setFontHeight, setIconSize, setIsMonitor, setTextSize, setTitleSize } from '../store/slices/uiSlice';
-import { setOverlayUrl, clearFlowResults, updateOverlayByWeek } from '../store/slices/mapSlice';
+import { setOverlayUrl, clearFlowResults, updateOverlayByWeek, clearOverlayUrl } from '../store/slices/mapSlice';
 import L from 'leaflet';
 
 // Fix for missing marker icon in production
@@ -84,6 +84,9 @@ const HomePage = () => {
   // Callback passed to MapView
   const handleLocationSelect = (latLon: string | null) => {
     setLocation(latLon ? [latLon] : []); // For now, just one point; supports multiple later
+    // If location is changed invalidate and stop displaying any prior results
+    dispatch(clearFlowResults());
+    dispatch(clearOverlayUrl());
   };
 
   function runTest() {
@@ -256,7 +259,7 @@ const HomePage = () => {
               location={location}
               nFlowWeeks={N_FLOW_WEEKS}
               speciesOptions={taxa}
-              disabled={location.length === 0}
+              disabled={location.length === 0 || (Array.isArray(flowResults) && flowResults.length > 0)}
             />
           </div>
 )}
