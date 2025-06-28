@@ -18,6 +18,14 @@ const monthLabels: Array<string> = [
   'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
 ];
 
+// Month marks for typical 52-week year (adjust values if your months start on different weeks)
+const monthMarks = [
+  { value: 0, label: 'Jan' }, { value: 4, label: 'Feb' }, { value: 8, label: 'Mar' },
+  { value: 13, label: 'Apr' }, { value: 17, label: 'May' }, { value: 21, label: 'Jun' },
+  { value: 26, label: 'Jul' }, { value: 30, label: 'Aug' }, { value: 35, label: 'Sep' },
+  { value: 39, label: 'Oct' }, { value: 43, label: 'Nov' }, { value: 47, label: 'Dec' }
+];
+
 // Keeps track of the props and prop type going into the component (look up interfaces in TypeScript)
 interface TimelineProps {
   onChangeWeek: (week: number) => void;
@@ -389,11 +397,23 @@ function CustomFixedRangeSlider({ min, max, offset, realValue, setRealValue, sho
   const allMarks = Array.from({ length: range }, (_, i) => min + i);
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: "12px", background: '#dee2e6', border: "1px solid black"}}>
-      {/* Custom filled bar */}
+    // <div style={{ position: 'relative', width: '100%', height: "12px", background: '#dee2e6', border: "1px solid black"}}>
+    <div style={{
+      position: 'relative',
+      maxWidth: '100%',
+      width: '100%',
+      minWidth: 0,
+      height: '10px', // more vertical space for marks/labels
+      background: '#dee2e6',
+      border: "1px solid black",
+      borderRadius: 8,
+      boxSizing: 'border-box',
+      margin: '0 auto'
+    }}>
+    {/* Custom filled bar */}
       <div style={{ ...filledStyle, position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }} />
       
-      {allMarks.map(markValue => {
+      {/* {allMarks.map(markValue => {
         const markPercent = ((markValue - min) / (max - min)) * 100;
         if (markValue === min || markValue === max) return null;
         return (
@@ -410,7 +430,37 @@ function CustomFixedRangeSlider({ min, max, offset, realValue, setRealValue, sho
             }}
           />
         );
-      })}
+      })} */}
+
+      {monthMarks.map(mark => {
+  const markPercent = ((mark.value - min) / (max - min)) * 100;
+  return (
+    <div
+      key={mark.value}
+      style={{
+        position: 'absolute',
+        left: `${markPercent}%`,
+        top: 3,
+        width: 4,
+        height: 4,
+        borderRadius: '50%',
+        backgroundColor: 'white',
+      }}
+    >
+      <span style={{
+        position: 'absolute',
+        top: 18,
+        left: '50%',
+        transform: 'translateX(-50%)',
+        color: 'black',
+        fontWeight: 500,
+        fontSize: 12,
+        whiteSpace: 'nowrap'
+      }}>{mark.label}</span>
+    </div>
+  );
+})}
+
 
       {showInflow && <>
         {/* Real draggable thumb (filled circle) */}
@@ -444,6 +494,7 @@ function CustomFixedRangeSlider({ min, max, offset, realValue, setRealValue, sho
         </div>
       </>
       }
+
 
       {!showInflow && <>
         {/* Real draggable thumb (hollow circle) */}
