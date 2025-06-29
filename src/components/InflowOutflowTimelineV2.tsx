@@ -160,7 +160,7 @@ export default function InflowOutflowTimelineV2({
             onDoubleClick={handleDoubleClick}
             style={{
               position: 'relative',
-              height: 24,
+              height: 10, // thinner track
               background: '#dee2e6',
               borderRadius: 8,
               border: '1px solid #bbb',
@@ -206,37 +206,47 @@ export default function InflowOutflowTimelineV2({
               />
             )}
 
-            {monthMarks.map(mark => (
-              <div
-                key={mark.week}
-                style={{
-                  position: 'absolute',
-                  left: `calc(${(mark.week / (WEEKS - 1)) * 100}% - 2px)`,
-                  top: 6,
-                  width: 6,
-                  height: 6,
-                  borderRadius: '50%',
-                  background: 'white',
-                  border: '1.5px solid #228be6',
-                  zIndex: 2,
-                }}
-              >
-                <span
-                  style={{
-                    position: 'absolute',
-                    top: 12,
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    fontSize: 12,
-                    color: 'black',
-                    fontWeight: 500,
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {mark.label}
-                </span>
-              </div>
-            ))}
+            {monthMarks.map((mark, idx) => {
+  const markPct = (mark.week / (WEEKS - 1)) * 100;
+  let labelStyle: React.CSSProperties = {
+    position: 'absolute',
+    top: 20, // below the track
+    left: '50%',
+    transform: 'translateX(-50%)',
+    fontSize: 12,
+    color: 'black',
+    fontWeight: 500,
+    whiteSpace: 'nowrap',
+  };
+  if (idx === 0) {
+    labelStyle.left = 0;
+    labelStyle.transform = 'none';
+    labelStyle.textAlign = 'left';
+  } else if (idx === monthMarks.length - 1) {
+    labelStyle.left = '100%';
+    labelStyle.transform = 'translateX(-100%)';
+    labelStyle.textAlign = 'right';
+  }
+  return (
+    <div
+      key={mark.week}
+      style={{
+        position: 'absolute',
+        left: `calc(${markPct}% - 3px)`,
+        top: '50%',
+        transform: 'translateY(-50%)',
+        width: 6,
+        height: 6,
+        borderRadius: '50%',
+        background: 'white',
+        border: '1.5px solid #228be6',
+        zIndex: 2,
+      }}
+    >
+      <span style={labelStyle}>{mark.label}</span>
+    </div>
+  );
+})}
 
             {/* Thumbs: **match V1 CSS & look** */}
             {/* Always render left circle and right arrow.
