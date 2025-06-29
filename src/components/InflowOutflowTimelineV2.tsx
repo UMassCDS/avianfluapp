@@ -126,7 +126,7 @@ export default function InflowOutflowTimelineV2({
   const markerPct = (markerWeek / (WEEKS - 1)) * 100;
 
   return (
-    <div className={`Timeline ${className || ''}`} style={style}>
+    <div className={`Timeline ${className || ''}`} style={{ ...style, marginTop: -18 }}>
       <Grid align="stretch">
         <Tooltip label={isPlaying ? "Pause" : "Play"}>
           <ActionIcon
@@ -258,7 +258,8 @@ export default function InflowOutflowTimelineV2({
   style={{
     position: 'absolute',
     left: `calc(${leftPct}% - 14px)`,
-    top: 2,
+    top: '50%',
+    transform: 'translateY(-50%)',
     width: 28,
     height: 28,
     zIndex: mode === 'outflow' ? 3 : 2,
@@ -278,7 +279,8 @@ export default function InflowOutflowTimelineV2({
   style={{
     position: 'absolute',
     left: `calc(${rightPct}% - 14px)`,
-    top: 2,
+    top: '50%',
+    transform: 'translateY(-50%)',
     width: 28,
     height: 28,
     zIndex: mode === 'inflow' ? 3 : 2,
@@ -306,7 +308,8 @@ export default function InflowOutflowTimelineV2({
     style={{
       position: 'absolute',
       left: `calc(${rightPct}% - 14px)`,
-      top: 2,
+      top: '50%',
+      transform: 'translateY(-50%)',
       width: 28,
       height: 28,
       zIndex: 4,
@@ -335,7 +338,8 @@ export default function InflowOutflowTimelineV2({
     style={{
       position: 'absolute',
       left: `calc(${leftPct}% - 14px)`,
-      top: 2,
+      top: '50%',
+      transform: 'translateY(-50%)',
       width: 28,
       height: 28,
       zIndex: 4,
