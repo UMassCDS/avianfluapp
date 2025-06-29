@@ -103,17 +103,18 @@ function FeedbackForm(this: any) {
         radius="lg"
         p="xl"
         style={{
-          maxWidth: 480,
-          margin: "48px auto",
+          maxWidth: 600, // increased from 480
+          margin: "64px auto", // more vertical margin
           background: "rgba(255,255,255,0.98)",
-          border: "1.5px solid #e3eaf5"
+          border: "1.5px solid #e3eaf5",
+          padding: "48px 48px 36px 48px" // more padding for desktop
         }}
       >
         <Group justify="space-between" align="center" mb="md">
-          <Title order={1} style={{ color: "#1976d2", fontFamily: "Playfair Display, serif", fontWeight: 600, fontSize: "2rem", margin: 0 }}>
+          <Title order={1} style={{ color: "#1976d2", fontFamily: "Playfair Display, serif", fontWeight: 600, fontSize: "2.4rem", margin: 0 }}>
             Feedback
           </Title>
-          <Link to="/" style={{ color: "#228be6", fontWeight: 500, textDecoration: "none", fontSize: "1rem" }}>
+          <Link to="/" style={{ color: "#228be6", fontWeight: 500, textDecoration: "none", fontSize: "1.1rem" }}>
             ← Return to App
           </Link>
         </Group>
@@ -130,8 +131,8 @@ function FeedbackForm(this: any) {
             placeholder="you@email.com"
             value={email}
             onChange={(event) => setEmail(event.currentTarget.value)}
-            style={{ marginBottom: 18 }}
-            size="md"
+            style={{ marginBottom: 22, fontSize: "1.08rem" }}
+            size="lg"
             radius="md"
             autoComplete="email"
           />
@@ -139,26 +140,26 @@ function FeedbackForm(this: any) {
             label="Your feedback"
             placeholder="Please provide your feedback here..."
             autosize
-            minRows={3}
+            minRows={4}
             value={text}
             onChange={(event) => setText(event.currentTarget.value)}
-            style={{ marginBottom: 22 }}
-            size="md"
+            style={{ marginBottom: 28, fontSize: "1.08rem" }}
+            size="lg"
             radius="md"
             required
           />
           <Button
             type="submit"
-            rightSection={<IconSend size={16} />}
+            rightSection={<IconSend size={18} />}
             disabled={buttonDisable}
-            size="md"
+            size="lg"
             radius="md"
             fullWidth
             style={{
               background: "linear-gradient(90deg, #228be6 60%, #1976d2 100%)",
               fontWeight: 600,
               letterSpacing: 0.5,
-              fontSize: "1.08rem"
+              fontSize: "1.15rem"
             }}
           >
             {buttonText}
