@@ -1,3 +1,264 @@
 .DefaultPage {
-    padding: 8%;
+  background: linear-gradient(135deg, #e3f2fd 0%, #b3e5fc 100%);
+  min-height: 100vh;
+  padding: 32px 0 32px 0;
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+.AboutCard {
+  background: rgba(255,255,255,0.97);
+  max-width: 800px;
+  margin: 32px auto;
+  border-radius: 18px;
+  box-shadow: 0 6px 32px 0 rgba(34,139,230,0.10), 0 1.5px 6px 0 rgba(34,139,230,0.08);
+  padding: 36px 36px 24px 36px;
+  position: relative;
+  overflow: hidden;
+}
+
+.AboutCard::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0; right: 0; bottom: 0;
+  background: url('data:image/svg+xml;utf8,<svg width="100" height="100" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="100" height="100" fill="none"/><g stroke="%23b3e5fc" stroke-width="0.5" opacity="0.25"><line x1="0" y1="20" x2="100" y2="20"/><line x1="0" y1="40" x2="100" y2="40"/><line x1="0" y1="60" x2="100" y2="60"/><line x1="0" y1="80" x2="100" y2="80"/><line x1="20" y1="0" x2="20" y2="100"/><line x1="40" y1="0" x2="40" y2="100"/><line x1="60" y1="0" x2="60" y2="100"/><line x1="80" y1="0" x2="80" y2="100"/></g></svg>');
+  background-size: 120px 120px;
+  z-index: 0;
+  opacity: 0.12;
+  pointer-events: none;
+  border-radius: 18px;
+}
+
+.AboutCard h1 {
+  text-align: center;
+  color: #228be6;
+  font-size: 2.5rem;
+  margin-bottom: 0.5em;
+  letter-spacing: 1px;
+}
+
+.AboutCard h2 {
+  color: #1976d2;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  border-bottom: 1.5px solid #b3e5fc;
+  padding-bottom: 0.2em;
+  font-size: 1.4rem;
+}
+
+.AboutCard h3 {
+  color: #228be6;
+  margin-top: 1em;
+  font-size: 1.1rem;
+}
+
+.AboutCard p, .AboutCard li {
+  color: #333;
+  line-height: 1.7;
+  font-size: 1.05rem;
+}
+
+.AboutCard ul {
+  margin-bottom: 1.2em;
+  padding-left: 1.5em;
+}
+
+.AboutCard a {
+  color: #1976d2;
+  text-decoration: underline;
+  transition: color 0.2s;
+}
+.AboutCard a:hover {
+  color: #1565c0;
+}
+
+.AboutCard .feather {
+  position: absolute;
+  opacity: 0.08;
+  pointer-events: none;
+  z-index: 0;
+}
+.AboutCard .feather.feather1 {
+  left: -60px; top: -40px; width: 120px; transform: rotate(-18deg);
+}
+.AboutCard .feather.feather2 {
+  right: -50px; bottom: -30px; width: 100px; transform: rotate(12deg);
+}
+
+.AboutCard .return-link {
+  display: inline-block;
+  margin-bottom: 1.5em;
+  color: #228be6;
+  font-weight: 500;
+  text-decoration: none;
+  border-bottom: 1.5px solid #b3e5fc;
+  transition: color 0.2s;
+}
+.AboutCard .return-link:hover {
+  color: #1565c0;
+}
+
+/* Add to Default.css */
+
+.about-banner {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 1.5em;
+  margin-top: 0.5em;
+  justify-content: center;
+}
+
+.about-bird {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  filter: drop-shadow(0 2px 8px #b3e5fc88);
+}
+
+.about-banner-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.about-banner-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #1976d2;
+  letter-spacing: 0.5px;
+}
+
+.about-banner-desc {
+  font-size: 1rem;
+  color: #228be6;
+  font-weight: 400;
+  margin-top: 2px;
+}
+
+/* Flapping bird (Twitter style) */
+.flap-bird {
+  width: 88px;
+  height: 125px;
+  background-image: url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/174479/bird-cells-new.svg');
+  background-size: auto 100%;
+  animation: flap-cycle 1s steps(10) infinite;
+  margin-top: 10px;
+  z-index: 1;
+}
+
+@keyframes flap-cycle {
+  100% {
+    background-position: -900px 0;
+  }
+}
+
+/* Responsive design */
+@media (max-width: 900px) {
+  .AboutCard {
+    max-width: 98vw;
+    padding: 18px 4vw 18px 4vw;
+  }
+  .AboutCard h1 {
+    font-size: 2rem;
+  }
+  .AboutCard h2 {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .AboutCard {
+    padding: 10px 2vw 10px 2vw;
+    border-radius: 10px;
+  }
+  .AboutCard h1 {
+    font-size: 1.3rem;
+  }
+  .AboutCard h2 {
+    font-size: 1rem;
+  }
+  .AboutCard .feather.feather1,
+  .AboutCard .feather.feather2 {
+    display: none;
+  }
+/* Stationary flapping bird container */
+.bird-stationary-container {
+  position: relative;
+  width: 88px;
+  height: 125px;
+  margin: 0 auto 1rem;
+}
+
+}
+
+/* Responsive AboutCard and bird/title row */
+.AboutCard {
+  max-width: 800px;
+  margin: 32px auto;
+  border-radius: 18px;
+  box-shadow: 0 6px 32px 0 rgba(34,139,230,0.10), 0 1.5px 6px 0 rgba(34,139,230,0.08);
+  padding: 36px 36px 24px 36px;
+  position: relative;
+  overflow: hidden;
+  background: rgba(255,255,255,0.97);
+}
+
+@media (max-width: 700px) {
+  .AboutCard {
+    max-width: 98vw;
+    padding: 18px 4vw 18px 4vw;
+  }
+  .AboutCard h1 {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 500px) {
+  .AboutCard {
+    padding: 10px 2vw 10px 2vw;
+    border-radius: 10px;
+  }
+  .AboutCard h1 {
+    font-size: 1.2rem;
+  }
+}
+
+/* Responsive bird/title row */
+.AboutCard > div[style*="display: flex"][style*="align-items: center"] {
+  flex-wrap: wrap;
+  gap: 0.5em;
+}
+
+@media (max-width: 500px) {
+  .AboutCard > div[style*="display: flex"][style*="align-items: center"] {
+    flex-direction: column;
+    align-items: center !important;
+    margin-bottom: 1em !important;
+  }
+  .AboutCard h1 {
+    text-align: center;
+    margin-top: 0.5em;
+  }
+}
+
+/* Make marker and bird scale down on small screens */
+@media (max-width: 500px) {
+  .AboutCard svg.feather,
+  .AboutCard div[style*="position: relative"] svg {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+  }
+  .AboutCard div[style*="position: relative"] {
+    width: 40px !important;
+    height: 54px !important;
+    margin-right: 0.5em !important;
+  }
+  .flap-bird {
+    width: 44px !important;
+    height: 62px !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+  }
 }
