@@ -1,3 +1,14 @@
+/* Import a formal, readable font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display:wght@600&display=swap');
+
+body, .DefaultPage {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  min-height: 100vh;
+  font-family: 'Inter', Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
 .DefaultPage {
   background: linear-gradient(135deg, #e3f2fd 0%, #b3e5fc 100%);
   min-height: 100vh;
@@ -6,14 +17,15 @@
 }
 
 .AboutCard {
-  background: rgba(255,255,255,0.97);
-  max-width: 800px;
-  margin: 32px auto;
-  border-radius: 18px;
-  box-shadow: 0 6px 32px 0 rgba(34,139,230,0.10), 0 1.5px 6px 0 rgba(34,139,230,0.08);
-  padding: 36px 36px 24px 36px;
+  background: rgba(255,255,255,0.98);
+  max-width: 820px;
+  margin: 40px auto 32px auto;
+  border-radius: 20px;
+  box-shadow: 0 8px 32px 0 rgba(34,139,230,0.10), 0 2px 8px 0 rgba(34,139,230,0.08);
+  padding: 44px 48px 32px 48px;
   position: relative;
   overflow: hidden;
+  border: 1.5px solid #e3eaf5;
 }
 
 .AboutCard::before {
@@ -29,32 +41,37 @@
 }
 
 .AboutCard h1 {
-  text-align: center;
-  color: #228be6;
-  font-size: 2.5rem;
-  margin-bottom: 0.5em;
+  font-family: 'Playfair Display', serif;
+  font-size: 2.6rem;
+  color: #1976d2;
   letter-spacing: 1px;
+  margin-bottom: 0.2em;
+  font-weight: 600;
 }
 
 .AboutCard h2 {
-  color: #1976d2;
-  margin-top: 1.5em;
+  color: #228be6;
+  font-size: 1.35rem;
+  margin-top: 2.2em;
   margin-bottom: 0.5em;
-  border-bottom: 1.5px solid #b3e5fc;
+  border-bottom: 1.5px solid #e3eaf5;
   padding-bottom: 0.2em;
-  font-size: 1.4rem;
+  font-family: 'Inter', Arial, sans-serif;
+  font-weight: 600;
 }
 
 .AboutCard h3 {
-  color: #228be6;
-  margin-top: 1em;
+  color: #1976d2;
   font-size: 1.1rem;
+  margin-top: 1.2em;
+  font-weight: 600;
 }
 
 .AboutCard p, .AboutCard li {
-  color: #333;
+  color: #222;
   line-height: 1.7;
-  font-size: 1.05rem;
+  font-size: 1.08rem;
+  margin-bottom: 1em;
 }
 
 .AboutCard ul {
@@ -71,9 +88,10 @@
   color: #1565c0;
 }
 
+/* Decorative feathers */
 .AboutCard .feather {
   position: absolute;
-  opacity: 0.08;
+  opacity: 0.09;
   pointer-events: none;
   z-index: 0;
 }
@@ -84,65 +102,37 @@
   right: -50px; bottom: -30px; width: 100px; transform: rotate(12deg);
 }
 
-.AboutCard .return-link {
-  display: inline-block;
-  margin-bottom: 1.5em;
-  color: #228be6;
-  font-weight: 500;
-  text-decoration: none;
-  border-bottom: 1.5px solid #b3e5fc;
-  transition: color 0.2s;
-}
-.AboutCard .return-link:hover {
-  color: #1565c0;
-}
-
-/* Add to Default.css */
-
-.about-banner {
+/* Bird/marker/title row */
+.AboutCard .about-title-row {
   display: flex;
   align-items: center;
-  gap: 18px;
-  margin-bottom: 1.5em;
-  margin-top: 0.5em;
+  justify-content: center;
+  gap: 1.2em;
+  margin: 1.5em 0 1.2em 0;
+}
+
+.AboutCard .bird-marker-wrap {
+  position: relative;
+  width: 60px;
+  height: 80px;
+  min-width: 60px;
+  min-height: 80px;
+  display: flex;
+  align-items: flex-end;
   justify-content: center;
 }
 
-.about-bird {
-  width: 56px;
-  height: 56px;
-  flex-shrink: 0;
-  filter: drop-shadow(0 2px 8px #b3e5fc88);
-}
-
-.about-banner-text {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.about-banner-title {
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: #1976d2;
-  letter-spacing: 0.5px;
-}
-
-.about-banner-desc {
-  font-size: 1rem;
-  color: #228be6;
-  font-weight: 400;
-  margin-top: 2px;
-}
-
-/* Flapping bird (Twitter style) */
 .flap-bird {
   width: 88px;
   height: 125px;
   background-image: url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/174479/bird-cells-new.svg');
   background-size: auto 100%;
   animation: flap-cycle 1s steps(10) infinite;
-  margin-top: 10px;
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  filter: hue-rotate(-30deg) brightness(1.1) saturate(1.4);
   z-index: 1;
 }
 
@@ -152,11 +142,23 @@
   }
 }
 
+/* Marker on top of bird's head */
+.AboutCard .bird-marker {
+  position: absolute;
+  left: 50%;
+  top:-50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 /* Responsive design */
 @media (max-width: 900px) {
   .AboutCard {
     max-width: 98vw;
-    padding: 18px 4vw 18px 4vw;
+    padding: 24px 4vw 18px 4vw;
   }
   .AboutCard h1 {
     font-size: 2rem;
@@ -169,7 +171,7 @@
 @media (max-width: 600px) {
   .AboutCard {
     padding: 10px 2vw 10px 2vw;
-    border-radius: 10px;
+    border-radius: 12px;
   }
   .AboutCard h1 {
     font-size: 1.3rem;
@@ -177,88 +179,21 @@
   .AboutCard h2 {
     font-size: 1rem;
   }
+  .AboutCard .about-title-row {
+    flex-direction: column;
+    gap: 0.5em;
+  }
+  .AboutCard .bird-marker-wrap {
+    margin-bottom: 0.5em;
+  }
   .AboutCard .feather.feather1,
   .AboutCard .feather.feather2 {
     display: none;
   }
-/* Stationary flapping bird container */
-.bird-stationary-container {
-  position: relative;
-  width: 88px;
-  height: 125px;
-  margin: 0 auto 1rem;
-}
-
-}
-
-/* Responsive AboutCard and bird/title row */
-.AboutCard {
-  max-width: 800px;
-  margin: 32px auto;
-  border-radius: 18px;
-  box-shadow: 0 6px 32px 0 rgba(34,139,230,0.10), 0 1.5px 6px 0 rgba(34,139,230,0.08);
-  padding: 36px 36px 24px 36px;
-  position: relative;
-  overflow: hidden;
-  background: rgba(255,255,255,0.97);
-}
-
-@media (max-width: 700px) {
-  .AboutCard {
-    max-width: 98vw;
-    padding: 18px 4vw 18px 4vw;
-  }
-  .AboutCard h1 {
-    font-size: 2rem;
-  }
-}
-
-@media (max-width: 500px) {
-  .AboutCard {
-    padding: 10px 2vw 10px 2vw;
-    border-radius: 10px;
-  }
-  .AboutCard h1 {
-    font-size: 1.2rem;
-  }
-}
-
-/* Responsive bird/title row */
-.AboutCard > div[style*="display: flex"][style*="align-items: center"] {
-  flex-wrap: wrap;
-  gap: 0.5em;
-}
-
-@media (max-width: 500px) {
-  .AboutCard > div[style*="display: flex"][style*="align-items: center"] {
-    flex-direction: column;
-    align-items: center !important;
-    margin-bottom: 1em !important;
-  }
-  .AboutCard h1 {
-    text-align: center;
-    margin-top: 0.5em;
-  }
-}
-
-/* Make marker and bird scale down on small screens */
-@media (max-width: 500px) {
-  .AboutCard svg.feather,
-  .AboutCard div[style*="position: relative"] svg {
-    width: 32px !important;
-    height: 32px !important;
-    min-width: 0 !important;
-    min-height: 0 !important;
-  }
-  .AboutCard div[style*="position: relative"] {
-    width: 40px !important;
-    height: 54px !important;
-    margin-right: 0.5em !important;
-  }
   .flap-bird {
-    width: 44px !important;
-    height: 62px !important;
-    min-width: 0 !important;
-    min-height: 0 !important;
+    width: 88px;
+    height: 125px;
+    min-width: 0;
+    min-height: 0;
   }
 }
