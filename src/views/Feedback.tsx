@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Button, Textarea, TextInput } from '@mantine/core';
+import { Button, Textarea, TextInput, Paper, Title, Group, Divider } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconSend } from '@tabler/icons-react';
 import emailjs from 'emailjs-com';
 
 import '../styles/Default.css';
 
-const EMAIL_REGEX = new RegExp(/^[^\s;]+@[^\s;]+\.[^\s;]*$/)
+const EMAIL_REGEX = new RegExp(/^[^\s;]+@[^\s;]+\.[^\s;]*$/);
 
 /**
  * Renders a feedback form allowing users to submit feedback and optionally provide their email address for a response.
@@ -27,7 +27,7 @@ function FeedbackForm(this: any) {
   const [email, setEmail] = useState("");
   const [text, setText] = useState("");
   const [buttonText, setButtonText] = useState("Submit Feedback");
-  const [buttonDisable, setButtonDisable] = useState(false)
+  const [buttonDisable, setButtonDisable] = useState(false);
   const navigate = useNavigate();
 
 
@@ -83,47 +83,88 @@ function FeedbackForm(this: any) {
   }
 
   const Plans = (
-    <div>
-        <h2>Future Plans</h2>
-        <ul>
-          <li>Automate daily outbreak updates.</li>
-          <li>Option to show historic outbreak data (beyond one year ago).</li>
-          <li>Ability to Download Data.</li>
-          <li>Plot bird data over time for a single location.</li>
-          <li>Add marker for today on the timeline.</li>
-          <li>Improve accessibility issues.</li>
-        </ul> 
+    <div style={{ marginBottom: 32 }}>
+      <Title order={2} style={{ color: "#1976d2", fontSize: "1.3rem", marginBottom: 10 }}>Future Plans</Title>
+      <ul style={{ marginLeft: 20, color: "#444", fontSize: "1.05rem" }}>
+        <li>Automate daily outbreak updates.</li>
+        <li>Option to show historic outbreak data (beyond one year ago).</li>
+        <li>Ability to Download Data.</li>
+        <li>Plot bird data over time for a single location.</li>
+        <li>Add marker for today on the timeline.</li>
+        <li>Improve accessibility issues.</li>
+      </ul>
     </div>
   );
 
   return (
-    <div className="DefaultPage" style={{marginLeft:50, marginRight:50}}>
-        <Link to="/">Return to App</Link>
+    <div className="DefaultPage" style={{ minHeight: "100vh", background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)" }}>
+      <Paper
+        shadow="md"
+        radius="lg"
+        p="xl"
+        style={{
+          maxWidth: 480,
+          margin: "48px auto",
+          background: "rgba(255,255,255,0.98)",
+          border: "1.5px solid #e3eaf5"
+        }}
+      >
+        <Group justify="space-between" align="center" mb="md">
+          <Title order={1} style={{ color: "#1976d2", fontFamily: "Playfair Display, serif", fontWeight: 600, fontSize: "2rem", margin: 0 }}>
+            Feedback
+          </Title>
+          <Link to="/" style={{ color: "#228be6", fontWeight: 500, textDecoration: "none", fontSize: "1rem" }}>
+            ← Return to App
+          </Link>
+        </Group>
+        <Divider my="sm" />
         {Plans}
-        <h2>Feedback</h2>
-        <TextInput
-          style={{width:300, marginTop:20}}
-          label="Provide your email to receive a response."
-          placeholder="Your email"
-          value={email}
-          onChange={(event) => setEmail(event.currentTarget.value)}
-        />
-        <Textarea
-          style={{marginTop:20, marginBottom:20}}
-          label="Please provide feedback."
-          autosize
-          minRows={2}
-          value={text}
-          onChange={(event) => setText(event.currentTarget.value)}
-        />
-        <Button 
-          rightSection={<IconSend size={14}/>} 
-          onClick={() => {sendFeedback()}}
-          disabled={buttonDisable}
+        <form
+          onSubmit={e => {
+            e.preventDefault();
+            sendFeedback();
+          }}
         >
-          {buttonText}
-        </Button>
-
+          <TextInput
+            label="Your email (optional)"
+            placeholder="you@email.com"
+            value={email}
+            onChange={(event) => setEmail(event.currentTarget.value)}
+            style={{ marginBottom: 18 }}
+            size="md"
+            radius="md"
+            autoComplete="email"
+          />
+          <Textarea
+            label="Your feedback"
+            placeholder="Please provide your feedback here..."
+            autosize
+            minRows={3}
+            value={text}
+            onChange={(event) => setText(event.currentTarget.value)}
+            style={{ marginBottom: 22 }}
+            size="md"
+            radius="md"
+            required
+          />
+          <Button
+            type="submit"
+            rightSection={<IconSend size={16} />}
+            disabled={buttonDisable}
+            size="md"
+            radius="md"
+            fullWidth
+            style={{
+              background: "linear-gradient(90deg, #228be6 60%, #1976d2 100%)",
+              fontWeight: 600,
+              letterSpacing: 0.5,
+              fontSize: "1.08rem"
+            }}
+          >
+            {buttonText}
+          </Button>
+        </form>
+      </Paper>
     </div>
   );
 }
