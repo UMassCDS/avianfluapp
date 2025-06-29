@@ -1,23 +1,10 @@
 import { Link } from 'react-router-dom';
 import '../styles/Default.css';
 
-
 /**
  * Renders the About page for the Avian Influenza application.
- *
- * This component provides detailed information and documentation about the application, including:
- * - Instructions on how to use the site
- * - Data sources and methodology for abundance and movement data
- * - Information about the species included in the model
- * - Details about avian influenza outbreak data
- * - Additional resources and links for further information
- * - Disclaimer regarding data usage and opinions
- * - Citations for all referenced data and publications
- *
- * @component
- * @returns {JSX.Element} The About page content as a React element.
  */
-function About(this: any) {
+function About() {
 
     const HowTo = (
         <div>
@@ -72,19 +59,19 @@ function About(this: any) {
     const MoreInformation = (
         <div>
             <h2>More Information</h2>
-            <p><a href="https://birdflow-science.github.io/" target="_blank">BirdFlow</a>
-                &nbsp;is a joint project between the <a href="https://www.cics.umass.edu/" target="_blank">University of Massachusetts Amherst</a>
-                &nbsp;and the <a href="https://www.birds.cornell.edu/home" target="_blank">Cornell Lab of Ornithology</a> 
-                &nbsp;funded by the <a href="https://www.nsf.gov" target="_blank">US National Science Foundation</a>.
+            <p><a href="https://birdflow-science.github.io/" target="_blank" rel="noopener noreferrer">BirdFlow</a>
+                &nbsp;is a joint project between the <a href="https://www.cics.umass.edu/" target="_blank" rel="noopener noreferrer">University of Massachusetts Amherst</a>
+                &nbsp;and the <a href="https://www.birds.cornell.edu/home" target="_blank" rel="noopener noreferrer">Cornell Lab of Ornithology</a> 
+                &nbsp;funded by the <a href="https://www.nsf.gov" target="_blank" rel="noopener noreferrer">US National Science Foundation</a>.
             </p>
-            <p> <a href="https://birdflow-science.github.io/BirdFlowR/" target="_blank">BirdFlowR</a>
+            <p> <a href="https://birdflow-science.github.io/BirdFlowR/" target="_blank" rel="noopener noreferrer">BirdFlowR</a>
                 &nbsp;package was used to develop movement data and can be used to make predictions 
                 programmatically from BirdFlow models. Its documentation includes a page giving an&nbsp;
-                <a href="https://birdflow-science.github.io/BirdFlowR/articles/BirdFlowOverview.html" target="_blank">
+                <a href="https://birdflow-science.github.io/BirdFlowR/articles/BirdFlowOverview.html" target="_blank" rel="noopener noreferrer">
                 Overview of the Uses and Limititations of BirdFlow models</a>.
             </p>
             <p>
-                <a href="https://birdflow-science.s3.amazonaws.com/avian_flu/index.html" target="_blank">
+                <a href="https://birdflow-science.s3.amazonaws.com/avian_flu/index.html" target="_blank" rel="noopener noreferrer">
                 The Avian Influenza BirdFlow Model Collection</a> distributes the models used by this application. 
             </p>
         </div>
@@ -94,7 +81,7 @@ function About(this: any) {
         <div>
             <h2>Disclaimer</h2>
             <p>This material uses data from the eBird Status and Trends Project at the Cornell Lab of Ornithology,
-            &nbsp;<a href="https://ebird.org" target="_blank">eBird.org</a>. Any opinions, findings, and conclusions or 
+            &nbsp;<a href="https://ebird.org" target="_blank" rel="noopener noreferrer">eBird.org</a>. Any opinions, findings, and conclusions or 
             recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the Cornell Lab of Ornithology.</p>
         </div>
     );
@@ -105,23 +92,23 @@ function About(this: any) {
             <p>
                 Fink, D., T. Auer, A. Johnston, M. Strimas-Mackey, S. Ligocki, O. Robinson, W. Hochachka, L. Jaromczyk, 
                 C. Crowley, K. Dunham, A. Stillman, I. Davies, A. Rodewald, V. Ruiz-Gutierrez, C. Wood. 2023. 
-                &nbsp;<a href="https://ebird.org/science/status-and-trends" target="_blank">eBird Status and Trends</a>, 
+                &nbsp;<a href="https://ebird.org/science/status-and-trends" target="_blank" rel="noopener noreferrer">eBird Status and Trends</a>, 
                 Data Version: 2022; Released: 2023. Cornell Lab of Ornithology, Ithaca, New York. 
-                &nbsp;<a href="https://doi.org/10.2173/ebirdst.2022" target="_blank">https://doi.org/10.2173/ebirdst.2022</a>
+                &nbsp;<a href="https://doi.org/10.2173/ebirdst.2022" target="_blank" rel="noopener noreferrer">https://doi.org/10.2173/ebirdst.2022</a>
             </p>
             <p>
                 Fuentes, Miguel, Benjamin M. Van Doren, Daniel Fink, and Daniel Sheldon. 
-                <a href="https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.14052" target="_blank">
+                <a href="https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.14052" target="_blank" rel="noopener noreferrer">
                 BirdFlow: Learning seasonal bird movements from eBird data</a>
                 &nbsp; Methods in Ecology and Evolution 14, no. 3 (2023): 923-938. 
-                <a href="https://doi.org/10.1111/2041-210X.14052" target="_blank">https://doi.org/10.1111/2041-210X.14052</a>
+                <a href="https://doi.org/10.1111/2041-210X.14052" target="_blank" rel="noopener noreferrer">https://doi.org/10.1111/2041-210X.14052</a>
             </p>
             <p>
                 Miller, Ryan 2024 Personal communication.
             </p>
             <p>
                 Partners in Flight. 2020. Population Estimates Database, version 3.1. Available at 
-                &nbsp;<a href="https://pif.birdconservancy.org/population-estimates-database" target="_blank">
+                &nbsp;<a href="https://pif.birdconservancy.org/population-estimates-database" target="_blank" rel="noopener noreferrer">
                 https://pif.birdconservancy.org/population-estimates-database</a>. 
                 Accessed on 2024-04-29.
             </p>
@@ -133,25 +120,83 @@ function About(this: any) {
             <h2>Outbreaks</h2>
             <p> The highly pathogenic avian influenza (HPAI) outbreak markers are based on the USDA Animal 
                 and Plant Health Inspection Service (APHIS) outbreak available for download at:&nbsp;
-                <a href="https://www.aphis.usda.gov/livestock-poultry-disease/avian/avian-influenza/hpai-detections/commercial-backyard-flocks" target="_blank">
+                <a href="https://www.aphis.usda.gov/livestock-poultry-disease/avian/avian-influenza/hpai-detections/commercial-backyard-flocks" target="_blank" rel="noopener noreferrer">
                 Confirmations of HPAI in Commercial and Backyard Flocks</a>. This app is updated periodically, link has the most up to date outbreak information.
             </p>
         </div>
     );
 
     return (
-    <div className="DefaultPage">
-        <h1 style={{textAlign:"center"}}>Avian Influenza</h1>
-        <Link to="/">Return to App</Link>
-        {HowTo}
-        {Data}
-        {Species}
-        {Outbreaks}
-        {MoreInformation}
-        {Disclaimer}
-        {Citations}        
-    </div>
-  );
+      <div className="DefaultPage">
+        <div className="AboutCard">
+          {/* Decorative SVG feathers */}
+          <svg className="feather feather1" viewBox="0 0 64 64" fill="none">
+            <path d="M12 52C28 28 52 12 52 12C52 12 36 36 12 52Z" fill="#228be6"/>
+          </svg>
+          <svg className="feather feather2" viewBox="0 0 64 64" fill="none">
+            <path d="M12 52C28 28 52 12 52 12C52 12 36 36 12 52Z" fill="#1976d2"/>
+          </svg>
+
+          {/* Bird/marker left of title */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '1em 0' }}>
+            {/* Marker + bird */}
+            <div style={{ position: 'relative', width: 60, height: 80, marginRight: 16 }}>
+              {/* Flapping bird - blue */}
+              <div
+                className="flap-bird"
+                style={{
+                  position: 'absolute',
+                  left: '50%',
+                  bottom: 0,
+                  transform: 'translateX(-80%)',
+                  filter: 'hue-rotate(-30deg) brightness(1.1) saturate(1.4)',
+                  zIndex: 1
+                }}
+              />
+              {/* Location marker - positioned on top of bird's head */}
+              <div
+                style={{
+                  position: 'absolute',
+                  left: '20%',
+                  top: '-50%',
+                  transform: 'translateX(-50%)',
+                  zIndex: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center'
+                }}
+              >
+                <svg width="40" height="45" viewBox="0 0 40 45" style={{ display: 'block' }}>
+                  <path
+                    d="M20 4 C28 4, 36 12, 20 38 C4 12, 12 4, 20 4Z"
+                    fill="red"
+                  />
+                  <circle cx="20" cy="16" r="7" fill="#fff"/>
+                  <circle cx="20" cy="16" r="4" fill="red"/>
+                  <path
+                    d="M20 4 C28 4, 36 12, 20 38 C4 12, 12 4, 20 4Z"
+                    fill="none"
+                    stroke="#fff"
+                    strokeWidth="2"
+                  />
+                </svg>
+              </div>
+            </div>
+            {/* Title */}
+            <h1 style={{ margin: 0 }}>Avian Influenza</h1>
+          </div>
+
+          <Link to="/" className="return-link">← Return to App</Link>
+          {HowTo}
+          {Data}
+          {Species}
+          {Outbreaks}
+          {MoreInformation}
+          {Disclaimer}
+          {Citations}
+        </div>
+      </div>
+    );
 }
 
 export default About;
