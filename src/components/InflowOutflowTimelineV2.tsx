@@ -89,7 +89,17 @@ export default function InflowOutflowTimelineV2({
       const rect = trackRef.current.getBoundingClientRect();
       let x = clamp(clientX - rect.left, 0, rect.width);
       let w = Math.round((x / rect.width) * (WEEKS - 1));
-      setWeek(w);
+
+      if (mode === "inflow") {
+        // Dragging the arrow (right): end is w, start wraps around
+        let end = w;
+        let start = (end - SPAN + WEEKS) % WEEKS;
+        setWeek(start);
+      } else {
+        // Dragging the circle (left): start is w, end wraps around
+        let start = w;
+        setWeek(start);
+      }
     };
     const moveHandler = (ev: MouseEvent | TouchEvent) => {
       if ("touches" in ev) move(ev.touches[0].clientX);
@@ -229,115 +239,61 @@ export default function InflowOutflowTimelineV2({
             ))}
 
             {/* Thumbs: **match V1 CSS & look** */}
-            {mode === 'inflow' ? (
-              <>
-                {/* Left: static filled circle */}
-                <div
-                  style={{
-                    position: 'absolute',
-                    left: `calc(${leftPct}% - 14px)`,
-                    top: 2,
-                    width: 28,
-                    height: 28,
-                    zIndex: 3,
-                    pointerEvents: 'none',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <svg width={28} height={28}>
-                    <circle cx={14} cy={14} r={10} fill="#228be6" stroke="#228be6" strokeWidth={2} />
-                  </svg>
-                </div>
+            {/* Always render left circle and right arrow.
+    For inflow: right arrow is draggable.
+    For outflow: left circle is draggable.
+*/}
+{/* Left: circle */}
+<div
+  style={{
+    position: 'absolute',
+    left: `calc(${leftPct}% - 14px)`,
+    top: 2,
+    width: 28,
+    height: 28,
+    zIndex: mode === 'outflow' ? 4 : 3,
+    cursor: mode === 'outflow' && !isPlaying ? 'pointer' : 'default',
+    pointerEvents: mode === 'outflow' && !isPlaying ? 'auto' : 'none',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  }}
+  onMouseDown={mode === 'outflow' && !isPlaying ? handleThumbDrag : undefined}
+  onTouchStart={mode === 'outflow' && !isPlaying ? (e => { e.preventDefault(); handleThumbDrag(e); }) : undefined}
+>
+  <svg width={28} height={28}>
+    <circle cx={14} cy={14} r={10} fill="white" stroke="#228be6" strokeWidth={3} />
+  </svg>
+</div>
 
-                {/* Right: draggable hollow arrow */}
-                <div
-                  style={{
-                    position: 'absolute',
-                    left: `calc(${rightPct}% - 14px)`,
-                    top: 2,
-                    width: 28,
-                    height: 28,
-                    zIndex: 4,
-                    cursor: isPlaying ? 'not-allowed' : 'pointer',
-                    pointerEvents: isPlaying ? 'none' : 'auto',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                  onMouseDown={handleThumbDrag}
-                  onTouchStart={e => {
-                    e.preventDefault();
-                    handleThumbDrag(e);
-                  }}
-                >
-                  <svg width="28" height="28" viewBox="0 0 24 24">
-                    <path
-                      d="M0 0 L0 24 L20 12 Z"
-                      fill="white"
-                      stroke="#228be6"
-                      strokeWidth="2.5"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </div>
-              </>
-            ) : (
-              <>
-                {/* Left: static hollow arrow */}
-                <div
-                  style={{
-                    position: 'absolute',
-                    left: `calc(${leftPct}% - 14px)`,
-                    top: 2,
-                    width: 28,
-                    height: 28,
-                    zIndex: 3,
-                    pointerEvents: 'none',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <svg width="28" height="28" viewBox="0 0 24 24">
-                    <path
-                      d="M0 0 L0 24 L20 12 Z"
-                      fill="white"
-                      stroke="#228be6"
-                      strokeWidth="2.5"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </div>
-
-                {/* Right: draggable filled circle */}
-                <div
-                  style={{
-                    position: 'absolute',
-                    left: `calc(${rightPct}% - 14px)`,
-                    top: 2,
-                    width: 28,
-                    height: 28,
-                    zIndex: 4,
-                    cursor: isPlaying ? 'not-allowed' : 'pointer',
-                    pointerEvents: isPlaying ? 'none' : 'auto',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                  onMouseDown={handleThumbDrag}
-                  onTouchStart={e => {
-                    e.preventDefault();
-                    handleThumbDrag(e);
-                  }}
-                >
-                  <svg width={28} height={28}>
-                    <circle cx={14} cy={14} r={10} fill="white" stroke="#228be6" strokeWidth={3} />
-                  </svg>
-                </div>
-              </>
-            )}
+{/* Right: arrow */}
+<div
+  style={{
+    position: 'absolute',
+    left: `calc(${rightPct}% - 14px)`,
+    top: 2,
+    width: 28,
+    height: 28,
+    zIndex: mode === 'inflow' ? 4 : 3,
+    cursor: mode === 'inflow' && !isPlaying ? 'pointer' : 'default',
+    pointerEvents: mode === 'inflow' && !isPlaying ? 'auto' : 'none',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  }}
+  onMouseDown={mode === 'inflow' && !isPlaying ? handleThumbDrag : undefined}
+  onTouchStart={mode === 'inflow' && !isPlaying ? (e => { e.preventDefault(); handleThumbDrag(e); }) : undefined}
+>
+  <svg width="28" height="28" viewBox="0 0 24 24">
+    <polygon
+      points="6,6 22,12 6,18"
+      fill="white"
+      stroke="#228be6"
+      strokeWidth="3"
+      strokeLinejoin="round"
+    />
+  </svg>
+</div>
           </div>
         </Grid.Col>
       </Grid>
