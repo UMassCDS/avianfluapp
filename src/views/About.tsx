@@ -138,41 +138,17 @@ function About() {
           </svg>
 
           {/* Bird/marker left of title */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '1em 0' }}>
-            {/* Marker + bird */}
-            <div style={{ position: 'relative', width: 60, height: 80, marginRight: 16 }}>
-              {/* Flapping bird - blue */}
-              <div
-                className="flap-bird"
-                style={{
-                  position: 'absolute',
-                  left: '50%',
-                  bottom: 0,
-                  transform: 'translateX(-80%)',
-                  filter: 'hue-rotate(-30deg) brightness(1.1) saturate(1.4)',
-                  zIndex: 1
-                }}
-              />
+          <div className="about-title-row">
+            <div className="bird-marker-wrap">
               {/* Location marker - positioned on top of bird's head */}
-              <div
-                style={{
-                  position: 'absolute',
-                  left: '20%',
-                  top: '-50%',
-                  transform: 'translateX(-50%)',
-                  zIndex: 2,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center'
-                }}
-              >
+              <div className="bird-marker">
                 <svg width="40" height="45" viewBox="0 0 40 45" style={{ display: 'block' }}>
                   <path
                     d="M20 4 C28 4, 36 12, 20 38 C4 12, 12 4, 20 4Z"
-                    fill="red"
+                    fill="#e53935"
                   />
                   <circle cx="20" cy="16" r="7" fill="#fff"/>
-                  <circle cx="20" cy="16" r="4" fill="red"/>
+                  <circle cx="20" cy="16" r="4" fill="#e53935"/>
                   <path
                     d="M20 4 C28 4, 36 12, 20 38 C4 12, 12 4, 20 4Z"
                     fill="none"
@@ -181,8 +157,9 @@ function About() {
                   />
                 </svg>
               </div>
+              {/* Flapping bird - blue */}
+              <div className="flap-bird" />
             </div>
-            {/* Title */}
             <h1 style={{ margin: 0 }}>Avian Influenza</h1>
           </div>
 
