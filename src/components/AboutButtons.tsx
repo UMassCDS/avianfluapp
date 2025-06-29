@@ -26,8 +26,12 @@ export default function AboutButtions({runTest }: AboutButtonsProps) {
   return (
     <div className="about">
       <Tooltip label='Test RestAPI'>
-          <ActionIcon style={{margin:12}} size={iconSize} onClick={() => { runTest()}}>
-            <IconTestPipe/>
+          <ActionIcon
+            style={{ margin: 12 }}
+            size={iconSize}
+            onClick={() => { window.open("https://www.birdfluapi.com/__docs__/", "_blank"); }}
+          >
+            <IconTestPipe />
           </ActionIcon>
       </Tooltip> 
       <Tooltip label='Leave feedback and suggestions.'>
