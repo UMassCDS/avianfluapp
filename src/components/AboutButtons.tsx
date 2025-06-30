@@ -23,7 +23,7 @@ export default function AboutButtons({ runTest }: AboutButtonsProps) {
   const iconSize = useSelector((state: RootState) => state.ui.iconSize);
 
   return (
-    <div className="fixed top-4 right-4 z-50 flex flex-col gap-2">
+    <div className="flex flex-col gap-2">
       <Tooltip label="Test RestAPI" position="left" withArrow>
         <button
           className="bg-white/90 hover:bg-blue-100 shadow-lg rounded-full p-2 border border-blue-200 transition"
