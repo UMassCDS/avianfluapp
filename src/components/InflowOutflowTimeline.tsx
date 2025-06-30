@@ -299,15 +299,41 @@ function InflowOutflowTimeline(props: TimelineProps) {
               className='slider-button'
               style={{
                 position: 'absolute',
-                left: `calc(${sliderValue * 100}% - ${'8px'})`,
-                top: 0,
+                left: `calc(${sliderValue * 100}% - 24px)`, // adjust for marker width
+                top: -38, // move marker up so the line ends at the timeline
+                width: 48,
+                height: 38,
+                pointerEvents: "none",
+                zIndex: 10,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
               }} >
-                {/* SLIDER BUTTON - NEED TO BE REWORKED */}
-                <div style={{backgroundColor: "white", padding: "3px"}}>
+                {/* Date label */}
+                <div
+                  style={{
+                    background: "white",
+                    padding: "2px 8px",
+                    borderRadius: 6,
+                    fontWeight: 600,
+                    fontSize: 14,
+                    textAlign: "center",
+                    marginBottom: 2,
+                    boxShadow: "0 2px 6px rgba(0,0,0,0.07)",
+                    width: "max-content",
+                    maxWidth: 80,
+                  }}
+                >
                   {dateLabels[dataIndex][week]}
                 </div>
-                {/* <IconCaretDownFilled viewBox='0, 5, 24, 24' /> */}
-                <div style={{backgroundColor: "black", width: "3px", height: "23px"}}></div>
+                {/* Black line pointing to timeline */}
+                <div
+                  style={{
+                    width: 0,
+                    height: 28, // adjust this so the line ends at the timeline
+                    borderLeft: "3px solid black",
+                  }}
+                />
             </div>
           </div>
           <p></p>
