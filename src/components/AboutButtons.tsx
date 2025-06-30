@@ -1,8 +1,8 @@
-import { ActionIcon, Tooltip } from "@mantine/core";
 import { IconInfoCircle, IconTestPipe, IconWriting } from "@tabler/icons-react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { RootState } from "../store/store";
+import { Tooltip } from '@mantine/core';
 
 interface AboutButtonsProps {
   runTest: () => void;
@@ -18,31 +18,47 @@ interface AboutButtonsProps {
  *
  * The component uses Redux to determine the icon size and React Router for navigation.
  */
-export default function AboutButtions({runTest }: AboutButtonsProps) {
+export default function AboutButtons({ runTest }: AboutButtonsProps) {
   const navigate = useNavigate();
-
   const iconSize = useSelector((state: RootState) => state.ui.iconSize);
-  
+
   return (
-    <div className="about">
-      <Tooltip label='Test RestAPI'>
-          <ActionIcon
-            style={{ margin: 12 }}
-            size={iconSize}
-            onClick={() => { window.open("https://www.birdfluapi.com/__docs__/", "_blank"); }}
-          >
-            <IconTestPipe />
-          </ActionIcon>
-      </Tooltip> 
-      <Tooltip label='Leave feedback and suggestions.'>
-          <ActionIcon style={{margin:12}} size={iconSize} onClick={() => { navigate("/feedback")}}>
-            <IconWriting/>
-          </ActionIcon>
+    <div className="fixed top-4 right-4 z-50 flex flex-col gap-2">
+      <Tooltip label="Test RestAPI" position="left" withArrow>
+        <button
+          className="bg-white/90 hover:bg-blue-100 shadow-lg rounded-full p-2 border border-blue-200 transition"
+          style={{ width: 48, height: 48 }}
+          aria-label="Test RestAPI"
+          title="Test RestAPI"
+          onClick={() => window.open("https://www.birdfluapi.com/__docs__/", "_blank")}
+          type="button"
+        >
+          <IconTestPipe size={iconSize || 28} className="text-blue-600 mx-auto" />
+        </button>
       </Tooltip>
-      <Tooltip label='About page'>
-          <ActionIcon size={iconSize} onClick={() => { navigate("/about")}}>
-            <IconInfoCircle/>
-          </ActionIcon>
+      <Tooltip label="Leave feedback and suggestions" position="left" withArrow>
+        <button
+          className="bg-white/90 hover:bg-blue-100 shadow-lg rounded-full p-2 border border-blue-200 transition"
+          style={{ width: 48, height: 48 }}
+          aria-label="Leave feedback and suggestions"
+          title="Leave feedback and suggestions"
+          onClick={() => navigate("/feedback")}
+          type="button"
+        >
+          <IconWriting size={iconSize || 28} className="text-blue-600 mx-auto" />
+        </button>
+      </Tooltip>
+      <Tooltip label="About page" position="left" withArrow>
+        <button
+          className="bg-white/90 hover:bg-blue-100 shadow-lg rounded-full p-2 border border-blue-200 transition"
+          style={{ width: 48, height: 48 }}
+          aria-label="About page"
+          title="About page"
+          onClick={() => navigate("/about")}
+          type="button"
+        >
+          <IconInfoCircle size={iconSize || 28} className="text-blue-600 mx-auto" />
+        </button>
       </Tooltip>
     </div>
   );
