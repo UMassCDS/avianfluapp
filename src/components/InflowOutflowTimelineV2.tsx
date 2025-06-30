@@ -117,6 +117,7 @@ export default function InflowOutflowTimelineV2({
     window.addEventListener("touchend", release);
   };
 
+  // --- Calculate positions ---
   const percent = (week / (WEEKS - 1)) * 100;
   const spanStart = week;
   const spanEnd = (week + SPAN) % WEEKS;
@@ -127,18 +128,24 @@ export default function InflowOutflowTimelineV2({
 
   return (
     <div className={`Timeline ${className || ''}`} style={{ ...style, marginTop: -18 }}>
-      <Grid align="stretch">
-        <Tooltip label={isPlaying ? "Pause" : "Play"}>
-          <ActionIcon
-            size="xl"
-            onClick={() => setIsPlaying(p => !p)}
-            variant={isPlaying ? 'filled' : 'default'}
-          >
-            {isPlaying ? <IconPlayerPauseFilled /> : <IconPlayerPlayFilled />}
-          </ActionIcon>
-        </Tooltip>
-        <Grid.Col span={11}>
-          <div style={{ position: 'relative', height: 25, zIndex: 1000 }}>
+      <div className="flex items-center w-full">
+        {/* Play/Pause Button */}
+        <div className="flex-shrink-0 mr-2" style={{ width: 48 }}>
+          <Tooltip label={isPlaying ? "Pause" : "Play"}>
+            <ActionIcon
+              size="xl"
+              onClick={() => setIsPlaying(p => !p)}
+              variant={isPlaying ? 'filled' : 'default'}
+              style={{ width: 48, height: 48 }}
+            >
+              {isPlaying ? <IconPlayerPauseFilled /> : <IconPlayerPlayFilled />}
+            </ActionIcon>
+          </Tooltip>
+        </div>
+        {/* Timeline Slider Area */}
+        <div className="flex-1" style={{marginLeft: "5%"}}>
+          {/* Thumb label and marker */}
+          <div style={{ height: 25, position: 'relative', zIndex: 1000 }}>
             <div
               className="slider-button"
               style={{
@@ -148,25 +155,30 @@ export default function InflowOutflowTimelineV2({
                 pointerEvents: 'none',
               }}
             >
-              <div style={{ backgroundColor: 'white', padding: '3px' }}>
+              <div style={{ backgroundColor: 'white', padding: '3px', borderRadius: 4, fontWeight: 500 }}>
                 {dateLabels[dataIndex]?.[markerWeek]}
               </div>
-              <div style={{ backgroundColor: 'black', width: 3, height: 23 }} />
+              <div style={{ backgroundColor: 'black', width: 3, height: 23, margin: '0 auto' }} />
             </div>
           </div>
-
+          {/* Custom Slider */}
           <div
             ref={trackRef}
             onDoubleClick={handleDoubleClick}
             style={{
               position: 'relative',
-              height: 10, // thinner track
+              height: 10,
               background: '#dee2e6',
               borderRadius: 8,
               border: '1px solid #bbb',
               userSelect: 'none',
+              marginTop: 0,
+              marginBottom: 0,
+              display: 'flex',
+              alignItems: 'center',
             }}
           >
+            {/* Filled bar */}
             {isWrapped ? (
               <>
                 <div
@@ -178,6 +190,7 @@ export default function InflowOutflowTimelineV2({
                     bottom: 0,
                     background: '#228be6',
                     zIndex: 1,
+                    borderRadius: 8,
                   }}
                 />
                 <div
@@ -189,6 +202,7 @@ export default function InflowOutflowTimelineV2({
                     bottom: 0,
                     background: '#228be6',
                     zIndex: 1,
+                    borderRadius: 8,
                   }}
                 />
               </>
@@ -202,164 +216,157 @@ export default function InflowOutflowTimelineV2({
                   bottom: 0,
                   background: '#228be6',
                   zIndex: 1,
+                  borderRadius: 8,
                 }}
               />
             )}
 
+            {/* Month marks and labels */}
             {monthMarks.map((mark, idx) => {
-  const markPct = (mark.week / (WEEKS - 1)) * 100;
-  let labelStyle: React.CSSProperties = {
-    position: 'absolute',
-    top: 20, // below the track
-    left: '50%',
-    transform: 'translateX(-50%)',
-    fontSize: 12,
-    color: 'black',
-    fontWeight: 500,
-    whiteSpace: 'nowrap',
-  };
-  if (idx === 0) {
-    labelStyle.left = 0;
-    labelStyle.transform = 'none';
-    labelStyle.textAlign = 'left';
-  } else if (idx === monthMarks.length - 1) {
-    labelStyle.left = '100%';
-    labelStyle.transform = 'translateX(-100%)';
-    labelStyle.textAlign = 'right';
-  }
-  return (
-    <div
-      key={mark.week}
-      style={{
-        position: 'absolute',
-        left: `calc(${markPct}% - 3px)`,
-        top: '50%',
-        transform: 'translateY(-50%)',
-        width: 6,
-        height: 6,
-        borderRadius: '50%',
-        background: 'white',
-        border: '1.5px solid #228be6',
-        zIndex: 2,
-      }}
-    >
-      <span style={labelStyle}>{mark.label}</span>
-    </div>
-  );
-})}
+              const markPct = (mark.week / (WEEKS - 1)) * 100;
+              let labelStyle: React.CSSProperties = {
+                position: 'absolute',
+                top: 20,
+                left: '50%',
+                transform: 'translateX(-50%)',
+                fontSize: 12,
+                color: 'black',
+                fontWeight: 500,
+                whiteSpace: 'nowrap',
+              };
+              if (idx === 0) {
+                labelStyle.left = 0;
+                labelStyle.transform = 'none';
+                labelStyle.textAlign = 'left';
+              } else if (idx === monthMarks.length - 1) {
+                labelStyle.left = '100%';
+                labelStyle.transform = 'translateX(-100%)';
+                labelStyle.textAlign = 'right';
+              }
+              return (
+                <div
+                  key={mark.week}
+                  style={{
+                    position: 'absolute',
+                    left: `calc(${markPct}% - 3px)`,
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    width: 6,
+                    height: 6,
+                    borderRadius: '50%',
+                    background: 'white',
+                    border: '1.5px solid #228be6',
+                    zIndex: 2,
+                  }}
+                >
+                  <span style={labelStyle}>{mark.label}</span>
+                </div>
+              );
+            })}
 
-            {/* Thumbs: **match V1 CSS & look** */}
-            {/* Always render left circle and right arrow.
-    For inflow: right arrow is draggable.
-    For outflow: left circle is draggable.
-*/}
-{/* Left: static blue circle */}
-<div
-  style={{
-    position: 'absolute',
-    left: `calc(${leftPct}% - 14px)`,
-    top: '50%',
-    transform: 'translateY(-50%)',
-    width: 28,
-    height: 28,
-    zIndex: mode === 'outflow' ? 3 : 2,
-    pointerEvents: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  }}
->
-  <svg width={28} height={28}>
-    <circle cx={14} cy={14} r={10} fill="#228be6" stroke="#228be6" strokeWidth={3} />
-  </svg>
-</div>
+            {/* Thumbs: static blue circle (left) and blue arrow (right) */}
+            <div
+              style={{
+                position: 'absolute',
+                left: `calc(${leftPct}% - 14px)`,
+                top: '50%',
+                transform: 'translateY(-50%)',
+                width: 28,
+                height: 28,
+                zIndex: mode === 'outflow' ? 3 : 2,
+                pointerEvents: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <svg width={28} height={28}>
+                <circle cx={14} cy={14} r={10} fill="#228be6" stroke="#228be6" strokeWidth={3} />
+              </svg>
+            </div>
+            <div
+              style={{
+                position: 'absolute',
+                left: `calc(${rightPct}% - 14px)`,
+                top: '50%',
+                transform: 'translateY(-50%)',
+                width: 28,
+                height: 28,
+                zIndex: mode === 'inflow' ? 3 : 2,
+                pointerEvents: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <svg width="28" height="28" viewBox="0 0 24 24">
+                <polygon
+                  points="6,6 22,12 6,18"
+                  fill="#228be6"
+                  stroke="#228be6"
+                  strokeWidth="3"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
 
-{/* Right: static blue arrow */}
-<div
-  style={{
-    position: 'absolute',
-    left: `calc(${rightPct}% - 14px)`,
-    top: '50%',
-    transform: 'translateY(-50%)',
-    width: 28,
-    height: 28,
-    zIndex: mode === 'inflow' ? 3 : 2,
-    pointerEvents: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  }}
->
-  <svg width="28" height="28" viewBox="0 0 24 24">
-    <polygon
-      points="6,6 22,12 6,18"
-      fill="#228be6"
-      stroke="#228be6"
-      strokeWidth="3"
-      strokeLinejoin="round"
-    />
-  </svg>
-</div>
-
-{/* Draggable: white arrow for inflow, white circle for outflow */}
-{mode === 'inflow' ? (
-  // Draggable white arrow (right)
-  <div
-    style={{
-      position: 'absolute',
-      left: `calc(${rightPct}% - 14px)`,
-      top: '50%',
-      transform: 'translateY(-50%)',
-      width: 28,
-      height: 28,
-      zIndex: 4,
-      cursor: !isPlaying ? 'pointer' : 'default',
-      pointerEvents: !isPlaying ? 'auto' : 'none',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-    }}
-    onMouseDown={!isPlaying ? handleThumbDrag : undefined}
-    onTouchStart={!isPlaying ? (e => { e.preventDefault(); handleThumbDrag(e); }) : undefined}
-  >
-    <svg width="28" height="28" viewBox="0 0 24 24">
-      <polygon
-        points="6,6 22,12 6,18"
-        fill="white"
-        stroke="#228be6"
-        strokeWidth="3"
-        strokeLinejoin="round"
-      />
-    </svg>
-  </div>
-) : (
-  // Draggable white circle (left)
-  <div
-    style={{
-      position: 'absolute',
-      left: `calc(${leftPct}% - 14px)`,
-      top: '50%',
-      transform: 'translateY(-50%)',
-      width: 28,
-      height: 28,
-      zIndex: 4,
-      cursor: !isPlaying ? 'pointer' : 'default',
-      pointerEvents: !isPlaying ? 'auto' : 'none',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-    }}
-    onMouseDown={!isPlaying ? handleThumbDrag : undefined}
-    onTouchStart={!isPlaying ? (e => { e.preventDefault(); handleThumbDrag(e); }) : undefined}
-  >
-    <svg width={28} height={28}>
-      <circle cx={14} cy={14} r={10} fill="white" stroke="#228be6" strokeWidth={3} />
-    </svg>
-  </div>
-)}
+            {/* Draggable: white arrow for inflow, white circle for outflow */}
+            {mode === 'inflow' ? (
+              <div
+                style={{
+                  position: 'absolute',
+                  left: `calc(${rightPct}% - 14px)`,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  width: 28,
+                  height: 28,
+                  zIndex: 4,
+                  cursor: !isPlaying ? 'pointer' : 'default',
+                  pointerEvents: !isPlaying ? 'auto' : 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+                onMouseDown={!isPlaying ? handleThumbDrag : undefined}
+                onTouchStart={!isPlaying ? (e => { e.preventDefault(); handleThumbDrag(e); }) : undefined}
+              >
+                <svg width="28" height="28" viewBox="0 0 24 24">
+                  <polygon
+                    points="6,6 22,12 6,18"
+                    fill="white"
+                    stroke="#228be6"
+                    strokeWidth="3"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </div>
+            ) : (
+              <div
+                style={{
+                  position: 'absolute',
+                  left: `calc(${leftPct}% - 14px)`,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  width: 28,
+                  height: 28,
+                  zIndex: 4,
+                  cursor: !isPlaying ? 'pointer' : 'default',
+                  pointerEvents: !isPlaying ? 'auto' : 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+                onMouseDown={!isPlaying ? handleThumbDrag : undefined}
+                onTouchStart={!isPlaying ? (e => { e.preventDefault(); handleThumbDrag(e); }) : undefined}
+              >
+                <svg width={28} height={28}>
+                  <circle cx={14} cy={14} r={10} fill="white" stroke="#228be6" strokeWidth={3} />
+                </svg>
+              </div>
+            )}
           </div>
-        </Grid.Col>
-      </Grid>
+        </div>
+      </div>
     </div>
   );
 }
