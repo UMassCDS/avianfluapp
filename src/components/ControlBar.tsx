@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from "react";
-import { IconStack2 } from "@tabler/icons-react";
+import { IconStack2, IconFeather } from "@tabler/icons-react";
 import taxa from "../assets/taxa.json";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
@@ -7,65 +7,69 @@ import { dataInfo } from "../hooks/dataUrl";
 
 type ControlBarProps = {
   checkInputTypes: (dataTypeIdx: number, speciesIdx: number) => void;
-  speciesCombo: any; // Replace 'any' with the actual type if known
-  checkSpecies: (speciesIdx: string, speciesCombo: any) => void; // Replace 'any' if possible
-  speciesOptions: any; // Replace 'any' with the actual type if known
+  speciesCombo: any;
+  checkSpecies: (speciesIdx: string, speciesCombo: any) => void;
+  speciesOptions: any;
 };
 
-export default function ControlBar({ checkInputTypes, speciesCombo, checkSpecies, speciesOptions }: ControlBarProps) {
-  const [open, setOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+export default function ControlBar({
+  checkInputTypes,
+  speciesCombo,
+  checkSpecies,
+  speciesOptions,
+}: ControlBarProps) {
+  const [openDataType, setOpenDataType] = useState(false);
+  const [openSpecies, setOpenSpecies] = useState(false);
+  const dataTypeRef = useRef<HTMLDivElement>(null);
+  const speciesRef = useRef<HTMLDivElement>(null);
 
-  // Redux state for selected indices
   const selectedDataType = useSelector((state: RootState) => state.species.dataIndex);
   const selectedSpecies = useSelector((state: RootState) => state.species.speciesIndex);
-
-  // Data for dropdowns
   const dataTypes = dataInfo.map((dt, idx) => ({ value: idx, label: dt.label }));
 
-  // Close dropdown on outside click
+  // Close dropdowns on outside click
   useEffect(() => {
     function handleClick(e: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setOpen(false);
+      if (openDataType && dataTypeRef.current && !dataTypeRef.current.contains(e.target as Node)) {
+        setOpenDataType(false);
+      }
+      if (openSpecies && speciesRef.current && !speciesRef.current.contains(e.target as Node)) {
+        setOpenSpecies(false);
       }
     }
-    if (open) document.addEventListener("mousedown", handleClick);
+    document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
-  }, [open]);
+  }, [openDataType, openSpecies]);
 
-  // Handlers
   function handleDataTypeSelect(idx: number) {
     checkInputTypes(idx, selectedSpecies);
-    setOpen(false);
+    setOpenDataType(false);
   }
   function handleSpeciesSelect(idx: number) {
     checkSpecies(String(idx), speciesCombo);
-    setOpen(false);
+    setOpenSpecies(false);
   }
 
   return (
-    <div
-      className="flex flex-col items-end"
-      ref={dropdownRef}
-      style={{ pointerEvents: "auto" }}
-    >
-      <button
-        className="bg-gradient-to-br from-blue-100 to-blue-300 hover:from-blue-200 hover:to-blue-400 shadow-xl rounded-xl border-2 border-blue-400 transition-all duration-200 flex items-center justify-center p-0"
-        style={{ width: 54, height: 54 }}
-        onClick={() => setOpen((v) => !v)}
-        aria-label="Show controls"
-        type="button"
-      >
-        <span className="flex items-center justify-center w-full h-full">
-          <IconStack2 size={32} className="text-blue-700" />
-        </span>
-      </button>
-      {open && (
-        <div className="mt-3 w-64 rounded-2xl bg-white/95 shadow-2xl border-2 border-blue-200 p-5 flex flex-col gap-6 animate-fade-in">
-          {/* Data Type Dropdown */}
-          <div>
-            <div className="mb-2 text-xs text-blue-700 font-bold uppercase tracking-wide">Data Type</div>
+    <div className="flex flex-col items-end gap-2">
+      {/* Data Type Dropdown */}
+      <div ref={dataTypeRef} className="relative">
+        <button
+          className="bg-gradient-to-br from-blue-100 to-blue-300 hover:from-blue-200 hover:to-blue-400 shadow-xl rounded-xl border-2 border-blue-400 transition-all duration-200 flex items-center justify-center p-0"
+          style={{ width: 54, height: 54 }}
+          onClick={() => setOpenDataType((v) => !v)}
+          aria-label="Show data type controls"
+          type="button"
+        >
+          <span className="flex items-center justify-center w-full h-full">
+            <IconStack2 size={32} className="text-blue-700" />
+          </span>
+        </button>
+        {openDataType && (
+          <div className="absolute right-0 mt-3 w-64 rounded-2xl bg-white/95 shadow-2xl border-2 border-blue-200 p-5 flex flex-col gap-2 animate-fade-in z-50">
+            <div className="mb-2 text-xs text-blue-700 font-bold uppercase tracking-wide flex items-center gap-1">
+              Data Type
+            </div>
             <div className="flex flex-col gap-1">
               {dataTypes.map((dt, idx) => (
                 <button
@@ -83,10 +87,46 @@ export default function ControlBar({ checkInputTypes, speciesCombo, checkSpecies
               ))}
             </div>
           </div>
-          {/* Species Dropdown */}
-          <div>
-            <div className="mb-2 text-xs text-blue-700 font-bold uppercase tracking-wide">Species</div>
-            <div className="flex flex-col gap-1 max-h-44 overflow-y-auto">
+        )}
+      </div>
+      {/* Species Dropdown */}
+      <div ref={speciesRef} className="relative">
+        <button
+          className="bg-gradient-to-br from-blue-100 to-blue-300 hover:from-blue-200 hover:to-blue-400 shadow-xl rounded-xl border-2 border-blue-400 transition-all duration-200 flex items-center justify-center p-0"
+          style={{ width: 54, height: 54 }}
+          onClick={() => setOpenSpecies((v) => !v)}
+          aria-label="Show species controls"
+          type="button"
+        >
+         <span className="flex items-center justify-center w-full h-full">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="28"
+              height="28"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="rgb(29 78 216)"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="inline-block"
+            >
+              <path d="M16 7h.01"></path>
+              <path d="M3.4 18H12a8 8 0 0 0 8-8V7a4 4 0 0 0-7.28-2.3L2 20"></path>
+              <path d="m20 7 2 .5-2 .5"></path>
+              <path d="M10 18v3"></path>
+              <path d="M14 17.75V21"></path>
+              <path d="M7 18a6 6 0 0 0 3.84-10.61"></path>
+            </svg>
+          </span>
+        </button>
+        {openSpecies && (
+          <div className="absolute right-0 mt-3 w-64 rounded-2xl bg-white/95 shadow-2xl border-2 border-blue-200 p-5 flex flex-col gap-2 animate-fade-in z-50">
+            <div className="mb-2 text-xs text-blue-700 font-bold uppercase tracking-wide flex items-center gap-1">
+             
+              Species
+            </div>
+            <div className="flex flex-col gap-1 max-h-44 overflow-y-auto scrollbar-thin scrollbar-thumb-blue-200 scrollbar-track-blue-50 pr-1">
               {taxa.map((t, idx) => (
                 <button
                   key={t.label}
@@ -103,8 +143,8 @@ export default function ControlBar({ checkInputTypes, speciesCombo, checkSpecies
               ))}
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
       <style>
         {`
           .animate-fade-in {
