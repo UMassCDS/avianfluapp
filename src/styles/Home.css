@@ -41,22 +41,43 @@
         transform: translate(-50%, -50%);
     }
 
-    .slider-button {
-        margin-bottom: 0;
+    .timeline-marker {
         display: flex;
-        flex-direction: column;
+        justify-content: center;
         align-items: center;
+        width: 80px;
+        height: 28px;
+        border-radius: 9999px; /* pill shape */
+        background-color: white;
+        border: 2px solid #228be6;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        transition: border 0.2s ease, color 0.2s ease;
     }
 
-    .slider-button > div:nth-child(1) {
-        border: 2px solid black;
+    .timeline-marker-label {
+        font-size: 13px;
+        font-weight: 500;
+        color: #228be6;
+        white-space: nowrap;
     }
 
-    .slider-button:hover > div:nth-child(1) {
-        color: blue;
-        font-weight: bold;
-        border: 3px solid black;
+    .timeline-marker:hover {
+        border: 2px solid #1864ab;
     }
+
+    .timeline-label {
+        margin-bottom: 4px;
+        background-color: black;
+        color: white;
+        padding: 2px 8px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 500;
+        white-space: nowrap;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+        opacity: 0.9;
+        }
 
     .calculate-button {
         position: absolute;

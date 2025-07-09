@@ -18,6 +18,14 @@ const monthLabels: Array<string> = [
   'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
 ];
 
+// Month marks for typical 52-week year (adjust values if your months start on different weeks)
+const monthMarks = [
+  { value: 0, label: 'Jan' }, { value: 4, label: 'Feb' }, { value: 8, label: 'Mar' },
+  { value: 13, label: 'Apr' }, { value: 17, label: 'May' }, { value: 21, label: 'Jun' },
+  { value: 26, label: 'Jul' }, { value: 30, label: 'Aug' }, { value: 35, label: 'Sep' },
+  { value: 39, label: 'Oct' }, { value: 43, label: 'Nov' }, { value: 47, label: 'Dec' }
+];
+
 // Keeps track of the props and prop type going into the component (look up interfaces in TypeScript)
 interface TimelineProps {
   onChangeWeek: (week: number) => void;
@@ -291,15 +299,41 @@ function InflowOutflowTimeline(props: TimelineProps) {
               className='slider-button'
               style={{
                 position: 'absolute',
-                left: `calc(${sliderValue * 100}% - ${'8px'})`,
-                top: 0,
+                left: `calc(${sliderValue * 100}% - 24px)`, // adjust for marker width
+                top: -38, // move marker up so the line ends at the timeline
+                width: 48,
+                height: 38,
+                pointerEvents: "none",
+                zIndex: 10,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
               }} >
-                {/* SLIDER BUTTON - NEED TO BE REWORKED */}
-                <div style={{backgroundColor: "white", padding: "3px"}}>
+                {/* Date label */}
+                <div
+                  style={{
+                    background: "white",
+                    padding: "2px 8px",
+                    borderRadius: 6,
+                    fontWeight: 600,
+                    fontSize: 14,
+                    textAlign: "center",
+                    marginBottom: 2,
+                    boxShadow: "0 2px 6px rgba(0,0,0,0.07)",
+                    width: "max-content",
+                    maxWidth: 80,
+                  }}
+                >
                   {dateLabels[dataIndex][week]}
                 </div>
-                {/* <IconCaretDownFilled viewBox='0, 5, 24, 24' /> */}
-                <div style={{backgroundColor: "black", width: "3px", height: "23px"}}></div>
+                {/* Black line pointing to timeline */}
+                <div
+                  style={{
+                    width: 0,
+                    height: 28, // adjust this so the line ends at the timeline
+                    borderLeft: "3px solid black",
+                  }}
+                />
             </div>
           </div>
           <p></p>
@@ -389,11 +423,23 @@ function CustomFixedRangeSlider({ min, max, offset, realValue, setRealValue, sho
   const allMarks = Array.from({ length: range }, (_, i) => min + i);
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: "12px", background: '#dee2e6', border: "1px solid black"}}>
-      {/* Custom filled bar */}
+    // <div style={{ position: 'relative', width: '100%', height: "12px", background: '#dee2e6', border: "1px solid black"}}>
+    <div style={{
+      position: 'relative',
+      maxWidth: '100%',
+      width: '100%',
+      minWidth: 0,
+      height: '10px', // more vertical space for marks/labels
+      background: '#dee2e6',
+      border: "1px solid black",
+      borderRadius: 8,
+      boxSizing: 'border-box',
+      margin: '0 auto'
+    }}>
+    {/* Custom filled bar */}
       <div style={{ ...filledStyle, position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }} />
       
-      {allMarks.map(markValue => {
+      {/* {allMarks.map(markValue => {
         const markPercent = ((markValue - min) / (max - min)) * 100;
         if (markValue === min || markValue === max) return null;
         return (
@@ -410,7 +456,37 @@ function CustomFixedRangeSlider({ min, max, offset, realValue, setRealValue, sho
             }}
           />
         );
-      })}
+      })} */}
+
+      {monthMarks.map(mark => {
+  const markPercent = ((mark.value - min) / (max - min)) * 100;
+  return (
+    <div
+      key={mark.value}
+      style={{
+        position: 'absolute',
+        left: `${markPercent}%`,
+        top: 3,
+        width: 4,
+        height: 4,
+        borderRadius: '50%',
+        backgroundColor: 'white',
+      }}
+    >
+      <span style={{
+        position: 'absolute',
+        top: 18,
+        left: '50%',
+        transform: 'translateX(-50%)',
+        color: 'black',
+        fontWeight: 500,
+        fontSize: 12,
+        whiteSpace: 'nowrap'
+      }}>{mark.label}</span>
+    </div>
+  );
+})}
+
 
       {showInflow && <>
         {/* Real draggable thumb (filled circle) */}
@@ -444,6 +520,7 @@ function CustomFixedRangeSlider({ min, max, offset, realValue, setRealValue, sho
         </div>
       </>
       }
+
 
       {!showInflow && <>
         {/* Real draggable thumb (hollow circle) */}

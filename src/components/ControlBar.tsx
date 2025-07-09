@@ -1,161 +1,160 @@
-import { Combobox, ComboboxStore, Grid, Input, InputBase, Select, Stack, Tooltip } from "@mantine/core";
-import { dataInfo } from "../hooks/dataUrl";
-import { forwardRef } from "react";
+import { useRef, useEffect, useState } from "react";
+import { IconStack2, IconFeather } from "@tabler/icons-react";
+import taxa from "../assets/taxa.json";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
-import taxa from "../assets/taxa.json";
+import { dataInfo } from "../hooks/dataUrl";
 
-/* This is Pam's component. She uses builtin components from Mantine Core to implement the dropdown used for Species dropdown menu */
-function genericCombo(ref_combo: ComboboxStore, onSubmit: Function, label: string, options: JSX.Element[]) {
-  const textSize = useSelector((state: RootState) => state.ui.textSize);
+type ControlBarProps = {
+  checkInputTypes: (dataTypeIdx: number, speciesIdx: number) => void;
+  speciesCombo: any;
+  checkSpecies: (speciesIdx: string, speciesCombo: any) => void;
+  speciesOptions: any;
+};
+
+export default function ControlBar({
+  checkInputTypes,
+  speciesCombo,
+  checkSpecies,
+  speciesOptions,
+}: ControlBarProps) {
+  const [openDataType, setOpenDataType] = useState(false);
+  const [openSpecies, setOpenSpecies] = useState(false);
+  const dataTypeRef = useRef<HTMLDivElement>(null);
+  const speciesRef = useRef<HTMLDivElement>(null);
+
+  const selectedDataType = useSelector((state: RootState) => state.species.dataIndex);
+  const selectedSpecies = useSelector((state: RootState) => state.species.speciesIndex);
+  const dataTypes = dataInfo.map((dt, idx) => ({ value: idx, label: dt.label }));
+
+  // Close dropdowns on outside click
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (openDataType && dataTypeRef.current && !dataTypeRef.current.contains(e.target as Node)) {
+        setOpenDataType(false);
+      }
+      if (openSpecies && speciesRef.current && !speciesRef.current.contains(e.target as Node)) {
+        setOpenSpecies(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [openDataType, openSpecies]);
+
+  function handleDataTypeSelect(idx: number) {
+    checkInputTypes(idx, selectedSpecies);
+    setOpenDataType(false);
+  }
+  function handleSpeciesSelect(idx: number) {
+    checkSpecies(String(idx), speciesCombo);
+    setOpenSpecies(false);
+  }
 
   return (
-    <Combobox
-      store={ref_combo}
-      onOptionSubmit={(val) => {
-        onSubmit(val, ref_combo); 
-      }}
-    >
-      <Combobox.Target>
-        <InputBase
-          component="button"
+    <div className="flex flex-col items-end gap-2">
+      {/* Data Type Dropdown */}
+      <div ref={dataTypeRef} className="relative">
+        <button
+          className="bg-gradient-to-br from-blue-100 to-blue-300 hover:from-blue-200 hover:to-blue-400 shadow-xl rounded-xl border-2 border-blue-400 transition-all duration-200 flex items-center justify-center p-0"
+          style={{ width: 54, height: 54 }}
+          onClick={() => setOpenDataType((v) => !v)}
+          aria-label="Show data type controls"
           type="button"
-          pointer
-          leftSection={<Combobox.Chevron />}
-          onClick={() => ref_combo.toggleDropdown()}
-          leftSectionPointerEvents="none"
-          size="xs"
-          multiline={true}
         >
-          {label || <Input.Placeholder>Pick value</Input.Placeholder>}
-        </InputBase>
-      </Combobox.Target>
-      <Combobox.Dropdown>
-        <Combobox.Options>{options}</Combobox.Options>
-      </Combobox.Dropdown>
-    </Combobox>      
-  );
-}
-
-// creates component surrounding the data type widgets to add tool tip
-interface DataTypeComponentProps {
-  checkInputTypes: (dataIndex: number, speciesIndex: number) => void;
-}
-
-/**
- * `DataTypeComponent` is a React forwardRef component that renders a selectable dropdown
- * for choosing a data type (e.g., "abundance", "movement", "inflow", "outflow").
- * It uses Redux selectors to obtain the current species and data indices from the application state.
- * When a new data type is selected, it invokes the `checkInputTypes` callback with the
- * corresponding data type index and the current species index.
- *
- * @param props - The props for the component.
- * @param props.checkInputTypes - A callback function that is called when the data type changes,
- *   receiving the new data type index and the current species index.
- * @param ref - A React ref forwarded to the root div element.
- *
- * @returns A React element containing a dropdown for selecting the data type.
- */
-
-/* Also Pam's component. I think forwardRef is used to pass control over DataTypeComponent to its child, but I'm not sure how Pam is using it yet. */
-const DataTypeComponent = forwardRef<HTMLDivElement, DataTypeComponentProps>((props, ref) => {
-  const { checkInputTypes } = props;
-  const speciesIndex = useSelector((state: RootState) => state.species.speciesIndex);
-  const dataIndex = useSelector((state: RootState) => state.species.dataIndex);
-  
-  const indexToData = ["abundance", "movement", "inflow", "outflow"];
-  const dataToIndex = {
-    "abundance": 0,
-    "movement": 1,
-    "inflow": 2,
-    "outflow": 3
-  };
-
-  return (
-    <div ref={ref}>
-      <Select
-        data={dataInfo.map((dt) => ({ value: dt.datatype, label: dt.label }))}
-        value={indexToData[dataIndex]}
-        onChange={(dataType) => {
-          if (dataType !== null) {
-            checkInputTypes(dataToIndex[dataType as keyof typeof dataToIndex], speciesIndex);
-          } else {
-            console.log("dataType is null (abundance, movement, inflow, outflow). This shouldn't be happening!");
+          <span className="flex items-center justify-center w-full h-full">
+            <IconStack2 size={32} className="text-blue-700" />
+          </span>
+        </button>
+        {openDataType && (
+          <div className="absolute right-0 mt-3 w-64 rounded-2xl bg-white/95 shadow-2xl border-2 border-blue-200 p-5 flex flex-col gap-2 animate-fade-in z-50">
+            <div className="mb-2 text-xs text-blue-500 font-bold uppercase tracking-wide flex items-center gap-1">
+              Data Type
+            </div>
+            <div className="flex flex-col gap-1">
+              {dataTypes.map((dt, idx) => (
+                <button
+                  key={dt.value}
+                  className={`w-full text-left px-4 py-2 rounded-lg transition font-medium ${
+                    selectedDataType === idx
+                      ? "bg-blue-100 text-blue-500 ring-2 ring-blue-300"
+                      : "hover:bg-blue-50 text-blue-500"
+                  }`}
+                  onClick={() => handleDataTypeSelect(idx)}
+                  type="button"
+                >
+                  {dt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+      {/* Species Dropdown */}
+      <div ref={speciesRef} className="relative">
+        <button
+          className="bg-gradient-to-br from-blue-100 to-blue-300 hover:from-blue-200 hover:to-blue-400 shadow-xl rounded-xl border-2 border-blue-400 transition-all duration-200 flex items-center justify-center p-0"
+          style={{ width: 54, height: 54 }}
+          onClick={() => setOpenSpecies((v) => !v)}
+          aria-label="Show species controls"
+          type="button"
+        >
+         <span className="flex items-center justify-center w-full h-full">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="28"
+              height="28"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="rgb(29 78 216)"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="inline-block"
+            >
+              <path d="M16 7h.01"></path>
+              <path d="M3.4 18H12a8 8 0 0 0 8-8V7a4 4 0 0 0-7.28-2.3L2 20"></path>
+              <path d="m20 7 2 .5-2 .5"></path>
+              <path d="M10 18v3"></path>
+              <path d="M14 17.75V21"></path>
+              <path d="M7 18a6 6 0 0 0 3.84-10.61"></path>
+            </svg>
+          </span>
+        </button>
+        {openSpecies && (
+          <div className="absolute right-0 mt-3 w-64 rounded-2xl bg-white/95 shadow-2xl border-2 border-blue-200 p-5 flex flex-col gap-2 animate-fade-in z-50">
+            <div className="mb-2 text-xs text-blue-500 font-bold uppercase tracking-wide flex items-center gap-1">
+              Species
+            </div>
+            <div className="flex flex-col gap-1 max-h-44 overflow-y-auto scrollbar-thin scrollbar-thumb-blue-200 scrollbar-track-blue-50 pr-1">
+              {taxa.map((t, idx) => (
+                <button
+                  key={t.label}
+                  className={`w-full text-left px-4 py-2 rounded-lg transition font-medium ${
+                    selectedSpecies === idx
+                      ? "bg-blue-100 text-blue-500 ring-2 ring-blue-300"
+                      : "hover:bg-blue-50 text-blue-500"
+                  }`}
+                  onClick={() => handleSpeciesSelect(idx)}
+                  type="button"
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+      <style>
+        {`
+          .animate-fade-in {
+            animation: fadeIn 0.18s cubic-bezier(.4,0,.2,1);
           }
-        }}
-      />
-    </div>
-  );
-});
-
-// Species combo box
-interface SpeciesComponentProps {
-  speciesCombo: ComboboxStore;
-  checkSpecies: (value: string, combo: ComboboxStore) => void;
-  speciesOptions: JSX.Element[];
-}
-
-/**
- * A React forwardRef component that renders a species selection combo box.
- *
- * @param props - The props for the SpeciesComponent.
- * @param props.speciesCombo - The current value or state for the species combo box.
- * @param props.checkSpecies - Callback function to handle species selection changes.
- * @param props.speciesOptions - Array of available species options for selection.
- * @param rest - Additional props passed to the root div element.
- * @param ref - Ref forwarded to the root div element.
- *
- * @returns A div containing the species dropdown menu, utilizing the `genericCombo` component.
- *
- * @remarks
- * Uses Redux's `useSelector` to access the current species index from the store.
- * The combo box is rendered using the `genericCombo` function, with the label determined by the selected species.
- */
-const SpeciesComponent = forwardRef<HTMLDivElement, SpeciesComponentProps>((props, ref) => {
-  const { speciesCombo, checkSpecies, speciesOptions, ...rest } = props;
-
-  const speciesIndex = useSelector((state: RootState) => state.species.speciesIndex);
-
-  return (
-    <div ref={ref} {...rest}>
-      {genericCombo(speciesCombo, checkSpecies, taxa[speciesIndex].label, speciesOptions)}
-    </div>
-  );
-});
-
-interface ControlBarProps {
-  checkInputTypes: (dataIndex: number, speciesIndex: number) => void;
-  speciesCombo: ComboboxStore;
-  checkSpecies: (value: string, combo: ComboboxStore) => void;
-  speciesOptions: JSX.Element[];
-}
-
-export default function ControlBar(props: ControlBarProps) {
-  const {checkInputTypes, speciesCombo, checkSpecies, speciesOptions } = props;
-
-  const titleSize = useSelector((state: RootState) => state.ui.titleSize);
-
-  return (
-    <div>
-      <Grid justify='center' align='stretch'>
-        { /* top row Title */ }
-        <Grid.Col span={12}>
-          <div style={{textAlign:"center", fontSize: titleSize, fontWeight:"bold"}}>Avian Influenza</div>
-        </Grid.Col>
-        { /* Components stacked vertically */ }
-        <Grid.Col span={12}>
-          <Stack>
-            {/* Dropdown for data type */}
-            <Tooltip label='Types of data sets'>
-              <DataTypeComponent checkInputTypes={checkInputTypes} />
-            </Tooltip>
-            {/* The dropdown for the species type */}
-            <Tooltip label='Wild bird species that potentially carry Avian Influenza'>
-              <SpeciesComponent speciesCombo={speciesCombo} checkSpecies={checkSpecies} speciesOptions={speciesOptions} />
-            </Tooltip>
-          </Stack>
-        </Grid.Col>
-      </Grid>
+          @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px);}
+            to { opacity: 1; transform: translateY(0);}
+          }
+        `}
+      </style>
     </div>
   );
 }

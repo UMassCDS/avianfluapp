@@ -1,4 +1,5 @@
 import React from 'react';
+import { IconArrowDownCircle, IconArrowUpCircle } from '@tabler/icons-react';
 import { Button } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import axios from 'axios';
@@ -79,7 +80,19 @@ const InflowOutflowCalculateButton: React.FC<Props> = ({
       color="blue" 
       mt="md"
       disabled={disabled}
+      className={`flex items-center gap-2 p-[6px] rounded-xl border-2 transition 
+        font-semibold shadow-md 
+        ${disabled
+          ? 'bg-gray-200 border-gray-300 text-gray-400 cursor-not-allowed'
+          : 'bg-white border-blue-400 text-blue-500 hover:bg-blue-50 hover:border-blue-500 active:bg-blue-100'}
+      `}
+      type="button"
     >
+      {dataIndex === 2 ? (
+        <IconArrowDownCircle size={22} className="text-blue-500" />
+      ) : (
+        <IconArrowUpCircle size={22} className="text-blue-500" />
+      )}
       Calculate {dataIndex === 2 ? 'Inflow' : 'Outflow'}
     </Button>
   );

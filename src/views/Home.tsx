@@ -12,6 +12,7 @@ import '../styles/Home.css';
 // const express = require('express');
 import 'leaflet-geosearch/dist/geosearch.css';
 import InflowOutflowTimeline from '../components/InflowOutflowTimeline';
+import InflowOutflowTimelineV2 from '../components/InflowOutflowTimelineV2';
 import InflowOutflowCalculateButton from '../components/InflowOutflowCalculateButton';
 import MapView from '../components/MapView';
 import ControlBar from '../components/ControlBar';
@@ -23,6 +24,9 @@ import { setWeek } from '../store/slices/timelineSlice';
 import { setFontHeight, setIconSize, setIsMonitor, setTextSize, setTitleSize } from '../store/slices/uiSlice';
 import { setOverlayUrl, clearFlowResults, updateOverlayByWeek, clearOverlayUrl } from '../store/slices/mapSlice';
 import L from 'leaflet';
+import ab_dates from '../assets/abundance_dates.json';
+import mv_dates from '../assets/movement_dates.json';
+import MapOverlayPanel from '../components/MapOverlayPanel';
 
 // Fix for missing marker icon in production
 // Import marker images
@@ -227,52 +231,74 @@ const HomePage = () => {
 	// - flowResults is a non-empty array (e.g., for inflow or outflow when results exist).
   const shouldShowLegend = dataIndex < 2 || (Array.isArray(flowResults) && flowResults.length > 0);
 
-  // Here is where you list the components and elements that you want rendered. 
+  // Build dateLabels (do this once, e.g. in useMemo or useEffect)
+const datasets = [ab_dates, mv_dates, ab_dates, ab_dates];
+const dateLabels = datasets.map(ds => ds.map(info => info.label));
+
+// Here is where you list the components and elements that you want rendered. 
   return (
     <div className="Home">
-      {/* Creates a map using the leaflet component */}
-      <MapView
-        week={week}
-        dataIndex={dataIndex}
-        onLocationSelect={handleLocationSelect}
-      />
+      {/* Top center overlay panel */}
+      <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[1100] max-w-lg w-[90vw]">
+        <MapOverlayPanel>
+          <div className="flex flex-col items-center gap-4">
+            {/* Heading is always shown by MapOverlayPanel */}
+            {dataIndex >= 2 && (
+              <InflowOutflowCalculateButton
+                dataIndex={dataIndex}
+                week={week}
+                speciesIndex={speciesIndex}
+                location={location}
+                nFlowWeeks={N_FLOW_WEEKS}
+                speciesOptions={taxa}
+                disabled={location.length === 0 || (Array.isArray(flowResults) && flowResults.length > 0)}
+              />
+            )}
+          </div>
+        </MapOverlayPanel>
+      </div>
 
-      <div className="widgets"> 
+      <div className="relative w-full h-[100vh]">
+        <MapView
+          week={week}
+          dataIndex={dataIndex}
+          onLocationSelect={handleLocationSelect}
+        />
+      </div>
+      <div className="widgets">
         <div style={{ display: 'flex', flexDirection: 'row', gap: '1rem' }}>
           <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center' }}>
-            <OutbreakLegend/>
+            <OutbreakLegend />
           </div>
-          <ControlBar 
-            checkInputTypes={checkInputTypes}
-            speciesCombo={speciesCombo}
-            checkSpecies={checkSpecies}
-            speciesOptions={speciesOptions}
-          />
         </div>
-        {/* Show `Calculate` button for inflow and outflow */}
-        {dataIndex >= 2 && (
-          <div className="calculate-button">
-            <InflowOutflowCalculateButton
-              dataIndex={dataIndex}
-              week={week}
-              speciesIndex={speciesIndex}
-              location={location}
-              nFlowWeeks={N_FLOW_WEEKS}
-              speciesOptions={taxa}
-              disabled={location.length === 0 || (Array.isArray(flowResults) && flowResults.length > 0)}
-            />
-          </div>
-)}
       </div>
-      <AboutButtons runTest={runTest} />
-      
+      <div className="fixed top-4 right-4 z-50 flex flex-col gap-3 items-end">
+        <AboutButtons runTest={runTest} />
+        <ControlBar
+          checkInputTypes={checkInputTypes}
+          speciesCombo={speciesCombo}
+          checkSpecies={checkSpecies}
+          speciesOptions={speciesOptions}
+        />
+      </div>
+
       {shouldShowLegend && <Legend />}
 
-      {/* Show this slider for abundance and movement */}
-      {dataIndex < 2 && <Timeline week={week} dataset={dataIndex} isMonitor={isMonitor} onChangeWeek={checkImageAndUpdate} />}
+      {/* Timeline for abundance and movement */}
+      {dataIndex < 2 && (
+        <Timeline week={week} dataset={dataIndex} isMonitor={isMonitor} onChangeWeek={checkImageAndUpdate} />
+      )}
 
-      {/* Show this slider for inflow and outflow */}
-      {dataIndex >= 2 && <InflowOutflowTimeline onChangeWeek={flowUpdate} duration={N_FLOW_WEEKS} />}
+      {/* Timeline for inflow and outflow */}
+      {dataIndex >= 2 && (
+        <InflowOutflowTimelineV2
+          onChangeWeek={flowUpdate}
+          mode={dataIndex === 2 ? "inflow" : "outflow"}
+          dateLabels={dateLabels}
+          dataIndex={dataIndex}
+          nFlowWeeks={N_FLOW_WEEKS}
+        />
+      )}
     </div>
   );
 }

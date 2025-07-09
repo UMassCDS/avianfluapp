@@ -186,23 +186,21 @@ function Timeline(props: TimelineProps) {
         </Grid.Col>
         <Grid.Col span={11}>
           {/* Slider with additional thumb showing current week */}
-          <div
-            ref={ref}
-            style={{ height: 25, position: 'relative', zIndex: 1000 }}>
+          <div ref={ref} style={{ height: 32, position: 'relative', zIndex: 1000 }}>
             <div
-              className='slider-button'
+              className="timeline-marker"
               style={{
                 position: 'absolute',
-                left: `calc(${sliderValue * 100}% - ${'8px'})`,
+                left: `calc(${sliderValue * 100}% - 40px)`,
                 top: 0,
-              }}>
-              <div style={{ backgroundColor: "white", padding: "3px" }}>
+                cursor: 'pointer',
+              }}
+            >
+              <div className="timeline-marker-label">
                 {dateLabels[dataset][week]}
               </div>
-              <div style={{ backgroundColor: "black", width: "3px", height: "23px" }}></div>
             </div>
           </div>
-          <p></p>
           <RangeSlider
             defaultValue={weekRange}
             value={weekRange}
