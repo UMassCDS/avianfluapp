@@ -1,16 +1,12 @@
-import React, { useRef, useEffect, useState,  } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { useDispatch, useSelector } from 'react-redux';
-import { Grid, Tooltip, ActionIcon } from '@mantine/core';
+import { Tooltip, ActionIcon } from '@mantine/core';
 import { useMove } from '@mantine/hooks';
 import { IconPlayerPlayFilled, IconPlayerPauseFilled } from "@tabler/icons-react";
 import { RootState } from '../store/store';
 import { clearOverlayUrl, clearFlowResults } from '../store/slices/mapSlice';
-import ab_dates from '../assets/abundance_dates.json';
-import mv_dates from '../assets/movement_dates.json';
 import {WEEKS_PER_YEAR} from '../utils/utils'
 
-const datasets = [ab_dates, mv_dates, ab_dates, ab_dates];
-const dateLabels = datasets.map(ds => ds.map((info: any) => info.label));
 
 const monthMarks = [
   { week: 0, label: 'Jan' }, { week: 4, label: 'Feb' }, { week: 8, label: 'Mar' },
@@ -19,9 +15,11 @@ const monthMarks = [
   { week: 39, label: 'Oct' }, { week: 43, label: 'Nov' }, { week: 47, label: 'Dec' }
 ];
 
-function clamp(val: number, min: number, max: number) {
-  return Math.max(min, Math.min(max, val));
-}
+const clamp = (val: number, min: number, max: number) => Math.max(min, Math.min(max, val));
+
+const isWithinSpan = (week: number, start: number, end: number, wrapped: boolean) => {
+  return wrapped ? week >= start || week <= end : week >= start && week <= end;
+};
 
 type Mode = "inflow" | "outflow";
 
@@ -46,141 +44,71 @@ export default function InflowOutflowTimelineV2({
   const isMonitor = useSelector((state: RootState) => state.ui.isMonitor);
   const flowResults = useSelector((state: RootState) => state.map.flowResults);
 
-  const playbackRef = useRef<NodeJS.Timeout | null>(null);
-
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [markerWeek, setMarkerWeek] = useState<number>(week);
-  const [sliderMarks, setSliderMarks] = useState(monthMarks);
-  const [spanStart, setSpanStart] = useState<number>(week);
-  const [isWrapped, setIsWrapped] = useState<boolean>(false);
-  const [leftPct, setLeftPct] = useState<number>(0);
-  const [rightPct, setRightPct] = useState<number>(0);
-  const [markerPct, setMarkerPct] = useState<number>(0);
-
-  // needs to be decreased by 1 so that the data received from the backend is displayed correctly 
-  // (exactly nFlowWeeks records come from the backend, but nFlowWeeks + 1 are displayed here)
   const localNFlowWeeks = nFlowWeeks - 1;
+  const playbackRef = useRef<NodeJS.Timeout | null>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
 
-  // marker ref
-  const { ref } = useMove(({ x }) => {
-    const curWeek = Math.floor(x * (WEEKS_PER_YEAR - 1));
-    setMarkerWeek(curWeek)
-    if (flowResults.length > 0) {
-      onChangeWeek(curWeek);
-    };
-  });
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [markerWeek, setMarkerWeek] = useState(week);
+  const [spanStart, setSpanStart] = useState(week);
+  const [spanEnd, setSpanEnd] = useState((week + localNFlowWeeks) % WEEKS_PER_YEAR);
+  const [isWrapped, setIsWrapped] = useState(false);
+  const [leftPct, setLeftPct] = useState(0);
+  const [rightPct, setRightPct] = useState(0);
+  const [markerPct, setMarkerPct] = useState(0);
+  const [sliderMarks, setSliderMarks] = useState(monthMarks);
 
-  useEffect(() => {
+  const updateMarkerAndSpan = () => {
     const spanEnd = (spanStart + localNFlowWeeks) % WEEKS_PER_YEAR;
-    const isWrapped = spanEnd < spanStart;
-    const curWeek = mode === 'inflow' ? spanEnd : spanStart;
-  
-    onChangeWeek(curWeek);
-    setIsWrapped(isWrapped);
+    const wrapped = spanEnd < spanStart;
+    const current = mode === 'inflow' ? spanEnd : spanStart;
+
+    setSpanEnd(spanEnd);
+    setIsWrapped(wrapped);
     setLeftPct((spanStart / (WEEKS_PER_YEAR - 1)) * 100);
     setRightPct((spanEnd / (WEEKS_PER_YEAR - 1)) * 100);
-  }, [spanStart]);
+    onChangeWeek(current);
+  };
 
-  useEffect(() => {
-    setMarkerPct((markerWeek / (WEEKS_PER_YEAR - 1)) * 100);
-  }, [markerWeek]);
+  const startPlayback = () => {
+    let current = markerWeek;
 
-  useEffect(() => {
-    setSliderMarks(isMonitor ? monthMarks : [])
-  }, [monthMarks, isMonitor]);
+    playbackRef.current = setInterval(() => {
+      current = (current + 1) % WEEKS_PER_YEAR;
+      if (!isWithinSpan(current, spanStart, spanEnd, isWrapped)) current = spanStart;
+      setMarkerWeek(current);
+      onChangeWeek(current);
+    }, 400);
+  };
 
-  useEffect(() => {
-      const spanEnd = (spanStart + localNFlowWeeks) % WEEKS_PER_YEAR;
-      const curWeek = mode === 'inflow' ? spanEnd : spanStart;
-    if (flowResults.length === 0) {
-      onChangeWeek(curWeek)
-    } else {
-      setMarkerWeek(curWeek)
-    }
-  }, [flowResults, spanStart]);
+  const stopPlayback = () => {
+    if (playbackRef.current) clearInterval(playbackRef.current);
+  };
 
+  const handleThumbDrag = (clientX: number) => {
+    if (!trackRef.current) return;
+    const rect = trackRef.current.getBoundingClientRect();
+    const x = clamp(clientX - rect.left, 0, rect.width);
+    const weekNum = Math.round((x / rect.width) * (WEEKS_PER_YEAR - 1));
 
-  useEffect(() => {
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "ArrowRight") {
-        const nextWeek = (week + 1) % WEEKS_PER_YEAR;
-        onChangeWeek(nextWeek);
-        setMarkerWeek(nextWeek);
-      };
-      if (e.key === "ArrowLeft") {
-        const prewWeek = (week - 1) % WEEKS_PER_YEAR;
-        onChangeWeek(prewWeek);
-        setMarkerWeek(prewWeek);
-      };
-    };
-    window.addEventListener("keydown", handleKey);
-    return () => window.removeEventListener("keydown", handleKey);
-  }, [week, onChangeWeek]);
+    const start = mode === "inflow"
+      ? (weekNum - localNFlowWeeks + WEEKS_PER_YEAR) % WEEKS_PER_YEAR
+      : weekNum;
 
-  useEffect(() => {
-    const spanEnd = (spanStart + localNFlowWeeks) % WEEKS_PER_YEAR;
+    const current = mode === "inflow" ? weekNum : start;
 
-    const isWithinSpan = (week: number) => {
-      if (!isWrapped) return week >= spanStart && week <= spanEnd;
-      return week >= spanStart || week <= spanEnd;
-    };
+    setSpanStart(start);
+    setMarkerWeek(current);
+    onChangeWeek(current);
 
-    if (isPlaying) {
-      let current = markerWeek; // Resume from current marker position
-      playbackRef.current = setInterval(() => {
-        current = (current + 1) % WEEKS_PER_YEAR;
+    dispatch(clearFlowResults());
+    dispatch(clearOverlayUrl());
+  };
 
-        // Wrap to spanStart if passed spanEnd
-        if (!isWithinSpan(current)) {
-          current = spanStart;
-        }
-
-        setMarkerWeek(current);
-        onChangeWeek(current);
-      }, 400);
-    } else {
-      if (playbackRef.current) clearInterval(playbackRef.current);
-    }
-
-    return () => {
-      if (playbackRef.current) clearInterval(playbackRef.current);
-    };
-  }, [isPlaying, markerWeek, spanStart, isWrapped]);
-
-
-
-  const handleDoubleClick = () => onChangeWeek(0);
-
-  const trackRef = useRef<HTMLDivElement>(null);
-  const handleThumbDrag = (e: React.MouseEvent | React.TouchEvent) => {
-    const move = (clientX: number) => {
-      if (!trackRef.current) return;
-      const rect = trackRef.current.getBoundingClientRect();
-      let x = clamp(clientX - rect.left, 0, rect.width);
-      let w = Math.round((x / rect.width) * (WEEKS_PER_YEAR - 1));
-      let start;
-      let curWeek;
-  
-      if (mode === "inflow") {
-        // Dragging the arrow (right): end is w, start wraps around
-        let end = w;
-        start = (end - localNFlowWeeks + WEEKS_PER_YEAR) % WEEKS_PER_YEAR;
-        curWeek = end;
-      } else {
-        // Dragging the circle (left): start is w, end wraps around
-        start = w;
-        curWeek = start;
-      }
-      setSpanStart(start);
-      setMarkerWeek(curWeek);
-      onChangeWeek(curWeek);
-
-      dispatch(clearFlowResults());
-      dispatch(clearOverlayUrl());
-    };
+  const setupDragHandlers = (e: React.MouseEvent | React.TouchEvent) => {
     const moveHandler = (ev: MouseEvent | TouchEvent) => {
-      if ("touches" in ev) move(ev.touches[0].clientX);
-      else move(ev.clientX);
+      const clientX = 'touches' in ev ? ev.touches[0].clientX : ev.clientX;
+      handleThumbDrag(clientX);
     };
     const release = () => {
       window.removeEventListener("mousemove", moveHandler);
@@ -193,6 +121,53 @@ export default function InflowOutflowTimelineV2({
     window.addEventListener("mouseup", release);
     window.addEventListener("touchend", release);
   };
+
+  const { ref } = useMove(({ x }) => {
+    const curWeek = Math.floor(x * (WEEKS_PER_YEAR - 1));
+    setMarkerWeek(curWeek);
+    if (flowResults.length > 0) onChangeWeek(curWeek);
+  });
+
+  useEffect(updateMarkerAndSpan, [spanStart]);
+
+  useEffect(() => {
+    setMarkerPct((markerWeek / (WEEKS_PER_YEAR - 1)) * 100);
+  }, [markerWeek]);
+
+  useEffect(() => {
+    setSliderMarks(isMonitor ? monthMarks : []);
+  }, [isMonitor]);
+
+  useEffect(() => {
+    const spanEnd = (spanStart + localNFlowWeeks) % WEEKS_PER_YEAR;
+    const current = mode === 'inflow' ? spanEnd : spanStart;
+    if (flowResults.length === 0) onChangeWeek(current);
+    else setMarkerWeek(current);
+  }, [flowResults, spanStart]);
+
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "ArrowRight") {
+        const next = (week + 1) % WEEKS_PER_YEAR;
+        onChangeWeek(next);
+        setMarkerWeek(next);
+      }
+      if (e.key === "ArrowLeft") {
+        const prev = (week - 1 + WEEKS_PER_YEAR) % WEEKS_PER_YEAR;
+        onChangeWeek(prev);
+        setMarkerWeek(prev);
+      }
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [week]);
+
+  useEffect(() => {
+    if (isPlaying) startPlayback();
+    else stopPlayback();
+    return stopPlayback;
+  }, [isPlaying, markerWeek, spanStart, isWrapped]);
+
 
   return (
     <div className="Timeline">
@@ -234,7 +209,6 @@ export default function InflowOutflowTimelineV2({
           {/* Custom Slider */}
           <div
             ref={trackRef}
-            onDoubleClick={handleDoubleClick}
             style={{
               position: 'relative',
               height: 10,
@@ -397,8 +371,8 @@ export default function InflowOutflowTimelineV2({
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}
-                onMouseDown={!isPlaying ? handleThumbDrag : undefined}
-                onTouchStart={!isPlaying ? (e => { e.preventDefault(); handleThumbDrag(e); }) : undefined}
+                onMouseDown={!isPlaying ? setupDragHandlers : undefined}
+                onTouchStart={!isPlaying ? (e => { e.preventDefault(); setupDragHandlers(e); }) : undefined}
               >
                 <svg width="28" height="28" viewBox="0 0 24 24">
                   <polygon
@@ -426,8 +400,8 @@ export default function InflowOutflowTimelineV2({
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}
-                onMouseDown={!isPlaying ? handleThumbDrag : undefined}
-                onTouchStart={!isPlaying ? (e => { e.preventDefault(); handleThumbDrag(e); }) : undefined}
+                onMouseDown={!isPlaying ? setupDragHandlers : undefined}
+                onTouchStart={!isPlaying ? (e => { e.preventDefault(); setupDragHandlers(e); }) : undefined}
               >
                 <svg width={28} height={28}>
                   <circle cx={14} cy={14} r={10} fill="white" stroke="#228be6" strokeWidth={3} />
