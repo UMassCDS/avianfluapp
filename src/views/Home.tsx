@@ -292,12 +292,11 @@ const dateLabels = datasets.map(ds => ds.map(info => info.label));
       {/* Timeline for inflow and outflow */}
       {dataIndex >= 2 && (
         <InflowOutflowTimelineV2
-          value={week}
-          onChange={flowUpdate}
+          onChangeWeek={flowUpdate}
           mode={dataIndex === 2 ? "inflow" : "outflow"}
           dateLabels={dateLabels}
           dataIndex={dataIndex}
-          style={{ marginTop: 32 }}
+          nFlowWeeks={N_FLOW_WEEKS}
         />
       )}
     </div>

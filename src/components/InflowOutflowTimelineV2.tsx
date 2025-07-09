@@ -1,14 +1,16 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState,  } from "react";
+import { useDispatch, useSelector } from 'react-redux';
 import { Grid, Tooltip, ActionIcon } from '@mantine/core';
+import { useMove } from '@mantine/hooks';
 import { IconPlayerPlayFilled, IconPlayerPauseFilled } from "@tabler/icons-react";
+import { RootState } from '../store/store';
+import { clearOverlayUrl, clearFlowResults } from '../store/slices/mapSlice';
 import ab_dates from '../assets/abundance_dates.json';
 import mv_dates from '../assets/movement_dates.json';
+import {WEEKS_PER_YEAR} from '../utils/utils'
 
 const datasets = [ab_dates, mv_dates, ab_dates, ab_dates];
 const dateLabels = datasets.map(ds => ds.map((info: any) => info.label));
-
-const WEEKS = 52;
-const SPAN = 20;
 
 const monthMarks = [
   { week: 0, label: 'Jan' }, { week: 4, label: 'Feb' }, { week: 8, label: 'Mar' },
@@ -24,63 +26,130 @@ function clamp(val: number, min: number, max: number) {
 type Mode = "inflow" | "outflow";
 
 interface Props {
-  value?: number;
-  onChange?: (week: number) => void;
+  onChangeWeek: (week: number) => void;
   mode: Mode;
   dateLabels: string[][];
   dataIndex: number;
-  className?: string;
-  style?: React.CSSProperties;
+  nFlowWeeks: number;
 }
 
 export default function InflowOutflowTimelineV2({
-  value,
-  onChange,
+  onChangeWeek,
   mode,
   dateLabels,
   dataIndex,
-  className,
-  style
+  nFlowWeeks,
 }: Props) {
-  const [internalWeek, setInternalWeek] = useState(0);
-  const week = value !== undefined ? value : internalWeek;
-  const setWeek = onChange ? onChange : setInternalWeek;
+  const dispatch = useDispatch();
 
-  const [isPlaying, setIsPlaying] = useState(false);
+  const week = useSelector((state: RootState) => state.timeline.week);
+  const isMonitor = useSelector((state: RootState) => state.ui.isMonitor);
+  const flowResults = useSelector((state: RootState) => state.map.flowResults);
+
   const playbackRef = useRef<NodeJS.Timeout | null>(null);
-  const [markerWeek, setMarkerWeek] = useState(week);
+
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [markerWeek, setMarkerWeek] = useState<number>(week);
+  const [sliderMarks, setSliderMarks] = useState(monthMarks);
+  const [spanStart, setSpanStart] = useState<number>(week);
+  const [isWrapped, setIsWrapped] = useState<boolean>(false);
+  const [leftPct, setLeftPct] = useState<number>(0);
+  const [rightPct, setRightPct] = useState<number>(0);
+  const [markerPct, setMarkerPct] = useState<number>(0);
+
+  // needs to be decreased by 1 so that the data received from the backend is displayed correctly 
+  // (exactly nFlowWeeks records come from the backend, but nFlowWeeks + 1 are displayed here)
+  const localNFlowWeeks = nFlowWeeks - 1;
+
+  // marker ref
+  const { ref } = useMove(({ x }) => {
+    const curWeek = Math.floor(x * (WEEKS_PER_YEAR - 1));
+    setMarkerWeek(curWeek)
+    if (flowResults.length > 0) {
+      onChangeWeek(curWeek);
+    };
+  });
+
+  useEffect(() => {
+    const spanEnd = (spanStart + localNFlowWeeks) % WEEKS_PER_YEAR;
+    const isWrapped = spanEnd < spanStart;
+    const curWeek = mode === 'inflow' ? spanEnd : spanStart;
+  
+    onChangeWeek(curWeek);
+    setIsWrapped(isWrapped);
+    setLeftPct((spanStart / (WEEKS_PER_YEAR - 1)) * 100);
+    setRightPct((spanEnd / (WEEKS_PER_YEAR - 1)) * 100);
+  }, [spanStart]);
+
+  useEffect(() => {
+    setMarkerPct((markerWeek / (WEEKS_PER_YEAR - 1)) * 100);
+  }, [markerWeek]);
+
+  useEffect(() => {
+    setSliderMarks(isMonitor ? monthMarks : [])
+  }, [monthMarks, isMonitor]);
+
+  useEffect(() => {
+      const spanEnd = (spanStart + localNFlowWeeks) % WEEKS_PER_YEAR;
+      const curWeek = mode === 'inflow' ? spanEnd : spanStart;
+    if (flowResults.length === 0) {
+      onChangeWeek(curWeek)
+    } else {
+      setMarkerWeek(curWeek)
+    }
+  }, [flowResults, spanStart]);
+
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "ArrowRight") setWeek((week + 1) % WEEKS);
-      if (e.key === "ArrowLeft") setWeek((week - 1 + WEEKS) % WEEKS);
+      if (e.key === "ArrowRight") {
+        const nextWeek = (week + 1) % WEEKS_PER_YEAR;
+        onChangeWeek(nextWeek);
+        setMarkerWeek(nextWeek);
+      };
+      if (e.key === "ArrowLeft") {
+        const prewWeek = (week - 1) % WEEKS_PER_YEAR;
+        onChangeWeek(prewWeek);
+        setMarkerWeek(prewWeek);
+      };
     };
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
-  }, [week, setWeek]);
+  }, [week, onChangeWeek]);
 
   useEffect(() => {
+    const spanEnd = (spanStart + localNFlowWeeks) % WEEKS_PER_YEAR;
+
+    const isWithinSpan = (week: number) => {
+      if (!isWrapped) return week >= spanStart && week <= spanEnd;
+      return week >= spanStart || week <= spanEnd;
+    };
+
     if (isPlaying) {
-      setMarkerWeek(week);
-      let current = week;
+      let current = markerWeek; // Resume from current marker position
       playbackRef.current = setInterval(() => {
-        current = (current + 1) % WEEKS;
-        setMarkerWeek(current);
-        if (current === (week + SPAN) % WEEKS) {
-          clearInterval(playbackRef.current!);
-          setIsPlaying(false);
+        current = (current + 1) % WEEKS_PER_YEAR;
+
+        // Wrap to spanStart if passed spanEnd
+        if (!isWithinSpan(current)) {
+          current = spanStart;
         }
+
+        setMarkerWeek(current);
+        onChangeWeek(current);
       }, 400);
     } else {
-      setMarkerWeek(week);
       if (playbackRef.current) clearInterval(playbackRef.current);
     }
+
     return () => {
       if (playbackRef.current) clearInterval(playbackRef.current);
     };
-  }, [isPlaying, week]);
+  }, [isPlaying, markerWeek, spanStart, isWrapped]);
 
-  const handleDoubleClick = () => setWeek(0);
+
+
+  const handleDoubleClick = () => onChangeWeek(0);
 
   const trackRef = useRef<HTMLDivElement>(null);
   const handleThumbDrag = (e: React.MouseEvent | React.TouchEvent) => {
@@ -88,18 +157,26 @@ export default function InflowOutflowTimelineV2({
       if (!trackRef.current) return;
       const rect = trackRef.current.getBoundingClientRect();
       let x = clamp(clientX - rect.left, 0, rect.width);
-      let w = Math.round((x / rect.width) * (WEEKS - 1));
-
+      let w = Math.round((x / rect.width) * (WEEKS_PER_YEAR - 1));
+      let start;
+      let curWeek;
+  
       if (mode === "inflow") {
         // Dragging the arrow (right): end is w, start wraps around
         let end = w;
-        let start = (end - SPAN + WEEKS) % WEEKS;
-        setWeek(start);
+        start = (end - localNFlowWeeks + WEEKS_PER_YEAR) % WEEKS_PER_YEAR;
+        curWeek = end;
       } else {
         // Dragging the circle (left): start is w, end wraps around
-        let start = w;
-        setWeek(start);
+        start = w;
+        curWeek = start;
       }
+      setSpanStart(start);
+      setMarkerWeek(curWeek);
+      onChangeWeek(curWeek);
+
+      dispatch(clearFlowResults());
+      dispatch(clearOverlayUrl());
     };
     const moveHandler = (ev: MouseEvent | TouchEvent) => {
       if ("touches" in ev) move(ev.touches[0].clientX);
@@ -117,48 +194,41 @@ export default function InflowOutflowTimelineV2({
     window.addEventListener("touchend", release);
   };
 
-  // --- Calculate positions ---
-  const percent = (week / (WEEKS - 1)) * 100;
-  const spanStart = week;
-  const spanEnd = (week + SPAN) % WEEKS;
-  const isWrapped = spanEnd < spanStart;
-  const leftPct = (spanStart / (WEEKS - 1)) * 100;
-  const rightPct = (spanEnd / (WEEKS - 1)) * 100;
-  const markerPct = (markerWeek / (WEEKS - 1)) * 100;
-
   return (
-    <div className={`Timeline ${className || ''}`} style={{ ...style, marginTop: -18 }}>
+    <div className="Timeline">
       <div className="flex items-center w-full">
         {/* Play/Pause Button */}
         <div className="flex-shrink-0 mr-2" style={{ width: 48 }}>
-          <Tooltip label={isPlaying ? "Pause" : "Play"}>
+        <Tooltip label="No flow results to play" disabled={flowResults.length > 0}>
+          <Tooltip label={isPlaying ? "Pause" : "Play"} disabled={flowResults.length === 0}>
             <ActionIcon
               size="xl"
               onClick={() => setIsPlaying(p => !p)}
-              variant={isPlaying ? 'filled' : 'default'}
+              variant={flowResults.length === 0 ? 'default' : 'filled'}
+              disabled={flowResults.length === 0}
               style={{ width: 48, height: 48 }}
             >
               {isPlaying ? <IconPlayerPauseFilled /> : <IconPlayerPlayFilled />}
             </ActionIcon>
           </Tooltip>
+        </Tooltip>
         </div>
         {/* Timeline Slider Area */}
         <div className="flex-1" style={{marginLeft: "5%"}}>
           {/* Thumb label and marker */}
-          <div style={{ height: 25, position: 'relative', zIndex: 1000 }}>
+          <div
+            ref={ref}
+            style={{ height: 25, position: 'relative', zIndex: 1000 }}>
             <div
-              className="slider-button"
+              className='slider-button'
               style={{
                 position: 'absolute',
                 left: `calc(${markerPct}% - 8px)`,
                 top: 0,
-                pointerEvents: 'none',
-              }}
-            >
-              <div style={{ backgroundColor: 'white', padding: '3px', borderRadius: 4, fontWeight: 500 }}>
+              }}>
+              <div style={{ backgroundColor: "white", padding: "3px" }}>
                 {dateLabels[dataIndex]?.[markerWeek]}
               </div>
-              <div style={{ backgroundColor: 'black', width: 3, height: 23, margin: '0 auto' }} />
             </div>
           </div>
           {/* Custom Slider */}
@@ -222,15 +292,15 @@ export default function InflowOutflowTimelineV2({
             )}
 
             {/* Month marks and labels */}
-            {monthMarks.map((mark, idx) => {
-              const markPct = (mark.week / (WEEKS - 1)) * 100;
+            {sliderMarks.map((mark, idx) => {
+              const markPct = (mark.week / (WEEKS_PER_YEAR - 1)) * 100;
               let labelStyle: React.CSSProperties = {
                 position: 'absolute',
                 top: 20,
                 left: '50%',
                 transform: 'translateX(-50%)',
                 fontSize: 12,
-                color: 'black',
+                color: 'gray',
                 fontWeight: 500,
                 whiteSpace: 'nowrap',
               };
@@ -238,7 +308,7 @@ export default function InflowOutflowTimelineV2({
                 labelStyle.left = 0;
                 labelStyle.transform = 'none';
                 labelStyle.textAlign = 'left';
-              } else if (idx === monthMarks.length - 1) {
+              } else if (idx === sliderMarks.length - 1) {
                 labelStyle.left = '100%';
                 labelStyle.transform = 'translateX(-100%)';
                 labelStyle.textAlign = 'right';
