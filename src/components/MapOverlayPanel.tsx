@@ -15,7 +15,7 @@ export default function MapOverlayPanel({ children }: MapOverlayPanelProps) {
   return (
     <div className="bg-white/30 rounded-xl shadow-lg p-4 w-full">
       <AppHeader />
-      <div className="text-sm text-blue-800 mb-2 text-center">
+      <div className="text-sm text-blue-500 mb-2 text-center">
         <strong>Data type:</strong> {dataInfo[dataIndex]?.label}
         <br/>
         <strong>Species:</strong> {taxa[speciesIndex].label}

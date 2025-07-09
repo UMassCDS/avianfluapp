@@ -59,7 +59,7 @@ function FeedbackForm() {
 
   const Plans = (
     <div className="mb-8">
-      <h2 className="text-lg font-semibold text-blue-700 mb-2">Future Plans</h2>
+      <h2 className="text-lg font-semibold text-blue-500 mb-2">Future Plans</h2>
       <ul className="list-disc ml-6 text-gray-700 text-base space-y-1">
         <li>Automate daily outbreak updates.</li>
         <li>Option to show historic outbreak data (beyond one year ago).</li>
@@ -77,13 +77,13 @@ function FeedbackForm() {
         {/* Back arrow in top left */}
         <Link
           to="/"
-          className="absolute top-4 left-4 text-blue-600 hover:text-blue-800 text-2xl"
+          className="absolute top-4 left-4 text-blue-600 hover:text-blue-500 text-2xl"
           aria-label="Return to App"
         >
           ←
         </Link>
         <div className="flex flex-col items-center mb-6">
-          <h1 className="text-3xl font-bold text-blue-700 font-serif mb-1">Feedback</h1>
+          <h1 className="text-3xl font-bold text-blue-500 font-serif mb-1">Feedback</h1>
         </div>
         <hr className="mb-6 border-blue-100" />
         {Plans}

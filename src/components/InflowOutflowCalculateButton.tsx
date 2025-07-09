@@ -84,7 +84,7 @@ const InflowOutflowCalculateButton: React.FC<Props> = ({
         font-semibold shadow-md 
         ${disabled
           ? 'bg-gray-200 border-gray-300 text-gray-400 cursor-not-allowed'
-          : 'bg-white border-blue-400 text-blue-700 hover:bg-blue-50 hover:border-blue-500 active:bg-blue-100'}
+          : 'bg-white border-blue-400 text-blue-500 hover:bg-blue-50 hover:border-blue-500 active:bg-blue-100'}
       `}
       type="button"
     >

@@ -67,7 +67,7 @@ export default function ControlBar({
         </button>
         {openDataType && (
           <div className="absolute right-0 mt-3 w-64 rounded-2xl bg-white/95 shadow-2xl border-2 border-blue-200 p-5 flex flex-col gap-2 animate-fade-in z-50">
-            <div className="mb-2 text-xs text-blue-700 font-bold uppercase tracking-wide flex items-center gap-1">
+            <div className="mb-2 text-xs text-blue-500 font-bold uppercase tracking-wide flex items-center gap-1">
               Data Type
             </div>
             <div className="flex flex-col gap-1">
@@ -76,8 +76,8 @@ export default function ControlBar({
                   key={dt.value}
                   className={`w-full text-left px-4 py-2 rounded-lg transition font-medium ${
                     selectedDataType === idx
-                      ? "bg-blue-100 text-blue-800 ring-2 ring-blue-300"
-                      : "hover:bg-blue-50 text-blue-700"
+                      ? "bg-blue-100 text-blue-500 ring-2 ring-blue-300"
+                      : "hover:bg-blue-50 text-blue-500"
                   }`}
                   onClick={() => handleDataTypeSelect(idx)}
                   type="button"
@@ -122,8 +122,7 @@ export default function ControlBar({
         </button>
         {openSpecies && (
           <div className="absolute right-0 mt-3 w-64 rounded-2xl bg-white/95 shadow-2xl border-2 border-blue-200 p-5 flex flex-col gap-2 animate-fade-in z-50">
-            <div className="mb-2 text-xs text-blue-700 font-bold uppercase tracking-wide flex items-center gap-1">
-             
+            <div className="mb-2 text-xs text-blue-500 font-bold uppercase tracking-wide flex items-center gap-1">
               Species
             </div>
             <div className="flex flex-col gap-1 max-h-44 overflow-y-auto scrollbar-thin scrollbar-thumb-blue-200 scrollbar-track-blue-50 pr-1">
@@ -132,8 +131,8 @@ export default function ControlBar({
                   key={t.label}
                   className={`w-full text-left px-4 py-2 rounded-lg transition font-medium ${
                     selectedSpecies === idx
-                      ? "bg-blue-100 text-blue-800 ring-2 ring-blue-300"
-                      : "hover:bg-blue-50 text-blue-700"
+                      ? "bg-blue-100 text-blue-500 ring-2 ring-blue-300"
+                      : "hover:bg-blue-50 text-blue-500"
                   }`}
                   onClick={() => handleSpeciesSelect(idx)}
                   type="button"

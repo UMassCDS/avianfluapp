@@ -166,7 +166,7 @@ export default function MapView({ week, dataIndex, onLocationSelect }: MapViewPr
         <button
           className="absolute top-4 left-12 z-[1200] flex items-center gap-2
             px-2 py-2 sm:px-4 sm:py-2
-            rounded-xl border-2 border-blue-400 bg-white/90 text-blue-700 font-semibold shadow-md
+            rounded-xl border-2 border-blue-400 bg-white/90 text-blue-500 font-semibold shadow-md
             hover:bg-blue-50 hover:border-blue-500 transition
             text-base sm:text-base"
           onClick={toggleMode}

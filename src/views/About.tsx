@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 function About() {
   const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
     <section className="mb-8">
-      <h2 className="text-xl font-semibold text-blue-800 mb-3">{title}</h2>
+      <h2 className="text-xl font-semibold text-blue-500 mb-3">{title}</h2>
       <div className="space-y-3 pl-4">{children}</div>
     </section>
   );
@@ -28,13 +28,13 @@ function About() {
   const Data = (
     <Section title="Data">
       <div>
-        <h3 className="text-lg font-semibold text-blue-700 mb-1">Abundance</h3>
+        <h3 className="text-lg font-semibold text-blue-500 mb-1">Abundance</h3>
         <p>
           Abundance is derived from eBird weekly relative abundance (Fink et al. 2022) combined with population estimates from Partners in Flight (2020). The units are in birds per km<sup>2</sup>. The resolution of the data is 100 km - each cell is 100 km on a side - and thus does show fine scale variation in habitat that might make areas within each cell higher or lower than the cell value. The abundance data for each species is derived from 10 years of observations and thus represents how many birds of the selected species tend to be in the area at the given week of year but does not incorporate any real-time information on where birds are this particular year.
         </p>
       </div>
       <div>
-        <h3 className="text-lg font-semibold text-blue-700 mb-1">Movement</h3>
+        <h3 className="text-lg font-semibold text-blue-500 mb-1">Movement</h3>
         <p>
           Movement is estimated using BirdFlow models fit to the abundance data and represents migratory movement (not local flights) through an area in birds per km of transect per week. As in the abundance data movement represents generalized patterns from ten years of data.
         </p>
@@ -58,7 +58,7 @@ function About() {
           href="https://www.aphis.usda.gov/livestock-poultry-disease/avian/avian-influenza/hpai-detections/commercial-backyard-flocks"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-blue-600 underline hover:text-blue-800"
+          className="text-blue-600 underline hover:text-blue-500"
         >
           Confirmations of HPAI in Commercial and Backyard Flocks
         </a>. This app is updated periodically, link has the most up to date outbreak information.
@@ -69,33 +69,33 @@ function About() {
   const MoreInformation = (
     <Section title="More Information">
       <p>
-        <a href="https://birdflow-science.github.io/" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-800">
+        <a href="https://birdflow-science.github.io/" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-500">
           BirdFlow
         </a>
         &nbsp;is a joint project between the&nbsp;
-        <a href="https://www.cics.umass.edu/" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-800">
+        <a href="https://www.cics.umass.edu/" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-500">
           University of Massachusetts Amherst
         </a>
         &nbsp;and the&nbsp;
-        <a href="https://www.birds.cornell.edu/home" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-800">
+        <a href="https://www.birds.cornell.edu/home" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-500">
           Cornell Lab of Ornithology
         </a>
         &nbsp;funded by the&nbsp;
-        <a href="https://www.nsf.gov" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-800">
+        <a href="https://www.nsf.gov" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-500">
           US National Science Foundation
         </a>.
       </p>
       <p>
-        <a href="https://birdflow-science.github.io/BirdFlowR/" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-800">
+        <a href="https://birdflow-science.github.io/BirdFlowR/" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-500">
           BirdFlowR
         </a>
         &nbsp;package was used to develop movement data and can be used to make predictions programmatically from BirdFlow models. Its documentation includes a page giving an&nbsp;
-        <a href="https://birdflow-science.github.io/BirdFlowR/articles/BirdFlowOverview.html" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-800">
+        <a href="https://birdflow-science.github.io/BirdFlowR/articles/BirdFlowOverview.html" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-500">
           Overview of the Uses and Limititations of BirdFlow models
         </a>.
       </p>
       <p>
-        <a href="https://birdflow-science.s3.amazonaws.com/avian_flu/index.html" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-800">
+        <a href="https://birdflow-science.s3.amazonaws.com/avian_flu/index.html" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-500">
           The Avian Influenza BirdFlow Model Collection
         </a>
         &nbsp;distributes the models used by this application.
@@ -107,7 +107,7 @@ function About() {
     <Section title="Disclaimer">
       <p>
         This material uses data from the eBird Status and Trends Project at the Cornell Lab of Ornithology,&nbsp;
-        <a href="https://ebird.org" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-800">
+        <a href="https://ebird.org" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-500">
           eBird.org
         </a>. Any opinions, findings, and conclusions or recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the Cornell Lab of Ornithology.
       </p>
@@ -120,21 +120,21 @@ function About() {
         <li>
           Fink, D., T. Auer, A. Johnston, M. Strimas-Mackey, S. Ligocki, O. Robinson, W. Hochachka, L. Jaromczyk,
           C. Crowley, K. Dunham, A. Stillman, I. Davies, A. Rodewald, V. Ruiz-Gutierrez, C. Wood. 2023.
-          <a href="https://ebird.org/science/status-and-trends" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-800 ml-1">
+          <a href="https://ebird.org/science/status-and-trends" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-500 ml-1">
             eBird Status and Trends
           </a>
           , Data Version: 2022; Released: 2023. Cornell Lab of Ornithology, Ithaca, New York.
-          <a href="https://doi.org/10.2173/ebirdst.2022" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-800 ml-1">
+          <a href="https://doi.org/10.2173/ebirdst.2022" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-500 ml-1">
             https://doi.org/10.2173/ebirdst.2022
           </a>
         </li>
         <li>
           Fuentes, Miguel, Benjamin M. Van Doren, Daniel Fink, and Daniel Sheldon.
-          <a href="https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.14052" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-800 ml-1">
+          <a href="https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.14052" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-500 ml-1">
             BirdFlow: Learning seasonal bird movements from eBird data
           </a>
           &nbsp; Methods in Ecology and Evolution 14, no. 3 (2023): 923-938.
-          <a href="https://doi.org/10.1111/2041-210X.14052" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-800 ml-1">
+          <a href="https://doi.org/10.1111/2041-210X.14052" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-500 ml-1">
             https://doi.org/10.1111/2041-210X.14052
           </a>
         </li>
@@ -143,7 +143,7 @@ function About() {
         </li>
         <li>
           Partners in Flight. 2020. Population Estimates Database, version 3.1. Available at
-          <a href="https://pif.birdconservancy.org/population-estimates-database" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-800 ml-1">
+          <a href="https://pif.birdconservancy.org/population-estimates-database" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-500 ml-1">
             https://pif.birdconservancy.org/population-estimates-database
           </a>.
           Accessed on 2024-04-29.
@@ -158,7 +158,7 @@ function About() {
         {/* Back arrow in top left */}
         <Link
           to="/"
-          className="absolute top-4 left-4 text-blue-600 hover:text-blue-800 text-2xl"
+          className="absolute top-4 left-4 text-blue-600 hover:text-blue-500 text-2xl"
           aria-label="Return to App"
         >
           ←
@@ -195,7 +195,7 @@ function About() {
             {/* Flapping bird - blue */}
             <div className="flap-bird" />
           </div>
-          <h1 className="text-3xl font-bold text-blue-700 m-0 text-center font-sans">Avian Influenza</h1>
+          <h1 className="text-3xl font-bold text-blue-500 m-0 text-center font-sans">Avian Influenza</h1>
         </div>
 
         {HowTo}
