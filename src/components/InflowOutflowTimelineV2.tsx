@@ -191,17 +191,17 @@ export default function InflowOutflowTimelineV2({
         {/* Timeline Slider Area */}
         <div className="flex-1" style={{marginLeft: "5%"}}>
           {/* Thumb label and marker */}
-          <div
-            ref={ref}
-            style={{ height: 25, position: 'relative', zIndex: 1000 }}>
+          <div ref={ref} style={{ height: 32, position: 'relative', zIndex: 1000 }}>
             <div
-              className='slider-button'
+              className="timeline-marker"
               style={{
                 position: 'absolute',
-                left: `calc(${markerPct}% - 8px)`,
+                left: `calc(${markerPct}% - 40px)`,
                 top: 0,
-              }}>
-              <div style={{ backgroundColor: "white", padding: "3px" }}>
+                cursor: 'pointer',
+              }}
+            >
+              <div className="timeline-marker-label">
                 {dateLabels[dataIndex]?.[markerWeek]}
               </div>
             </div>
