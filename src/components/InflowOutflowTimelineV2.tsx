@@ -5,7 +5,7 @@ import { useMove } from '@mantine/hooks';
 import { IconPlayerPlayFilled, IconPlayerPauseFilled } from "@tabler/icons-react";
 import { RootState } from '../store/store';
 import { clearOverlayUrl, clearFlowResults } from '../store/slices/mapSlice';
-import {WEEKS_PER_YEAR} from '../utils/utils'
+import {MAX_WEEK, WEEKS_PER_YEAR} from '../utils/utils'
 
 
 const monthMarks = [
@@ -57,6 +57,12 @@ export default function InflowOutflowTimelineV2({
   const [rightPct, setRightPct] = useState(0);
   const [markerPct, setMarkerPct] = useState(0);
   const [sliderMarks, setSliderMarks] = useState(monthMarks);
+  const [showSpanLabels, setShowSpanLabels] = useState(false);
+
+  function isNear(a: number, b: number, range: number = 2, max: number = MAX_WEEK) {
+    const diff = Math.abs(a - b);
+    return diff <= range || (max - diff) <= range;
+}
 
   const updateMarkerAndSpan = () => {
     const spanEnd = (spanStart + localNFlowWeeks) % WEEKS_PER_YEAR;
@@ -170,7 +176,11 @@ export default function InflowOutflowTimelineV2({
 
 
   return (
-    <div className="Timeline">
+    <div
+      className="Timeline"
+      onMouseEnter={() => setShowSpanLabels(true)}
+      onMouseLeave={() => setShowSpanLabels(false)}
+    >
       <div className="flex items-center w-full">
         {/* Play/Pause Button */}
         <div className="flex-shrink-0 mr-2" style={{ width: 48 }}>
@@ -309,6 +319,7 @@ export default function InflowOutflowTimelineV2({
             })}
 
             {/* Thumbs: static blue circle (left) and blue arrow (right) */}
+            {/* LEFT (circle) */}
             <div
               style={{
                 position: 'absolute',
@@ -319,15 +330,27 @@ export default function InflowOutflowTimelineV2({
                 height: 28,
                 zIndex: mode === 'outflow' ? 3 : 2,
                 pointerEvents: 'none',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
               }}
             >
+              {showSpanLabels && !isNear(spanStart, markerWeek)  && (
+                <div
+                  className="timeline-label"
+                  style={{
+                    position: 'absolute',
+                    top: -28,
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                  }}
+                >
+                  {dateLabels[dataIndex]?.[spanStart]}
+                </div>
+              )}
               <svg width={28} height={28}>
                 <circle cx={14} cy={14} r={10} fill="#228be6" stroke="#228be6" strokeWidth={3} />
               </svg>
             </div>
+
+            {/* RIGHT (arrow) */}
             <div
               style={{
                 position: 'absolute',
@@ -338,11 +361,21 @@ export default function InflowOutflowTimelineV2({
                 height: 28,
                 zIndex: mode === 'inflow' ? 3 : 2,
                 pointerEvents: 'none',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
               }}
             >
+              {showSpanLabels && !isNear(spanEnd, markerWeek) && (
+                <div
+                  className="timeline-label"
+                  style={{
+                    position: 'absolute',
+                    top: -28,
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                  }}
+                >
+                  {dateLabels[dataIndex]?.[spanEnd]}
+                </div>
+              )}
               <svg width="28" height="28" viewBox="0 0 24 24">
                 <polygon
                   points="6,6 22,12 6,18"
