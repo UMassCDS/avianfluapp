@@ -199,7 +199,6 @@ function Timeline(props: TimelineProps) {
               <div style={{ backgroundColor: "white", padding: "3px" }}>
                 {dateLabels[dataset][week]}
               </div>
-              <div style={{ backgroundColor: "black", width: "3px", height: "23px" }}></div>
             </div>
           </div>
           <p></p>
