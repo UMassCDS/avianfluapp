@@ -3,7 +3,7 @@ import { MantineSize } from '@mantine/core';
 
 interface UIState {
   isMonitor: boolean;
-  iconSize: MantineSize;
+  iconSize: number;
   textSize: MantineSize;
   fontHeight: number;
   titleSize: number;
@@ -11,7 +11,7 @@ interface UIState {
 
 const initialState: UIState = {
   isMonitor: true,
-  iconSize: 'xl',
+  iconSize: 28,
   textSize: 'md',
   fontHeight: 14,
   titleSize: 40,
@@ -24,7 +24,7 @@ const uiSlice = createSlice({
     setIsMonitor(state, action: PayloadAction<boolean>) {
       state.isMonitor = action.payload;
     },
-    setIconSize(state, action: PayloadAction<MantineSize>) {
+    setIconSize(state, action: PayloadAction<number>) {
       state.iconSize = action.payload;
     },
     setTextSize(state, action: PayloadAction<MantineSize>) {
