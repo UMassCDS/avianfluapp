@@ -115,14 +115,14 @@ const HomePage = () => {
       // small window
       dispatch(setTextSize('xs'));
       dispatch(setFontHeight(10));
-      dispatch(setIconSize('xl'));
+      dispatch(setIconSize(28));
       dispatch(setTitleSize(20));
       dispatch(setIsMonitor(false));
     } else {
       // reg window
       dispatch(setTextSize('md'));
       dispatch(setFontHeight(14));
-      dispatch(setIconSize('xl'));
+      dispatch(setIconSize(28));
       dispatch(setTitleSize(40));
       dispatch(setIsMonitor(true));
     }
