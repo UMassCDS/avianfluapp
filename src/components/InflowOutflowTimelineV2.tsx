@@ -5,7 +5,7 @@ import { useMove } from '@mantine/hooks';
 import { IconPlayerPlayFilled, IconPlayerPauseFilled } from "@tabler/icons-react";
 import { RootState } from '../store/store';
 import { clearOverlayUrl, clearFlowResults } from '../store/slices/mapSlice';
-import {MAX_WEEK, WEEKS_PER_YEAR} from '../utils/utils'
+import {MAX_WEEK, WEEKS_PER_YEAR, getTimelinePosition} from '../utils/utils'
 
 
 const monthMarks = [
@@ -221,6 +221,12 @@ export default function InflowOutflowTimelineV2({
                 position: 'absolute',
                 left: `calc(${markerPct}% - 3px)`,
                 top: '30px',
+              }}
+            />
+            <div
+              className="timeline-today-marker"
+              style={{
+                left: `calc(${getTimelinePosition(new Date())}% - 2px)`,
               }}
             />
           </div>

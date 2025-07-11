@@ -87,6 +87,17 @@
         background-color: white;
     }
 
+    .timeline-today-marker {
+        position: absolute;
+        top: 32px;
+        width: 2px;
+        height: 10px;
+        background-color: red;
+        border-radius: 2px;
+        z-index: 3;
+        pointer-events: none;
+    }
+
     .calculate-button {
         position: absolute;
         margin-bottom: 0;
