@@ -21,6 +21,11 @@ const isWithinSpan = (week: number, start: number, end: number, wrapped: boolean
   return wrapped ? week >= start || week <= end : week >= start && week <= end;
 };
 
+const isNear = (a: number, b: number, range: number = 2, max: number = MAX_WEEK) => {
+  const diff = Math.abs(a - b);
+  return diff <= range || (max - diff) <= range;
+}
+
 type Mode = "inflow" | "outflow";
 
 interface Props {
@@ -58,11 +63,6 @@ export default function InflowOutflowTimelineV2({
   const [markerPct, setMarkerPct] = useState(0);
   const [sliderMarks, setSliderMarks] = useState(monthMarks);
   const [showSpanLabels, setShowSpanLabels] = useState(false);
-
-  function isNear(a: number, b: number, range: number = 2, max: number = MAX_WEEK) {
-    const diff = Math.abs(a - b);
-    return diff <= range || (max - diff) <= range;
-}
 
   const updateMarkerAndSpan = () => {
     const spanEnd = (spanStart + localNFlowWeeks) % WEEKS_PER_YEAR;
