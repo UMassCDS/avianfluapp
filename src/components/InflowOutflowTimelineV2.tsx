@@ -215,6 +215,14 @@ export default function InflowOutflowTimelineV2({
                 {dateLabels[dataIndex]?.[markerWeek]}
               </div>
             </div>
+            <div
+              className="timeline-marker-dot"
+              style={{
+                position: 'absolute',
+                left: `calc(${markerPct}% - 3px)`,
+                top: '30px',
+              }}
+            />
           </div>
           {/* Custom Slider */}
           <div

@@ -200,6 +200,14 @@ function Timeline(props: TimelineProps) {
                 {dateLabels[dataset][week]}
               </div>
             </div>
+            <div
+              className="timeline-marker-dot"
+              style={{
+                position: 'absolute',
+                left: `calc(${sliderValue * 100}% - 3px)`,
+                top: '33px',
+              }}
+            />
           </div>
           <RangeSlider
             defaultValue={weekRange}
