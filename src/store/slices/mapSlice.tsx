@@ -9,11 +9,13 @@ interface FlowResult {
 interface MapState {
   overlayUrl: string;
   flowResults: FlowResult[]; // stores all API Flow results
+  showOutbreaks: boolean;
 }
 
 const initialState: MapState = {
   overlayUrl: "",
   flowResults: [],
+  showOutbreaks: true,
 };
 
 const mapSlice = createSlice({
@@ -39,7 +41,10 @@ const mapSlice = createSlice({
       } else {
         state.overlayUrl = "";
       }
-    }
+    },
+    toggleOutbreaks(state) {
+      state.showOutbreaks = !state.showOutbreaks;
+    },
   },
 });
 
@@ -48,7 +53,8 @@ export const {
   clearOverlayUrl,
   setFlowResults,
   clearFlowResults,
-  updateOverlayByWeek
+  updateOverlayByWeek,
+  toggleOutbreaks,
 } = mapSlice.actions;
 
 export default mapSlice.reducer;
