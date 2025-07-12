@@ -1,9 +1,10 @@
 import { useRef, useEffect, useState } from "react";
-import { IconStack2, IconFeather } from "@tabler/icons-react";
+import { IconStack2 } from "@tabler/icons-react";
 import taxa from "../assets/taxa.json";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../store/store";
 import { dataInfo } from "../hooks/dataUrl";
+import { toggleOutbreaks } from "../store/slices/mapSlice";
 
 type ControlBarProps = {
   checkInputTypes: (dataTypeIdx: number, speciesIdx: number) => void;
@@ -22,9 +23,11 @@ export default function ControlBar({
   const [openSpecies, setOpenSpecies] = useState(false);
   const dataTypeRef = useRef<HTMLDivElement>(null);
   const speciesRef = useRef<HTMLDivElement>(null);
+  const dispatch = useDispatch();
 
   const selectedDataType = useSelector((state: RootState) => state.species.dataIndex);
   const selectedSpecies = useSelector((state: RootState) => state.species.speciesIndex);
+  const showOutbreaks = useSelector((state: RootState) => state.map.showOutbreaks);
   const dataTypes = dataInfo.map((dt, idx) => ({ value: idx, label: dt.label }));
 
   // Close dropdowns on outside click
@@ -43,7 +46,7 @@ export default function ControlBar({
 
   function handleDataTypeSelect(idx: number) {
     checkInputTypes(idx, selectedSpecies);
-    setOpenDataType(false);
+    // Do not close dropdown on select to allow toggling outbreaks
   }
   function handleSpeciesSelect(idx: number) {
     checkSpecies(String(idx), speciesCombo);
@@ -66,29 +69,54 @@ export default function ControlBar({
           </span>
         </button>
         {openDataType && (
-          <div className="absolute right-0 mt-3 w-64 rounded-2xl bg-white/95 shadow-2xl border-2 border-blue-200 p-5 flex flex-col gap-2 animate-fade-in z-50">
-            <div className="mb-2 text-xs text-blue-500 font-bold uppercase tracking-wide flex items-center gap-1">
-              Data Type
-            </div>
-            <div className="flex flex-col gap-1">
-              {dataTypes.map((dt, idx) => (
+          <div className="absolute right-0 mt-3 w-64 rounded-2xl bg-white/95 shadow-2xl border-2 border-blue-200 p-5 flex flex-col gap-4 animate-fade-in z-50">
+            {/* Outbreaks Section */}
+            <div>
+              <div className="mb-2 text-xs text-blue-700 font-bold uppercase tracking-wide">Outbreaks</div>
+              <div className="flex items-center justify-between bg-blue-50/50 p-2 rounded-lg">
+                <label htmlFor="outbreak-toggle" className="font-medium text-blue-800 text-sm">
+                  Show HPAI Outbreaks
+                </label>
                 <button
-                  key={dt.value}
-                  className={`w-full text-left px-4 py-2 rounded-lg transition font-medium ${
-                    selectedDataType === idx
-                      ? "bg-blue-100 text-blue-500 ring-2 ring-blue-300"
-                      : "hover:bg-blue-50 text-blue-500"
+                  id="outbreak-toggle"
+                  onClick={() => dispatch(toggleOutbreaks())}
+                  className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors ${
+                    showOutbreaks ? 'bg-blue-500' : 'bg-gray-300'
                   }`}
-                  onClick={() => handleDataTypeSelect(idx)}
-                  type="button"
                 >
-                  {dt.label}
+                  <span
+                    className={`inline-block w-4 h-4 transform bg-white rounded-full transition-transform ${
+                      showOutbreaks ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
                 </button>
-              ))}
+              </div>
+            </div>
+
+            {/* Data Type Section */}
+            <div>
+              <div className="mb-2 text-xs text-blue-700 font-bold uppercase tracking-wide">Data Type</div>
+              <div className="flex flex-col gap-1">
+                {dataTypes.map((dt, idx) => (
+                  <button
+                    key={dt.value}
+                    className={`w-full text-left px-4 py-2 rounded-lg transition font-medium ${
+                      selectedDataType === idx
+                        ? "bg-blue-100 text-blue-800 ring-2 ring-blue-300"
+                        : "hover:bg-blue-50 text-blue-700"
+                    }`}
+                    onClick={() => handleDataTypeSelect(idx)}
+                    type="button"
+                  >
+                    {dt.label}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         )}
       </div>
+
       {/* Species Dropdown */}
       <div ref={speciesRef} className="relative">
         <button
