@@ -6,6 +6,15 @@ export const WEEKS_PER_YEAR = 52;
 export const MIN_WEEK = 0;   // week index
 export const MAX_WEEK = WEEKS_PER_YEAR -1;  
 
+
+// Original month marks: year is irrelevant
+const baseMonthMarks = [
+  { date: '2022-01-01', label: 'Jan' }, { date: '2022-02-01', label: 'Feb' }, { date: '2022-03-01', label: 'Mar' },
+  { date: '2022-04-01', label: 'Apr' }, { date: '2022-05-01', label: 'May' }, { date: '2022-06-01', label: 'Jun' },
+  { date: '2022-07-01', label: 'Jul' }, { date: '2022-08-01', label: 'Aug' }, { date: '2022-09-01', label: 'Sep' },
+  { date: '2022-10-01', label: 'Oct' }, { date: '2022-11-01', label: 'Nov' }, { date: '2022-12-01', label: 'Dec' }
+];
+
 export function isMobile():boolean|undefined {
     return useMediaQuery(`(max-width: ${em(750)})`);
 }
@@ -67,3 +76,15 @@ export function getTimelinePosition(dateInput: Date | string): number {
   // Return timeline position
   return dayOfYear / totalDays * 100;
 }
+
+
+/**
+ * Transforms base month marks by computing their timeline position (0–100)
+ * based on the current year, while keeping the month/day.
+ *
+ * @returns Array of marks with percentage `value` and text `label`
+ */
+export const monthMarks = baseMonthMarks.map(({ date, label }) => ({
+  value: getTimelinePosition(date),
+  label,
+}));

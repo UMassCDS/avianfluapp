@@ -5,15 +5,8 @@ import { useMove } from '@mantine/hooks';
 import { IconPlayerPlayFilled, IconPlayerPauseFilled } from "@tabler/icons-react";
 import { RootState } from '../store/store';
 import { clearOverlayUrl, clearFlowResults } from '../store/slices/mapSlice';
-import {MAX_WEEK, WEEKS_PER_YEAR, getTimelinePosition} from '../utils/utils'
+import {MAX_WEEK, WEEKS_PER_YEAR, getTimelinePosition, monthMarks} from '../utils/utils'
 
-
-const monthMarks = [
-  { week: 0, label: 'Jan' }, { week: 4, label: 'Feb' }, { week: 8, label: 'Mar' },
-  { week: 13, label: 'Apr' }, { week: 17, label: 'May' }, { week: 21, label: 'Jun' },
-  { week: 26, label: 'Jul' }, { week: 30, label: 'Aug' }, { week: 35, label: 'Sep' },
-  { week: 39, label: 'Oct' }, { week: 43, label: 'Nov' }, { week: 47, label: 'Dec' }
-];
 
 const clamp = (val: number, min: number, max: number) => Math.max(min, Math.min(max, val));
 
@@ -28,19 +21,23 @@ const isNear = (a: number, b: number, range: number = 2, max: number = MAX_WEEK)
 
 type Mode = "inflow" | "outflow";
 
+export interface DatasetItem {
+  index: number;
+  date: string; // format: YYYY-MM-DD
+  label: string; // e.g., "Jan 7"
+}
+
 interface Props {
   onChangeWeek: (week: number) => void;
   mode: Mode;
-  dateLabels: string[][];
-  dataIndex: number;
+  dataset: DatasetItem[];
   nFlowWeeks: number;
 }
 
 export default function InflowOutflowTimelineV2({
   onChangeWeek,
   mode,
-  dateLabels,
-  dataIndex,
+  dataset,
   nFlowWeeks,
 }: Props) {
   const dispatch = useDispatch();
@@ -71,8 +68,8 @@ export default function InflowOutflowTimelineV2({
 
     setSpanEnd(spanEnd);
     setIsWrapped(wrapped);
-    setLeftPct((spanStart / (WEEKS_PER_YEAR - 1)) * 100);
-    setRightPct((spanEnd / (WEEKS_PER_YEAR - 1)) * 100);
+    setLeftPct(getTimelinePosition(dataset[spanStart].date));
+    setRightPct(getTimelinePosition(dataset[spanEnd].date));
     onChangeWeek(current);
   };
 
@@ -137,7 +134,7 @@ export default function InflowOutflowTimelineV2({
   useEffect(updateMarkerAndSpan, [spanStart]);
 
   useEffect(() => {
-    setMarkerPct((markerWeek / (WEEKS_PER_YEAR - 1)) * 100);
+    setMarkerPct(getTimelinePosition(dataset[markerWeek].date));
   }, [markerWeek]);
 
   useEffect(() => {
@@ -173,7 +170,6 @@ export default function InflowOutflowTimelineV2({
     else stopPlayback();
     return stopPlayback;
   }, [isPlaying, markerWeek, spanStart, isWrapped]);
-
 
   return (
     <div
@@ -212,7 +208,7 @@ export default function InflowOutflowTimelineV2({
               }}
             >
               <div className="timeline-marker-label">
-                {dateLabels[dataIndex]?.[markerWeek]}
+                {dataset[markerWeek].label}
               </div>
             </div>
             <div
@@ -291,7 +287,6 @@ export default function InflowOutflowTimelineV2({
 
             {/* Month marks and labels */}
             {sliderMarks.map((mark, idx) => {
-              const markPct = (mark.week / (WEEKS_PER_YEAR - 1)) * 100;
               let labelStyle: React.CSSProperties = {
                 position: 'absolute',
                 top: 20,
@@ -313,10 +308,10 @@ export default function InflowOutflowTimelineV2({
               }
               return (
                 <div
-                  key={mark.week}
+                  key={mark.label}
                   style={{
                     position: 'absolute',
-                    left: `calc(${markPct}% - 3px)`,
+                    left: `calc(${mark.value}% - 3px)`,
                     top: '50%',
                     transform: 'translateY(-50%)',
                     width: 6,
@@ -356,7 +351,7 @@ export default function InflowOutflowTimelineV2({
                     transform: 'translateX(-50%)',
                   }}
                 >
-                  {dateLabels[dataIndex]?.[spanStart]}
+                  {dataset[spanStart].label}
                 </div>
               )}
               <svg width={28} height={28}>
@@ -387,7 +382,7 @@ export default function InflowOutflowTimelineV2({
                     transform: 'translateX(-50%)',
                   }}
                 >
-                  {dateLabels[dataIndex]?.[spanEnd]}
+                  {dataset[spanEnd].label}
                 </div>
               )}
               <svg width="28" height="28" viewBox="0 0 24 24">
