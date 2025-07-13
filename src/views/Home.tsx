@@ -9,9 +9,7 @@ import Timeline from '../components/Timeline';
 import Legend from '../components/Legend';
 import {loadOutbreaks, OutbreakLegend} from '../components/OutbreakPoints'
 import '../styles/Home.css';
-// const express = require('express');
 import 'leaflet-geosearch/dist/geosearch.css';
-import InflowOutflowTimeline from '../components/InflowOutflowTimeline';
 import InflowOutflowTimelineV2 from '../components/InflowOutflowTimelineV2';
 import InflowOutflowCalculateButton from '../components/InflowOutflowCalculateButton';
 import MapView from '../components/MapView';
@@ -24,8 +22,6 @@ import { setWeek } from '../store/slices/timelineSlice';
 import { setFontHeight, setIconSize, setIsMonitor, setTextSize, setTitleSize } from '../store/slices/uiSlice';
 import { setOverlayUrl, clearFlowResults, updateOverlayByWeek, clearOverlayUrl } from '../store/slices/mapSlice';
 import L from 'leaflet';
-import ab_dates from '../assets/abundance_dates.json';
-import mv_dates from '../assets/movement_dates.json';
 import MapOverlayPanel from '../components/MapOverlayPanel';
 
 // Fix for missing marker icon in production
@@ -231,10 +227,6 @@ const HomePage = () => {
 	// - flowResults is a non-empty array (e.g., for inflow or outflow when results exist).
   const shouldShowLegend = dataIndex < 2 || (Array.isArray(flowResults) && flowResults.length > 0);
 
-  // Build dateLabels (do this once, e.g. in useMemo or useEffect)
-const datasets = [ab_dates, mv_dates, ab_dates, ab_dates];
-const dateLabels = datasets.map(ds => ds.map(info => info.label));
-
 // Here is where you list the components and elements that you want rendered. 
   return (
     <div className="Home">
@@ -293,8 +285,6 @@ const dateLabels = datasets.map(ds => ds.map(info => info.label));
       {dataIndex >= 2 && (
         <InflowOutflowTimelineV2
           onChangeWeek={flowUpdate}
-          mode={dataIndex === 2 ? "inflow" : "outflow"}
-          dataset={datasets[dataIndex]}
           nFlowWeeks={N_FLOW_WEEKS}
         />
       )}

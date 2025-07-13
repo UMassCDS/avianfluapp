@@ -6,7 +6,12 @@ import { IconPlayerPlayFilled, IconPlayerPauseFilled } from "@tabler/icons-react
 import { RootState } from '../store/store';
 import { clearOverlayUrl, clearFlowResults } from '../store/slices/mapSlice';
 import {MAX_WEEK, WEEKS_PER_YEAR, getTimelinePosition, monthMarks} from '../utils/utils'
+import { dataInfo } from '../hooks/dataUrl';
+import ab_dates from '../assets/abundance_dates.json';
+import mv_dates from '../assets/movement_dates.json';
 
+
+const datasets = [ab_dates, mv_dates, ab_dates, ab_dates];
 
 const clamp = (val: number, min: number, max: number) => Math.max(min, Math.min(max, val));
 
@@ -19,32 +24,20 @@ const isNear = (a: number, b: number, range: number = 2, max: number = MAX_WEEK)
   return diff <= range || (max - diff) <= range;
 }
 
-type Mode = "inflow" | "outflow";
-
-export interface DatasetItem {
-  index: number;
-  date: string; // format: YYYY-MM-DD
-  label: string; // e.g., "Jan 7"
-}
-
-interface Props {
-  onChangeWeek: (week: number) => void;
-  mode: Mode;
-  dataset: DatasetItem[];
-  nFlowWeeks: number;
-}
 
 export default function InflowOutflowTimelineV2({
   onChangeWeek,
-  mode,
-  dataset,
   nFlowWeeks,
-}: Props) {
+}: {
+  onChangeWeek: (week: number) => void;
+  nFlowWeeks: number;
+}) {
   const dispatch = useDispatch();
 
   const week = useSelector((state: RootState) => state.timeline.week);
   const isMonitor = useSelector((state: RootState) => state.ui.isMonitor);
   const flowResults = useSelector((state: RootState) => state.map.flowResults);
+  const dataIndex = useSelector((state: RootState) => state.species.dataIndex);
 
   const localNFlowWeeks = nFlowWeeks - 1;
   const playbackRef = useRef<NodeJS.Timeout | null>(null);
@@ -60,6 +53,7 @@ export default function InflowOutflowTimelineV2({
   const [markerPct, setMarkerPct] = useState(0);
   const [sliderMarks, setSliderMarks] = useState(monthMarks);
   const [showSpanLabels, setShowSpanLabels] = useState(false);
+  const [mode, setMode] = useState('');
 
   const updateMarkerAndSpan = () => {
     const spanEnd = (spanStart + localNFlowWeeks) % WEEKS_PER_YEAR;
@@ -68,8 +62,8 @@ export default function InflowOutflowTimelineV2({
 
     setSpanEnd(spanEnd);
     setIsWrapped(wrapped);
-    setLeftPct(getTimelinePosition(dataset[spanStart].date));
-    setRightPct(getTimelinePosition(dataset[spanEnd].date));
+    setLeftPct(getTimelinePosition(datasets[dataIndex][spanStart].date));
+    setRightPct(getTimelinePosition(datasets[dataIndex][spanEnd].date));
     onChangeWeek(current);
   };
 
@@ -131,10 +125,15 @@ export default function InflowOutflowTimelineV2({
     if (flowResults.length > 0) onChangeWeek(curWeek);
   });
 
+  useEffect(() => {
+    const mode = dataInfo[dataIndex].label;
+    setMode(mode);
+  }, [dataInfo, dataIndex]);
+
   useEffect(updateMarkerAndSpan, [spanStart]);
 
   useEffect(() => {
-    setMarkerPct(getTimelinePosition(dataset[markerWeek].date));
+    setMarkerPct(getTimelinePosition(datasets[dataIndex][markerWeek].date));
   }, [markerWeek]);
 
   useEffect(() => {
@@ -208,7 +207,7 @@ export default function InflowOutflowTimelineV2({
               }}
             >
               <div className="timeline-marker-label">
-                {dataset[markerWeek].label}
+                {datasets[dataIndex][markerWeek].label}
               </div>
             </div>
             <div
@@ -351,7 +350,7 @@ export default function InflowOutflowTimelineV2({
                     transform: 'translateX(-50%)',
                   }}
                 >
-                  {dataset[spanStart].label}
+                  {datasets[dataIndex][spanStart].label}
                 </div>
               )}
               <svg width={28} height={28}>
@@ -382,7 +381,7 @@ export default function InflowOutflowTimelineV2({
                     transform: 'translateX(-50%)',
                   }}
                 >
-                  {dataset[spanEnd].label}
+                  {datasets[dataIndex][spanEnd].label}
                 </div>
               )}
               <svg width="28" height="28" viewBox="0 0 24 24">
