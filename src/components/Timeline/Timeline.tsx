@@ -11,7 +11,7 @@ import ab_dates from '../../assets/abundance_dates.json';
 import mv_dates from '../../assets/movement_dates.json';
 
 import { PlayPauseButton } from './PlayPauseButton';
-
+import { TimelineMarkerLabel } from './TimelineMarkerLabel';
 
 const datasets = [ab_dates, mv_dates, ab_dates, ab_dates];
 
@@ -190,19 +190,11 @@ export default function Timeline({
         <div className="flex-1" style={{marginLeft: "5%"}}>
           {/* Thumb label and marker */}
           <div ref={ref} style={{ height: 32, position: 'relative', zIndex: 1000 }}>
-            <div
-              className="timeline-marker"
-              style={{
-                position: 'absolute',
-                left: `calc(${markerPct}% - 40px)`,
-                top: 0,
-                cursor: 'pointer',
-              }}
-            >
-              <div className="timeline-marker-label">
-                {datasets[dataIndex][markerWeek].label}
-              </div>
-            </div>
+            <TimelineMarkerLabel
+              left={markerPct}
+              label={datasets[dataIndex][markerWeek].label}
+            />
+
             <div
               className="timeline-marker-dot"
               style={{
