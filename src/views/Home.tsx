@@ -1,66 +1,130 @@
-import { ActionIcon, Combobox, ComboboxStore, Grid, Input, InputBase, useCombobox } from '@mantine/core';
-import { CheckIcon, MantineSize, Radio, Stack, Tooltip } from '@mantine/core';
-import { MapContainer, TileLayer, ImageOverlay } from 'react-leaflet';
-import { forwardRef, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { IconInfoCircle, IconWriting } from '@tabler/icons-react';
+import { Combobox, ComboboxStore, useCombobox } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
+import { useEffect, useState } from 'react';
+import 'leaflet/dist/leaflet.css';
+import axios from 'axios';
 import { imageURL, getScalingFilename, dataInfo} from '../hooks/dataUrl';
 import taxa from '../assets/taxa.json';
 import Timeline from '../components/Timeline';
 import Legend from '../components/Legend';
-import {OutbreakMarkers, loadOutbreaks, OutbreakLegend} from '../components/OutbreakPoints'
-import {MIN_WEEK} from '../utils/utils'
+import {loadOutbreaks, OutbreakLegend} from '../components/OutbreakPoints'
 import '../styles/Home.css';
-import 'leaflet/dist/leaflet.css';
+// const express = require('express');
+import 'leaflet-geosearch/dist/geosearch.css';
+import InflowOutflowTimeline from '../components/InflowOutflowTimeline';
+import InflowOutflowTimelineV2 from '../components/InflowOutflowTimelineV2';
+import InflowOutflowCalculateButton from '../components/InflowOutflowCalculateButton';
+import MapView from '../components/MapView';
+import ControlBar from '../components/ControlBar';
+import AboutButtons from '../components/AboutButtons';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../store/store'; // Adjust the path to your store file
+import { setDataIndex, setSpeciesIndex } from '../store/slices/speciesSlice';
+import { setWeek } from '../store/slices/timelineSlice';
+import { setFontHeight, setIconSize, setIsMonitor, setTextSize, setTitleSize } from '../store/slices/uiSlice';
+import { setOverlayUrl, clearFlowResults, updateOverlayByWeek, clearOverlayUrl } from '../store/slices/mapSlice';
+import L from 'leaflet';
+import ab_dates from '../assets/abundance_dates.json';
+import mv_dates from '../assets/movement_dates.json';
+import MapOverlayPanel from '../components/MapOverlayPanel';
 
+// Fix for missing marker icon in production
+// Import marker images
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+
+// Fix for missing marker icon in production
+delete L.Icon.Default.prototype._getIconUrl;
+
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: markerIcon2x,
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow,
+});
+//
 
 const MIN_REG_WINDOW_WIDTH = 600;
-// the lat/long bounds of the data image provided by the backend
-const imageBounds = [
-  [9.622994, -170.291626],
-  [79.98956, -49.783429],
-];
+const N_FLOW_WEEKS = 20; // can be made configurable later
 
-/* This is the main page and only page of the application. 
-   Here, the map renders as well as all the AvianFluApp feature controls */
+/**
+ * HomePage component is the main view for the application, responsible for rendering the interactive map,
+ * control widgets, and timeline sliders for visualizing avian flu data. It manages state related to species,
+ * data type, week selection, and UI preferences using Redux selectors and dispatchers.
+ *
+ * Features:
+ * - Loads outbreak data and adjusts UI based on window size.
+ * - Handles species and data type selection, including validation of required resources.
+ * - Dynamically updates map overlays and legends based on user input.
+ * - Provides timeline controls for abundance, movement, inflow, and outflow datasets.
+ * - Integrates with backend APIs for testing connectivity.
+ *
+ * @component
+ * @returns {JSX.Element} The rendered HomePage component.
+ */
+
+/* Right now, HomePage() component is where most of the logic lives (for example, things like play/pause button to display data every week over the range provided by timeline slider) */
 const HomePage = () => {  
-  // Sets the default position for the map.
-  const position = {
-    lat: 45,
-    lng: -95,
-  };
-  // Initialize data type - so far this is abundance or netmovement
-  const [dataIndex, setDataIndex] = useState(0);
-  // Sets state for the species type 
-  const [speciesIndex, setSpeciesIndex] = useState(0);
-  const [week, setWeek] = useState(MIN_WEEK);
+  const dispatch = useDispatch();
+  const speciesIndex = useSelector((state: RootState) => state.species.speciesIndex);
+  const dataIndex = useSelector((state: RootState) => state.species.dataIndex);
+  const flowResults = useSelector((state: RootState) => state.map.flowResults);
+
+  // const [week, setWeek] = useState(MIN_WEEK);
+  const week = useSelector((state: RootState) => state.timeline.week);
+
   // default state of the map overlay url for the current data displayed.
-  const [overlayUrl, setOverlayUrl] = useState("");
+  const overlayUrl = useSelector((state: RootState) => state.map.overlayUrl);
   const speciesCombo = useCombobox();
-  // useNavigate is used to switch pages
-  const navigate = useNavigate();
-  const [iconSize, setIconSize] = useState<MantineSize>('xl');
-  const [textSize, setTextSize] = useState<MantineSize>('md');
-  const [fontHeight, setFontHeight] = useState<number>(14);
-  const [titleSize, setTitleSize] = useState<number>(40);
-  const [isMonitor, setIsMonitor] = useState<boolean>(true);
 
+  const isMonitor = useSelector((state: RootState) => state.ui.isMonitor);
+  const iconSize = useSelector((state: RootState) => state.ui.iconSize);
+  const textSize = useSelector((state: RootState) => state.ui.textSize);
+  const fontHeight = useSelector((state: RootState) => state.ui.fontHeight);
+  const titleSize = useSelector((state: RootState) => state.ui.titleSize);
 
+  const [location, setLocation] = useState<string[]>([]);
+
+  // Callback passed to MapView
+  const handleLocationSelect = (latLon: string | null) => {
+    setLocation(latLon ? [latLon] : []); // For now, just one point; supports multiple later
+    // If location is changed invalidate and stop displaying any prior results
+    dispatch(clearFlowResults());
+    dispatch(clearOverlayUrl());
+  };
+
+  function runTest() {
+    console.log("Pam's test code");
+    axios.get('http://localhost:8000/echo', {params: {text: "Tiggy Rules"}})
+      .then(function (response) {
+        // handle success
+        console.log(response.data);
+      })
+      .catch(function (error) {
+        // handle error
+        console.log(error);
+      })
+      .finally(function () {
+        // always executed
+      }
+    );
+  }
+  
   function handleWindowSizeChange() {
     if (window.innerWidth <  MIN_REG_WINDOW_WIDTH) {
       // small window
-      setTextSize('xs');
-      setFontHeight(10);
-      setIconSize('xl');
-      setTitleSize(20);
-      setIsMonitor(false);
+      dispatch(setTextSize('xs'));
+      dispatch(setFontHeight(10));
+      dispatch(setIconSize(28));
+      dispatch(setTitleSize(20));
+      dispatch(setIsMonitor(false));
     } else {
       // reg window
-      setTextSize('md');
-      setFontHeight(14);
-      setIconSize('xl');
-      setTitleSize(40);
-      setIsMonitor(true);
+      dispatch(setTextSize('md'));
+      dispatch(setFontHeight(14));
+      dispatch(setIconSize(28));
+      dispatch(setTitleSize(40));
+      dispatch(setIsMonitor(true));
     }
   }
 
@@ -75,16 +139,27 @@ const HomePage = () => {
     };
   }, []);
 
-  async function checkImage(this_week: number): Promise<boolean>{
-    var image_url = imageURL(dataIndex, speciesIndex, this_week);
-    var response = await fetch(image_url);
+  async function checkImage(this_week: number): Promise<boolean> {
+    // Skip check for inflow/outflow
+    if (dataIndex >= 2) {
+      dispatch(setOverlayUrl(""));
+      return Promise.resolve(true);
+    }
+
+    const image_url = imageURL(dataIndex, speciesIndex, this_week);
+    const response = await fetch(image_url);
+
     if (!response.ok) {
       console.debug(response);
-      var message = "The .png for week "+this_week+" on "+dataInfo[dataIndex].label+" of "+taxa[speciesIndex].label+" is missing.";
-      alert(message);
+      notifications.show({
+        title: 'Missing Image',
+        message: `The .png for week ${this_week} on ${dataInfo[dataIndex].label} of ${taxa[speciesIndex].label} is missing.`,
+        color: 'orange',
+      });
+
       return false;
     }
-    setOverlayUrl(image_url);
+    dispatch(setOverlayUrl(image_url));
     return true;
   }
 
@@ -92,84 +167,50 @@ const HomePage = () => {
     var response = await checkImage(this_week);
     if (response) {
       console.log("HOME: onChangeWeek: ",this_week);
-      setWeek(this_week);
+      dispatch(setWeek(this_week));
     }
+  }
+
+  function flowUpdate(this_week: number) {
+    console.log("flowUpdate: ",this_week);
+    dispatch(setWeek(this_week));
+    dispatch(updateOverlayByWeek(this_week));
   }
 
   useEffect(() => {
     console.log("dataIndex and species change", week);
     checkImage(week);
+    dispatch(clearFlowResults());
   }, [dataIndex, speciesIndex]);
 
   async function checkInputTypes(d_index: number, s_index: number) {
-    // check required legend file is available. 
-    var response;
+    // Inflow/Outflow is handled separately via the InflowOutflowCalculateButton button component.
+    if (d_index === 2 || d_index === 3) {
+      speciesCombo.selectedOptionIndex = s_index;
+      dispatch(setDataIndex(d_index));
+      dispatch(setSpeciesIndex(s_index));
+      return;
+    }
+    // END
+
+    // Check if legend (scale) file exists
     if ((d_index !== dataIndex) || (s_index !== speciesIndex)) {
-      response = await fetch(getScalingFilename(d_index, s_index));
+      const response = await fetch(getScalingFilename(d_index, s_index));
       if (!response.ok) {
         console.debug(response);
-        var message = "The scale file for "+dataInfo[d_index].label+" of "+taxa[s_index].label+" is missing.";
-        alert(message);
+        notifications.show({
+          title: 'Missing Scale File',
+          message: `The scale file for ${dataInfo[d_index].label} of ${taxa[s_index].label} is missing.`,
+          color: 'orange',
+        });
+
         return;
       }
     }
     speciesCombo.selectedOptionIndex = s_index;
-    setDataIndex(d_index);
-    setSpeciesIndex(s_index);
+    dispatch(setDataIndex(d_index));
+    dispatch(setSpeciesIndex(s_index));
   };
-
-  // maps data types (abundance, movement etc) to radio buttons
-  const dataTypeRadio = dataInfo.map((dt, index) => (
-    <Radio 
-      icon={CheckIcon} 
-      key={dt.label}
-      checked={dataIndex===index} 
-      onChange={() => {
-        checkInputTypes(index, speciesIndex)}
-      } 
-      size={textSize}
-      label={dt.label} 
-    />
-  ));
-  
-  // creates component surrounding the data type widgets to add tool tip
-  const DataTypeComponent = forwardRef<HTMLDivElement>((props, ref) => (
-    <div ref={ref} {...props}>
-      <Stack>
-        {dataTypeRadio}
-      </Stack>
-    </div>
-  ));
-
-  function genericCombo(ref_combo: ComboboxStore, onSubmit: Function, label: string, options: JSX.Element[]) {
-    return (
-      <Combobox
-        store={ref_combo}
-        onOptionSubmit={(val) => {
-          onSubmit(val, ref_combo); 
-        }}
-        size={textSize}
-      >
-        <Combobox.Target>
-          <InputBase
-            component="button"
-            type="button"
-            pointer
-            leftSection={<Combobox.Chevron />}
-            onClick={() => ref_combo.toggleDropdown()}
-            leftSectionPointerEvents="none"
-            size={textSize}
-            multiline={true}
-          >
-            {label || <Input.Placeholder>Pick value</Input.Placeholder>}
-          </InputBase>
-        </Combobox.Target>
-        <Combobox.Dropdown>
-          <Combobox.Options>{options}</Combobox.Options>
-        </Combobox.Dropdown>
-      </Combobox>      
-    );
-  }
 
   // Maps the species from the taxa file provided to a dropdown with options. 
   const speciesOptions = taxa.map((t, index) => (
@@ -185,90 +226,79 @@ const HomePage = () => {
     ref_combo.closeDropdown();
   }
 
-  // Species combo box
-  const SpeciesComponent = forwardRef<HTMLDivElement>((props, ref) => (
-    <div ref={ref} {...props}>
-      {genericCombo(speciesCombo, checkSpecies, taxa[speciesIndex].label, speciesOptions)}
-    </div>
-  ));
+  // Shows the Legend component if:
+	// - dataIndex < 2 (e.g., for abundance or movement), or
+	// - flowResults is a non-empty array (e.g., for inflow or outflow when results exist).
+  const shouldShowLegend = dataIndex < 2 || (Array.isArray(flowResults) && flowResults.length > 0);
 
-  // species selection, type selection and about button
-  const ControlBar = () => (
-    <div>
-      <Grid justify='center' align='stretch'>
-        { /* top row Title */ }
-        <Grid.Col span={12}>
-          <div style={{textAlign:"center", fontSize:titleSize, fontWeight:"bold"}}>Avian Influenza</div>
-        </Grid.Col>
-        { /* 2nd row */ }
-        <Grid.Col span={{ base: 4, md: 2, lg: 2 }}>
-          {/* Dropdown for data type */}
-          <Tooltip label='Types of data sets'>
-            <DataTypeComponent />
-          </Tooltip>
-        </Grid.Col>
-        <Grid.Col span={{ base: 6, md: 4, lg: 3 }}>
-          {/* The dropdown for the species type */}
-          <Tooltip label='Wild bird species that potentially carry Avian Influenza'>
-            <SpeciesComponent />
-          </Tooltip>
-        </Grid.Col>
-      </Grid>
-    </div>
-  );
+  // Build dateLabels (do this once, e.g. in useMemo or useEffect)
+const datasets = [ab_dates, mv_dates, ab_dates, ab_dates];
+const dateLabels = datasets.map(ds => ds.map(info => info.label));
 
-
-  // Here is where you list the components and elements that you want rendered. 
+// Here is where you list the components and elements that you want rendered. 
   return (
     <div className="Home">
-      {/* Creates a map using the leaflet component */}
-      <MapContainer
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        center={position}
-        zoom={3.5}
-        style={{ height: '100vh', width: '100%' }}
-        className="Map"
-        keyboard={false}
-        maxBounds={imageBounds}
-      >
-       {/* Adds the attributions to the map */}
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          attribution='Abundance data provided by <a target="_blank" href="https://ebird.org/science/status-and-trends ">Cornell Lab of Ornithology - eBird</a> | <a target="_blank" href="https://birdflow-science.github.io/"> BirdFlow </a>'
-        />
-        { /* Overlays an image that contains the data to be displayed on top of the map */}
-        <ImageOverlay
-          url={overlayUrl}
-          bounds={imageBounds}
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          opacity={0.7}
-        />
-        {OutbreakMarkers(week)}
-      </MapContainer>
-      <div className="widgets"> 
-        <ControlBar/>
-        <OutbreakLegend/>
+      {/* Top center overlay panel */}
+      <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[1100] max-w-lg w-[90vw]">
+        <MapOverlayPanel>
+          <div className="flex flex-col items-center gap-4">
+            {/* Heading is always shown by MapOverlayPanel */}
+            {dataIndex >= 2 && (
+              <InflowOutflowCalculateButton
+                dataIndex={dataIndex}
+                week={week}
+                speciesIndex={speciesIndex}
+                location={location}
+                nFlowWeeks={N_FLOW_WEEKS}
+                speciesOptions={taxa}
+                disabled={location.length === 0 || (Array.isArray(flowResults) && flowResults.length > 0)}
+              />
+            )}
+          </div>
+        </MapOverlayPanel>
       </div>
-      <div className="about"> 
-        <Tooltip label='Leave feedback and suggestions.'>
-            <ActionIcon style={{margin:12}} size={iconSize} onClick={() => { navigate("/feedback")}}>
-              <IconWriting/>
-            </ActionIcon>
-        </Tooltip>
-        <Tooltip label='About page'>
-            <ActionIcon size={iconSize} onClick={() => { navigate("/about")}}>
-              <IconInfoCircle/>
-            </ActionIcon>
-        </Tooltip>
+
+      <div className="relative w-full h-[100vh]">
+        <MapView
+          week={week}
+          dataIndex={dataIndex}
+          onLocationSelect={handleLocationSelect}
+        />
       </div>
-      {/* Calls the custom legend component with the data type and species type as parameters. */}
-      <Legend dataTypeIndex={dataIndex} speciesIndex={speciesIndex} />
-      {/* Calls the custom timeline component with the current week onChange function as parameters */}
-      <Timeline week={week} dataset={dataIndex} isMonitor={isMonitor} onChangeWeek={checkImageAndUpdate} />
+      <div className="widgets">
+        <div style={{ display: 'flex', flexDirection: 'row', gap: '1rem' }}>
+          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center' }}>
+            <OutbreakLegend />
+          </div>
+        </div>
+      </div>
+      <div className="fixed top-4 right-4 z-50 flex flex-col gap-3 items-end">
+        <AboutButtons runTest={runTest} />
+        <ControlBar
+          checkInputTypes={checkInputTypes}
+          speciesCombo={speciesCombo}
+          checkSpecies={checkSpecies}
+          speciesOptions={speciesOptions}
+        />
+      </div>
+
+      {shouldShowLegend && <Legend />}
+
+      {/* Timeline for abundance and movement */}
+      {dataIndex < 2 && (
+        <Timeline week={week} dataset={dataIndex} isMonitor={isMonitor} onChangeWeek={checkImageAndUpdate} />
+      )}
+
+      {/* Timeline for inflow and outflow */}
+      {dataIndex >= 2 && (
+        <InflowOutflowTimelineV2
+          onChangeWeek={flowUpdate}
+          mode={dataIndex === 2 ? "inflow" : "outflow"}
+          dateLabels={dateLabels}
+          dataIndex={dataIndex}
+          nFlowWeeks={N_FLOW_WEEKS}
+        />
+      )}
     </div>
   );
 }

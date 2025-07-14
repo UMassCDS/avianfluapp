@@ -17,6 +17,7 @@ type outMarker = {
     label: string;
 }
 
+// This is the red location marker icon that is displayed on the map
 function outbreakIcon(icon_path: string) {
     return new Icon({
         iconUrl: icon_path,
@@ -37,6 +38,7 @@ const markerIcons: (typeof Icon)[] = [
     outbreakIcon(iconThree),
 ]
 
+/* This method goes through outbreaks.json, extract data from these entries and add it to the outbreakMarkers[] array to be processed by selectedOutbreaks() method */
 export function loadOutbreaks() {
     if (outbreakMarkers.length > 0) {
         // only run this once
@@ -60,6 +62,7 @@ export function loadOutbreaks() {
 }
 
 
+/* The way I understand this, this method returns the list of outbreaks to be rendered as OutbreakMarkers, in the current week. As for how the list is calculated/returned, I don't really know since Pam did it */
 function selectedOutbreaks(this_week: number):outMarker[] {
     // show only outbreaks in the last year.  
     const markers: outMarker[]=[];
@@ -78,8 +81,15 @@ function selectedOutbreaks(this_week: number):outMarker[] {
 }
 
 
-// Adds markers with a outbreak info to the map w/ at the correct lat/long
-// Note: "week" value is for the currently displayed week. 
+/**
+ * Renders outbreak markers for a given week (this is the location marker that changes when you move the slider bar).
+ *
+ * @param week - The week number to filter and display outbreak markers for.
+ * @returns An array of Marker components representing outbreaks for the specified week.
+ *
+ * Each marker uses an icon based on how many years ago the outbreak occurred,
+ * and displays a popup with a label describing the outbreak.
+ */
 export function OutbreakMarkers(week: number) {
     const currentMarkers = selectedOutbreaks(week);
     return (
@@ -98,7 +108,19 @@ export function OutbreakMarkers(week: number) {
 }
 
 
-// meaning of marker color
+/**
+ * Renders a legend for outbreak points, displaying icons and labels for the current year and the previous year.
+ *
+ * @component
+ * @returns {JSX.Element} The outbreak legend component with icons and corresponding year labels.
+ *
+ * @example
+ * <OutbreakLegend />
+ *
+ * @remarks
+ * - Expects `iconOne`, `iconTwo`, and `thisYear` to be defined in the parent scope.
+ * - Each legend entry consists of an icon and a bold label indicating the year.
+ */
 export const OutbreakLegend = () => (
     <div>
         <div style={{display:"flex"}}>

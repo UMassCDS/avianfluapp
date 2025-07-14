@@ -1,3 +1,38 @@
-.DefaultPage {
-    padding: 8%;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display:wght@600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Import a formal, readable font */
+body {
+  font-family: 'Inter', Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Remove .DefaultPage, .AboutCard, and related custom classes if you are using Tailwind for layout and styling */
+
+.flap-bird {
+  width: 88px;
+  height: 125px;
+  background-image: url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/174479/bird-cells-new.svg');
+  background-size: auto 100%;
+  animation: flap-cycle 1s steps(10) infinite;
+  position: absolute;
+  left: 50%;
+  bottom: -50%;
+  transform: translateX(-50%);
+  filter: hue-rotate(-30deg) brightness(1.1) saturate(1.4);
+  z-index: 1;
+}
+
+@keyframes flap-cycle {
+  100% {
+    background-position: -900px 0;
+  }
+}
+
+.header-title {
+  font-family: 'Playfair Display', serif;
 }
