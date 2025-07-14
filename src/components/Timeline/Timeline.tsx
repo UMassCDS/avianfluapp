@@ -15,6 +15,7 @@ import { TimelineMarkerLabel } from './TimelineMarkerLabel';
 import { TimelineMarkerDot } from './TimelineMarkerDot';
 import { TimelineTodayMarker } from './TimelineTodayMarker';
 import { TimelineMonthMark } from './TimelineMonthMark';
+import { TimelineFilledBar } from './TimelineFilledBar';
 
 const datasets = [ab_dates, mv_dates, ab_dates, ab_dates];
 
@@ -191,15 +192,14 @@ export default function Timeline({
 
         {/* Timeline Slider Area */}
         <div className="flex-1" style={{marginLeft: "5%"}}>
+
           {/* Thumb label and marker */}
           <div ref={ref} style={{ height: 32, position: 'relative', zIndex: 1000 }}>
-            <TimelineMarkerLabel
-              left={markerPct}
-              label={datasets[dataIndex][markerWeek].label}
-            />
+            <TimelineMarkerLabel left={markerPct} label={datasets[dataIndex][markerWeek].label} />
             <TimelineMarkerDot left={markerPct} />
             <TimelineTodayMarker left={getTimelinePosition(new Date())} />
           </div>
+
           {/* Custom Slider */}
           <div
             ref={trackRef}
@@ -216,48 +216,7 @@ export default function Timeline({
               alignItems: 'center',
             }}
           >
-            {/* Filled bar */}
-            {isWrapped ? (
-              <>
-                <div
-                  style={{
-                    position: 'absolute',
-                    left: 0,
-                    width: `${rightPct}%`,
-                    top: 0,
-                    bottom: 0,
-                    background: '#228be6',
-                    zIndex: 1,
-                    borderRadius: 8,
-                  }}
-                />
-                <div
-                  style={{
-                    position: 'absolute',
-                    left: `${leftPct}%`,
-                    width: `${100 - leftPct}%`,
-                    top: 0,
-                    bottom: 0,
-                    background: '#228be6',
-                    zIndex: 1,
-                    borderRadius: 8,
-                  }}
-                />
-              </>
-            ) : (
-              <div
-                style={{
-                  position: 'absolute',
-                  left: `${leftPct}%`,
-                  width: `${rightPct - leftPct}%`,
-                  top: 0,
-                  bottom: 0,
-                  background: '#228be6',
-                  zIndex: 1,
-                  borderRadius: 8,
-                }}
-              />
-            )}
+            <TimelineFilledBar isWrapped={isWrapped} leftPct={leftPct} rightPct={rightPct} />
 
             {/* Month marks and labels */}
             {sliderMarks.map((mark, idx) => (
