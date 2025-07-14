@@ -14,6 +14,7 @@ import { PlayPauseButton } from './PlayPauseButton';
 import { TimelineMarkerLabel } from './TimelineMarkerLabel';
 import { TimelineMarkerDot } from './TimelineMarkerDot';
 import { TimelineTodayMarker } from './TimelineTodayMarker';
+import { TimelineMonthMark } from './TimelineMonthMark';
 
 const datasets = [ab_dates, mv_dates, ab_dates, ab_dates];
 
@@ -259,46 +260,15 @@ export default function Timeline({
             )}
 
             {/* Month marks and labels */}
-            {sliderMarks.map((mark, idx) => {
-              let labelStyle: React.CSSProperties = {
-                position: 'absolute',
-                top: 20,
-                left: '50%',
-                transform: 'translateX(-50%)',
-                fontSize: 12,
-                color: 'gray',
-                fontWeight: 500,
-                whiteSpace: 'nowrap',
-              };
-              if (idx === 0) {
-                labelStyle.left = 0;
-                labelStyle.transform = 'none';
-                labelStyle.textAlign = 'left';
-              } else if (idx === sliderMarks.length - 1) {
-                labelStyle.left = '100%';
-                labelStyle.transform = 'translateX(-100%)';
-                labelStyle.textAlign = 'right';
-              }
-              return (
-                <div
-                  key={mark.label}
-                  style={{
-                    position: 'absolute',
-                    left: `calc(${mark.value}% - 3px)`,
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    width: 6,
-                    height: 6,
-                    borderRadius: '50%',
-                    background: 'white',
-                    border: '1.5px solid #228be6',
-                    zIndex: 2,
-                  }}
-                >
-                  <span style={labelStyle}>{mark.label}</span>
-                </div>
-              );
-            })}
+            {sliderMarks.map((mark, idx) => (
+              <TimelineMonthMark
+                key={mark.label}
+                label={mark.label}
+                value={mark.value}
+                isFirst={idx === 0}
+                isLast={idx === sliderMarks.length - 1}
+              />
+            ))}
 
             {/* Thumbs: static blue circle (left) and blue arrow (right) */}
             {/* LEFT (circle) */}
