@@ -132,7 +132,7 @@ export default function Timeline({
   });
 
   useEffect(() => {
-    const mode = dataInfo[dataIndex].label;
+    const mode = dataInfo[dataIndex].datatype;
     setMode(mode);
   }, [dataInfo, dataIndex]);
 

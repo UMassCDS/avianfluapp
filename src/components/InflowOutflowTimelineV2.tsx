@@ -126,7 +126,7 @@ export default function InflowOutflowTimelineV2({
   });
 
   useEffect(() => {
-    const mode = dataInfo[dataIndex].label;
+    const mode = dataInfo[dataIndex].datatype;
     setMode(mode);
   }, [dataInfo, dataIndex]);
 
