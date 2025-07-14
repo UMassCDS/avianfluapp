@@ -16,6 +16,7 @@ import { TimelineMarkerDot } from './TimelineMarkerDot';
 import { TimelineTodayMarker } from './TimelineTodayMarker';
 import { TimelineMonthMark } from './TimelineMonthMark';
 import { TimelineFilledBar } from './TimelineFilledBar';
+import { TimelineThumb } from './TimelineThumb';
 
 const datasets = [ab_dates, mv_dates, ab_dates, ab_dates];
 
@@ -231,127 +232,27 @@ export default function Timeline({
 
             {/* Thumbs: static blue circle (left) and blue arrow (right) */}
             {/* LEFT (circle) */}
-            <div
-              style={{
-                position: 'absolute',
-                left: `calc(${leftPct}% - 14px)`,
-                top: '50%',
-                transform: 'translateY(-50%)',
-                width: 28,
-                height: 28,
-                zIndex: mode === 'outflow' ? 3 : 2,
-                pointerEvents: 'none',
-              }}
-            >
-              {showSpanLabels && !isNear(spanStart, markerWeek)  && (
-                <div
-                  className="timeline-label"
-                  style={{
-                    position: 'absolute',
-                    top: -28,
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                  }}
-                >
-                  {datasets[dataIndex][spanStart].label}
-                </div>
-              )}
-              <svg width={28} height={28}>
-                <circle cx={14} cy={14} r={10} fill="#228be6" stroke="#228be6" strokeWidth={3} />
-              </svg>
-            </div>
-
+            <TimelineThumb 
+              positionPct={leftPct}
+              type='circle'
+              label={datasets[dataIndex][spanStart].label}
+              showLabel={showSpanLabels && !isNear(spanStart, markerWeek)}
+              isDraggable={mode === 'outflow'}
+              isPlaying={isPlaying}
+              color={mode === 'outflow' ? 'white' : '#228be6'}
+              setupDragHandlers={mode === 'outflow' ? setupDragHandlers: undefined}
+            />
             {/* RIGHT (arrow) */}
-            <div
-              style={{
-                position: 'absolute',
-                left: `calc(${rightPct}% - 14px)`,
-                top: '50%',
-                transform: 'translateY(-50%)',
-                width: 28,
-                height: 28,
-                zIndex: mode === 'inflow' ? 3 : 2,
-                pointerEvents: 'none',
-              }}
-            >
-              {showSpanLabels && !isNear(spanEnd, markerWeek) && (
-                <div
-                  className="timeline-label"
-                  style={{
-                    position: 'absolute',
-                    top: -28,
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                  }}
-                >
-                  {datasets[dataIndex][spanEnd].label}
-                </div>
-              )}
-              <svg width="28" height="28" viewBox="0 0 24 24">
-                <polygon
-                  points="6,6 22,12 6,18"
-                  fill="#228be6"
-                  stroke="#228be6"
-                  strokeWidth="3"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </div>
-
-            {/* Draggable: white arrow for inflow, white circle for outflow */}
-            {mode === 'inflow' ? (
-              <div
-                style={{
-                  position: 'absolute',
-                  left: `calc(${rightPct}% - 14px)`,
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  width: 28,
-                  height: 28,
-                  zIndex: 4,
-                  cursor: !isPlaying ? 'pointer' : 'default',
-                  pointerEvents: !isPlaying ? 'auto' : 'none',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-                onMouseDown={!isPlaying ? setupDragHandlers : undefined}
-                onTouchStart={!isPlaying ? (e => { e.preventDefault(); setupDragHandlers(e); }) : undefined}
-              >
-                <svg width="28" height="28" viewBox="0 0 24 24">
-                  <polygon
-                    points="6,6 22,12 6,18"
-                    fill="white"
-                    stroke="#228be6"
-                    strokeWidth="3"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </div>
-            ) : (
-              <div
-                style={{
-                  position: 'absolute',
-                  left: `calc(${leftPct}% - 14px)`,
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  width: 28,
-                  height: 28,
-                  zIndex: 4,
-                  cursor: !isPlaying ? 'pointer' : 'default',
-                  pointerEvents: !isPlaying ? 'auto' : 'none',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-                onMouseDown={!isPlaying ? setupDragHandlers : undefined}
-                onTouchStart={!isPlaying ? (e => { e.preventDefault(); setupDragHandlers(e); }) : undefined}
-              >
-                <svg width={28} height={28}>
-                  <circle cx={14} cy={14} r={10} fill="white" stroke="#228be6" strokeWidth={3} />
-                </svg>
-              </div>
-            )}
+            <TimelineThumb 
+              positionPct={rightPct}
+              type='arrow'
+              label={datasets[dataIndex][spanEnd].label}
+              showLabel={showSpanLabels && !isNear(spanEnd, markerWeek)}
+              isDraggable={mode === 'inflow'}
+              isPlaying={isPlaying}
+              color={mode === 'inflow' ? 'white' : '#228be6'}
+              setupDragHandlers={mode === 'inflow' ? setupDragHandlers: undefined}
+            />
           </div>
         </div>
       </div>
