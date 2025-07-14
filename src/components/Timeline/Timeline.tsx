@@ -12,6 +12,7 @@ import mv_dates from '../../assets/movement_dates.json';
 
 import { PlayPauseButton } from './PlayPauseButton';
 import { TimelineMarkerLabel } from './TimelineMarkerLabel';
+import { TimelineMarkerDot } from './TimelineMarkerDot';
 
 const datasets = [ab_dates, mv_dates, ab_dates, ab_dates];
 
@@ -194,15 +195,7 @@ export default function Timeline({
               left={markerPct}
               label={datasets[dataIndex][markerWeek].label}
             />
-
-            <div
-              className="timeline-marker-dot"
-              style={{
-                position: 'absolute',
-                left: `calc(${markerPct}% - 3px)`,
-                top: '30px',
-              }}
-            />
+            <TimelineMarkerDot left={markerPct} />
             <div
               className="timeline-today-marker"
               style={{
