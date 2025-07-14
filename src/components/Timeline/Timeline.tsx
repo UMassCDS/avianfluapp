@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useMemo, useRef, useEffect, useState } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import { useMove } from '@mantine/hooks';
 import { RootState } from '../../store/store';
@@ -26,8 +26,8 @@ const isWithinSpan = (week: number, start: number, end: number, wrapped: boolean
 
 const isNear = (a: number, b: number, range: number = 2, max: number = MAX_WEEK) => {
   const diff = Math.abs(a - b);
-  return diff <= range || (max - diff) <= range;
-}
+  return diff <= range;
+};
 
 
 export default function Timeline({
@@ -59,6 +59,8 @@ export default function Timeline({
   const [sliderMarks, setSliderMarks] = useState(monthMarks);
   const [showSpanLabels, setShowSpanLabels] = useState(false);
   const [mode, setMode] = useState('');
+
+  const todayPct = useMemo(() => getTimelinePosition(new Date()), []);
 
   const updateMarkerAndSpan = () => {
     const spanEnd = (spanStart + localNFlowWeeks) % WEEKS_PER_YEAR;
@@ -135,7 +137,7 @@ export default function Timeline({
     setMode(mode);
   }, [dataInfo, dataIndex]);
 
-  useEffect(updateMarkerAndSpan, [spanStart]);
+  useEffect(updateMarkerAndSpan, [spanStart, mode]);
 
   useEffect(() => {
     setMarkerPct(getTimelinePosition(datasets[dataIndex][markerWeek].date));
@@ -196,7 +198,7 @@ export default function Timeline({
           <div ref={ref} style={{ height: 32, position: 'relative', zIndex: 1000 }}>
             <TimelineMarkerLabel left={markerPct} label={datasets[dataIndex][markerWeek].label} />
             <TimelineMarkerDot left={markerPct} />
-            <TimelineTodayMarker left={getTimelinePosition(new Date())} />
+            <TimelineTodayMarker left={todayPct} />
           </div>
 
           {/* Custom Slider */}
