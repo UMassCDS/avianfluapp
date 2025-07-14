@@ -10,6 +10,8 @@ import { dataInfo } from '../../hooks/dataUrl';
 import ab_dates from '../../assets/abundance_dates.json';
 import mv_dates from '../../assets/movement_dates.json';
 
+import { PlayPauseButton } from './PlayPauseButton';
+
 
 const datasets = [ab_dates, mv_dates, ab_dates, ab_dates];
 
@@ -178,21 +180,12 @@ export default function Timeline({
     >
       <div className="flex items-center w-full">
         {/* Play/Pause Button */}
-        <div className="flex-shrink-0 mr-2" style={{ width: 48 }}>
-        <Tooltip label="No flow results to play" disabled={flowResults.length > 0}>
-          <Tooltip label={isPlaying ? "Pause" : "Play"} disabled={flowResults.length === 0}>
-            <ActionIcon
-              size="xl"
-              onClick={() => setIsPlaying(p => !p)}
-              variant={flowResults.length === 0 ? 'default' : 'filled'}
-              disabled={flowResults.length === 0}
-              style={{ width: 48, height: 48 }}
-            >
-              {isPlaying ? <IconPlayerPauseFilled /> : <IconPlayerPlayFilled />}
-            </ActionIcon>
-          </Tooltip>
-        </Tooltip>
-        </div>
+        <PlayPauseButton 
+          isPlaying={isPlaying}
+          onToggle={() => setIsPlaying(p => !p)}
+          disabled={flowResults.length === 0}
+        />
+
         {/* Timeline Slider Area */}
         <div className="flex-1" style={{marginLeft: "5%"}}>
           {/* Thumb label and marker */}
