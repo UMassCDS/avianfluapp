@@ -1,8 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import { useDispatch, useSelector } from 'react-redux';
-import { Tooltip, ActionIcon } from '@mantine/core';
 import { useMove } from '@mantine/hooks';
-import { IconPlayerPlayFilled, IconPlayerPauseFilled } from "@tabler/icons-react";
 import { RootState } from '../../store/store';
 import { clearOverlayUrl, clearFlowResults } from '../../store/slices/mapSlice';
 import {MAX_WEEK, WEEKS_PER_YEAR, getTimelinePosition, monthMarks} from '../../utils/utils'
