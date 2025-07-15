@@ -63,12 +63,6 @@ export function getTimelinePosition(dateInput: Date | string): number {
 
   const dayOfYear = Math.floor((targetDate.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24)) + 1;
 
-  if (dateInput === '2022-01-01') {
-    console.log(`targetDate: ${targetDate}`)
-    console.log(`startOfYear: ${startOfYear}`)
-    console.log(`dayOfYear: ${dayOfYear}`)
-  }
-
   // Determine if current year is a leap year
   const isLeapYear = (year: number) => (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
   const totalDays = isLeapYear(now.getFullYear()) ? 366 : 365;

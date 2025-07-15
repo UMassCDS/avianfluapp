@@ -1,14 +1,13 @@
 import React from 'react';
 
 type MonthMarkProps = {
-  key: string;
   label: string;
   value: number;
   isFirst?: boolean;
   isLast?: boolean;
 };
 
-export const TimelineMonthMark = ({ key, label, value, isFirst, isLast }: MonthMarkProps) => {
+export const TimelineMonthMark = ({ label, value, isFirst, isLast }: MonthMarkProps) => {
   const labelStyle: React.CSSProperties = {
     position: 'absolute',
     top: 20,
@@ -33,7 +32,7 @@ export const TimelineMonthMark = ({ key, label, value, isFirst, isLast }: MonthM
 
   return (
     <div
-    key={key}
+      key={value}
       style={{
         position: 'absolute',
         left: `calc(${value}% - 3px)`,

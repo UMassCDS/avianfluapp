@@ -1,28 +1,38 @@
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Combobox, ComboboxStore, useCombobox } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { useEffect, useState } from 'react';
-import 'leaflet/dist/leaflet.css';
-import axios from 'axios';
-import { imageURL, getScalingFilename, dataInfo} from '../hooks/dataUrl';
-import taxa from '../assets/taxa.json';
-import Timeline from '../components/Timeline';
-import Legend from '../components/Legend';
-import {loadOutbreaks, OutbreakLegend} from '../components/OutbreakPoints'
-import '../styles/Home.css';
-import 'leaflet-geosearch/dist/geosearch.css';
-import InflowOutflowTimelineV2 from '../components/InflowOutflowTimelineV2';
-import InflowOutflowCalculateButton from '../components/InflowOutflowCalculateButton';
-import MapView from '../components/MapView';
-import ControlBar from '../components/ControlBar';
+import L from 'leaflet';
 import AboutButtons from '../components/AboutButtons';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../store/store'; // Adjust the path to your store file
+import ControlBar from '../components/ControlBar';
+import InflowOutflowCalculateButton from '../components/InflowOutflowCalculateButton';
+import Legend from '../components/Legend';
+import MapOverlayPanel from '../components/MapOverlayPanel';
+import MapView from '../components/MapView';
+import Timeline from '../components/Timeline/Timeline';
+import { loadOutbreaks, OutbreakLegend } from '../components/OutbreakPoints';
+import { imageURL, getScalingFilename, dataInfo } from '../hooks/dataUrl';
+import { RootState } from '../store/store';
 import { setDataIndex, setSpeciesIndex } from '../store/slices/speciesSlice';
 import { setWeek } from '../store/slices/timelineSlice';
-import { setFontHeight, setIconSize, setIsMonitor, setTextSize, setTitleSize } from '../store/slices/uiSlice';
-import { setOverlayUrl, clearFlowResults, updateOverlayByWeek, clearOverlayUrl } from '../store/slices/mapSlice';
-import L from 'leaflet';
-import MapOverlayPanel from '../components/MapOverlayPanel';
+import {
+  setFontHeight,
+  setIconSize,
+  setIsMonitor,
+  setTextSize,
+  setTitleSize,
+} from '../store/slices/uiSlice';
+import {
+  setOverlayUrl,
+  clearFlowResults,
+  updateOverlayByWeek,
+  clearOverlayUrl,
+} from '../store/slices/mapSlice';
+
+import 'leaflet/dist/leaflet.css';
+import 'leaflet-geosearch/dist/geosearch.css';
+import '../styles/Home.css';
+import taxa from '../assets/taxa.json';
 
 // Fix for missing marker icon in production
 // Import marker images
@@ -65,19 +75,11 @@ const HomePage = () => {
   const speciesIndex = useSelector((state: RootState) => state.species.speciesIndex);
   const dataIndex = useSelector((state: RootState) => state.species.dataIndex);
   const flowResults = useSelector((state: RootState) => state.map.flowResults);
-
-  // const [week, setWeek] = useState(MIN_WEEK);
   const week = useSelector((state: RootState) => state.timeline.week);
 
   // default state of the map overlay url for the current data displayed.
-  const overlayUrl = useSelector((state: RootState) => state.map.overlayUrl);
   const speciesCombo = useCombobox();
-
-  const isMonitor = useSelector((state: RootState) => state.ui.isMonitor);
-  const iconSize = useSelector((state: RootState) => state.ui.iconSize);
-  const textSize = useSelector((state: RootState) => state.ui.textSize);
   const fontHeight = useSelector((state: RootState) => state.ui.fontHeight);
-  const titleSize = useSelector((state: RootState) => state.ui.titleSize);
 
   const [location, setLocation] = useState<string[]>([]);
 
@@ -89,23 +91,6 @@ const HomePage = () => {
     dispatch(clearOverlayUrl());
   };
 
-  function runTest() {
-    console.log("Pam's test code");
-    axios.get('http://localhost:8000/echo', {params: {text: "Tiggy Rules"}})
-      .then(function (response) {
-        // handle success
-        console.log(response.data);
-      })
-      .catch(function (error) {
-        // handle error
-        console.log(error);
-      })
-      .finally(function () {
-        // always executed
-      }
-    );
-  }
-  
   function handleWindowSizeChange() {
     if (window.innerWidth <  MIN_REG_WINDOW_WIDTH) {
       // small window
@@ -135,48 +120,39 @@ const HomePage = () => {
     };
   }, []);
 
-  async function checkImage(this_week: number): Promise<boolean> {
+  async function checkImage(thisWeek: number): Promise<boolean> {
     // Skip check for inflow/outflow
     if (dataIndex >= 2) {
-      dispatch(setOverlayUrl(""));
       return Promise.resolve(true);
     }
 
-    const image_url = imageURL(dataIndex, speciesIndex, this_week);
-    const response = await fetch(image_url);
-
+    const imageUrl = imageURL(dataIndex, speciesIndex, thisWeek);
+    const response = await fetch(imageUrl);
     if (!response.ok) {
       console.debug(response);
       notifications.show({
         title: 'Missing Image',
-        message: `The .png for week ${this_week} on ${dataInfo[dataIndex].label} of ${taxa[speciesIndex].label} is missing.`,
+        message: `The .png for week ${thisWeek} on ${dataInfo[dataIndex].label} of ${taxa[speciesIndex].label} is missing.`,
         color: 'orange',
       });
 
       return false;
     }
-    dispatch(setOverlayUrl(image_url));
+    dispatch(setOverlayUrl(imageUrl));
     return true;
   }
 
-  async function checkImageAndUpdate(this_week: number) {
-    var response = await checkImage(this_week);
-    if (response) {
-      console.log("HOME: onChangeWeek: ",this_week);
-      dispatch(setWeek(this_week));
-    }
-  }
-
-  function flowUpdate(this_week: number) {
-    console.log("flowUpdate: ",this_week);
-    dispatch(setWeek(this_week));
-    dispatch(updateOverlayByWeek(this_week));
+  async function onChangeWeek(thisWeek: number) {
+    console.log(`onChangeWeek ${thisWeek}`)
+    dispatch(setWeek(thisWeek));
+    dispatch(updateOverlayByWeek(thisWeek));
+    await checkImage(thisWeek);
   }
 
   useEffect(() => {
-    console.log("dataIndex and species change", week);
-    checkImage(week);
+    dispatch(clearOverlayUrl());
     dispatch(clearFlowResults());
+    checkImage(week);
   }, [dataIndex, speciesIndex]);
 
   async function checkInputTypes(d_index: number, s_index: number) {
@@ -264,8 +240,9 @@ const HomePage = () => {
           </div>
         </div>
       </div>
+
       <div className="fixed top-4 right-4 z-50 flex flex-col gap-3 items-end">
-        <AboutButtons runTest={runTest} />
+        <AboutButtons />
         <ControlBar
           checkInputTypes={checkInputTypes}
           speciesCombo={speciesCombo}
@@ -276,18 +253,10 @@ const HomePage = () => {
 
       {shouldShowLegend && <Legend />}
 
-      {/* Timeline for abundance and movement */}
-      {dataIndex < 2 && (
-        <Timeline week={week} dataset={dataIndex} isMonitor={isMonitor} onChangeWeek={checkImageAndUpdate} />
-      )}
-
-      {/* Timeline for inflow and outflow */}
-      {dataIndex >= 2 && (
-        <InflowOutflowTimelineV2
-          onChangeWeek={flowUpdate}
-          nFlowWeeks={N_FLOW_WEEKS}
-        />
-      )}
+      <Timeline
+        onChangeWeek={onChangeWeek}
+        nFlowWeeks={N_FLOW_WEEKS}
+      />
     </div>
   );
 }

@@ -63,6 +63,14 @@ export default function Timeline({
   const todayPct = useMemo(() => getTimelinePosition(new Date()), []);
 
   const updateMarkerAndSpan = () => {
+    if (mode === 'abundance' || mode === 'movement') {
+      setSpanStart(0);
+      setSpanEnd(MAX_WEEK);
+      setLeftPct(0);
+      setRightPct(100);
+      return;
+    }
+
     const spanEnd = (spanStart + localNFlowWeeks) % WEEKS_PER_YEAR;
     const wrapped = spanEnd < spanStart;
     const current = mode === 'inflow' ? spanEnd : spanStart;
@@ -129,13 +137,15 @@ export default function Timeline({
   const { ref } = useMove(({ x }) => {
     const curWeek = Math.floor(x * (WEEKS_PER_YEAR - 1));
     setMarkerWeek(curWeek);
-    if (flowResults.length > 0) onChangeWeek(curWeek);
+    if (flowResults.length > 0 || mode === 'abundance' || mode === 'movement') onChangeWeek(curWeek);
   });
 
   useEffect(() => {
-    const mode = dataInfo[dataIndex].datatype;
+    const mode = dataInfo[dataIndex].datatype; // 'inflow', 'outflow', 'abundance', 'movement'
     setMode(mode);
-  }, [dataInfo, dataIndex]);
+    stopPlayback();
+    setIsPlaying(false);
+  }, [dataIndex]);
 
   useEffect(updateMarkerAndSpan, [spanStart, mode]);
 
@@ -188,7 +198,7 @@ export default function Timeline({
         <PlayPauseButton 
           isPlaying={isPlaying}
           onToggle={() => setIsPlaying(p => !p)}
-          disabled={flowResults.length === 0}
+          disabled={flowResults.length === 0 && (mode !== 'abundance' && mode !== 'movement')}
         />
 
         {/* Timeline Slider Area */}
@@ -222,7 +232,6 @@ export default function Timeline({
             {/* Month marks and labels */}
             {sliderMarks.map((mark, idx) => (
               <TimelineMonthMark
-                key={mark.label}
                 label={mark.label}
                 value={mark.value}
                 isFirst={idx === 0}
@@ -242,10 +251,10 @@ export default function Timeline({
               color={mode === 'outflow' ? 'white' : '#228be6'}
               setupDragHandlers={mode === 'outflow' ? setupDragHandlers: undefined}
             />
-            {/* RIGHT (arrow) */}
+            {/* RIGHT (circle or arrow) */}
             <TimelineThumb 
               positionPct={rightPct}
-              type='arrow'
+              type={mode === 'inflow' || mode === 'outflow' ? 'arrow' : 'circle'}
               label={datasets[dataIndex][spanEnd].label}
               showLabel={showSpanLabels && !isNear(spanEnd, markerWeek)}
               isDraggable={mode === 'inflow'}
