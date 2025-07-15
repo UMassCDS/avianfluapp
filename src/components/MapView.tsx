@@ -1,13 +1,13 @@
 import { ImageOverlay, MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
 import { OutbreakMarkers } from "./OutbreakPoints";
-import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
+import { GeoSearchControl, OpenStreetMapProvider } from "leaflet-geosearch";
+import "leaflet-geosearch/dist/geosearch.css";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../store/store";
 import { clearFlowResults, clearOverlayUrl } from '../store/slices/mapSlice';
 import { IconClick, IconSearch } from "@tabler/icons-react";
-
-import 'leaflet/dist/leaflet.css';
-import 'leaflet-geosearch/dist/geosearch.css';
 
 const imageBounds = [
   [9.622994, -170.291626],
@@ -124,9 +124,10 @@ function SearchField({ onLocationSelect, setMarkerPosition }: any) {
 export default function MapView({ week, dataIndex, onLocationSelect }: MapViewProps): JSX.Element {
   const dispatch = useDispatch();
 
-  const overlayUrl = useSelector((state: any) => state.map.overlayUrl);
+  const overlayUrl = useSelector((state: RootState) => state.map.overlayUrl);
+  const showOutbreaks = useSelector((state: RootState) => state.map.showOutbreaks); // Get the toggle state
   const [markerPosition, setMarkerPosition] = useState<{ lat: number, lng: number } | null>(null);
-  const [useSearchMode, setUseSearchMode] = useState(true); // Toggle: true = search, false = click
+  const [useSearchMode, setUseSearchMode] = useState(false);
 
   const position = { lat: 45, lng: -95 };
 
@@ -233,7 +234,8 @@ export default function MapView({ week, dataIndex, onLocationSelect }: MapViewPr
         </Marker>
       )}
 
-      {OutbreakMarkers(week)}
+      {/* This line now correctly hides/shows the markers */}
+      {showOutbreaks && OutbreakMarkers(week)}
     </MapContainer>
     </div>
   );

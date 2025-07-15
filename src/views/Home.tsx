@@ -75,6 +75,9 @@ const HomePage = () => {
   const speciesIndex = useSelector((state: RootState) => state.species.speciesIndex);
   const dataIndex = useSelector((state: RootState) => state.species.dataIndex);
   const flowResults = useSelector((state: RootState) => state.map.flowResults);
+  const showOutbreaks = useSelector((state: RootState) => state.map.showOutbreaks);
+
+  // const [week, setWeek] = useState(MIN_WEEK);
   const week = useSelector((state: RootState) => state.timeline.week);
 
   // default state of the map overlay url for the current data displayed.
@@ -233,14 +236,15 @@ const HomePage = () => {
           onLocationSelect={handleLocationSelect}
         />
       </div>
-      <div className="widgets">
-        <div style={{ display: 'flex', flexDirection: 'row', gap: '1rem' }}>
-          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center' }}>
-            <OutbreakLegend />
+      {showOutbreaks && (
+        <div className="widgets">
+          <div style={{ display: 'flex', flexDirection: 'row', gap: '1rem' }}>
+            <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center' }}>
+              <OutbreakLegend />
+            </div>
           </div>
         </div>
-      </div>
-
+      )}
       <div className="fixed top-4 right-4 z-50 flex flex-col gap-3 items-end">
         <AboutButtons />
         <ControlBar
