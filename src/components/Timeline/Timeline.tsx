@@ -145,6 +145,7 @@ export default function Timeline({
     setMode(mode);
     stopPlayback();
     setIsPlaying(false);
+    setSpanStart(markerWeek);
     setMarkerPct(getTimelinePosition(datasets[dataIndex][markerWeek].date));
   }, [dataIndex]);
 
