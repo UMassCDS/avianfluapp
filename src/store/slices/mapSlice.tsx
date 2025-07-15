@@ -35,12 +35,9 @@ const mapSlice = createSlice({
       state.flowResults = [];
     },
     updateOverlayByWeek(state, action: PayloadAction<number>) {
+      if (state.flowResults.length === 0) return;
       const match = state.flowResults.find((r) => r.week === action.payload);
-      if (match) {
-        state.overlayUrl = match.url;
-      } else {
-        state.overlayUrl = "";
-      }
+      state.overlayUrl = match ? match.url : "";
     },
     toggleOutbreaks(state) {
       state.showOutbreaks = !state.showOutbreaks;

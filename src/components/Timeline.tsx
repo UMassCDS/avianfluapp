@@ -4,7 +4,7 @@ import { useMove } from '@mantine/hooks';
 import { IconCaretDownFilled, IconPlayerPlayFilled, IconPlayerPauseFilled } from '@tabler/icons-react';
 import ab_dates from '../assets/abundance_dates.json';
 import mv_dates from '../assets/movement_dates.json';
-import { dateToWeek, MIN_WEEK, MAX_WEEK, WEEKS_PER_YEAR } from '../utils/utils';
+import { dateToWeek, getTimelinePosition, MIN_WEEK, MAX_WEEK, WEEKS_PER_YEAR } from '../utils/utils';
 
 // The Timeline includes three values the user can set.
 // 1. the currently displayed week of a year.  This is done with a separate 'thumb' above the range slider.
@@ -200,6 +200,22 @@ function Timeline(props: TimelineProps) {
                 {dateLabels[dataset][week]}
               </div>
             </div>
+            <div
+              className="timeline-marker-dot"
+              style={{
+                position: 'absolute',
+                left: `calc(${sliderValue * 100}% - 3px)`,
+                top: '33px',
+              }}
+            />
+            <div
+              className="timeline-today-marker"
+              style={{
+                left: `calc(${getTimelinePosition(new Date())}% - 2px)`,
+                top: '36px',
+                height: '8px',
+              }}
+            />
           </div>
           <RangeSlider
             defaultValue={weekRange}

@@ -77,7 +77,26 @@
         pointer-events: none;
         transition: opacity 0.2s ease;
         opacity: 0.9;
-        }
+    }
+
+    .timeline-marker-dot {
+        margin-top: 4px;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background-color: white;
+    }
+
+    .timeline-today-marker {
+        position: absolute;
+        top: 32px;
+        width: 2px;
+        height: 10px;
+        background-color: red;
+        border-radius: 2px;
+        z-index: 3;
+        pointer-events: none;
+    }
 
     .calculate-button {
         position: absolute;

@@ -4,10 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { RootState } from "../store/store";
 import { Tooltip } from '@mantine/core';
 
-interface AboutButtonsProps {
-  runTest: () => void;
-}
-
 /**
  * Renders a set of action buttons for the About section, including:
  * - A button to run a test REST API call.
@@ -18,7 +14,7 @@ interface AboutButtonsProps {
  *
  * The component uses Redux to determine the icon size and React Router for navigation.
  */
-export default function AboutButtons({ runTest }: AboutButtonsProps) {
+export default function AboutButtons() {
   const navigate = useNavigate();
   const iconSize = useSelector((state: RootState) => state.ui.iconSize);
 

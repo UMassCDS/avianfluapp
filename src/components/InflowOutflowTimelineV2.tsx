@@ -5,15 +5,13 @@ import { useMove } from '@mantine/hooks';
 import { IconPlayerPlayFilled, IconPlayerPauseFilled } from "@tabler/icons-react";
 import { RootState } from '../store/store';
 import { clearOverlayUrl, clearFlowResults } from '../store/slices/mapSlice';
-import {MAX_WEEK, WEEKS_PER_YEAR} from '../utils/utils'
+import {MAX_WEEK, WEEKS_PER_YEAR, getTimelinePosition, monthMarks} from '../utils/utils'
+import { dataInfo } from '../hooks/dataUrl';
+import ab_dates from '../assets/abundance_dates.json';
+import mv_dates from '../assets/movement_dates.json';
 
 
-const monthMarks = [
-  { week: 0, label: 'Jan' }, { week: 4, label: 'Feb' }, { week: 8, label: 'Mar' },
-  { week: 13, label: 'Apr' }, { week: 17, label: 'May' }, { week: 21, label: 'Jun' },
-  { week: 26, label: 'Jul' }, { week: 30, label: 'Aug' }, { week: 35, label: 'Sep' },
-  { week: 39, label: 'Oct' }, { week: 43, label: 'Nov' }, { week: 47, label: 'Dec' }
-];
+const datasets = [ab_dates, mv_dates, ab_dates, ab_dates];
 
 const clamp = (val: number, min: number, max: number) => Math.max(min, Math.min(max, val));
 
@@ -21,28 +19,25 @@ const isWithinSpan = (week: number, start: number, end: number, wrapped: boolean
   return wrapped ? week >= start || week <= end : week >= start && week <= end;
 };
 
-type Mode = "inflow" | "outflow";
-
-interface Props {
-  onChangeWeek: (week: number) => void;
-  mode: Mode;
-  dateLabels: string[][];
-  dataIndex: number;
-  nFlowWeeks: number;
+const isNear = (a: number, b: number, range: number = 2, max: number = MAX_WEEK) => {
+  const diff = Math.abs(a - b);
+  return diff <= range || (max - diff) <= range;
 }
+
 
 export default function InflowOutflowTimelineV2({
   onChangeWeek,
-  mode,
-  dateLabels,
-  dataIndex,
   nFlowWeeks,
-}: Props) {
+}: {
+  onChangeWeek: (week: number) => void;
+  nFlowWeeks: number;
+}) {
   const dispatch = useDispatch();
 
   const week = useSelector((state: RootState) => state.timeline.week);
   const isMonitor = useSelector((state: RootState) => state.ui.isMonitor);
   const flowResults = useSelector((state: RootState) => state.map.flowResults);
+  const dataIndex = useSelector((state: RootState) => state.species.dataIndex);
 
   const localNFlowWeeks = nFlowWeeks - 1;
   const playbackRef = useRef<NodeJS.Timeout | null>(null);
@@ -58,11 +53,7 @@ export default function InflowOutflowTimelineV2({
   const [markerPct, setMarkerPct] = useState(0);
   const [sliderMarks, setSliderMarks] = useState(monthMarks);
   const [showSpanLabels, setShowSpanLabels] = useState(false);
-
-  function isNear(a: number, b: number, range: number = 2, max: number = MAX_WEEK) {
-    const diff = Math.abs(a - b);
-    return diff <= range || (max - diff) <= range;
-}
+  const [mode, setMode] = useState('');
 
   const updateMarkerAndSpan = () => {
     const spanEnd = (spanStart + localNFlowWeeks) % WEEKS_PER_YEAR;
@@ -71,8 +62,8 @@ export default function InflowOutflowTimelineV2({
 
     setSpanEnd(spanEnd);
     setIsWrapped(wrapped);
-    setLeftPct((spanStart / (WEEKS_PER_YEAR - 1)) * 100);
-    setRightPct((spanEnd / (WEEKS_PER_YEAR - 1)) * 100);
+    setLeftPct(getTimelinePosition(datasets[dataIndex][spanStart].date));
+    setRightPct(getTimelinePosition(datasets[dataIndex][spanEnd].date));
     onChangeWeek(current);
   };
 
@@ -134,10 +125,15 @@ export default function InflowOutflowTimelineV2({
     if (flowResults.length > 0) onChangeWeek(curWeek);
   });
 
+  useEffect(() => {
+    const mode = dataInfo[dataIndex].datatype;
+    setMode(mode);
+  }, [dataInfo, dataIndex]);
+
   useEffect(updateMarkerAndSpan, [spanStart]);
 
   useEffect(() => {
-    setMarkerPct((markerWeek / (WEEKS_PER_YEAR - 1)) * 100);
+    setMarkerPct(getTimelinePosition(datasets[dataIndex][markerWeek].date));
   }, [markerWeek]);
 
   useEffect(() => {
@@ -173,7 +169,6 @@ export default function InflowOutflowTimelineV2({
     else stopPlayback();
     return stopPlayback;
   }, [isPlaying, markerWeek, spanStart, isWrapped]);
-
 
   return (
     <div
@@ -212,9 +207,23 @@ export default function InflowOutflowTimelineV2({
               }}
             >
               <div className="timeline-marker-label">
-                {dateLabels[dataIndex]?.[markerWeek]}
+                {datasets[dataIndex][markerWeek].label}
               </div>
             </div>
+            <div
+              className="timeline-marker-dot"
+              style={{
+                position: 'absolute',
+                left: `calc(${markerPct}% - 3px)`,
+                top: '30px',
+              }}
+            />
+            <div
+              className="timeline-today-marker"
+              style={{
+                left: `calc(${getTimelinePosition(new Date())}% - 2px)`,
+              }}
+            />
           </div>
           {/* Custom Slider */}
           <div
@@ -277,7 +286,6 @@ export default function InflowOutflowTimelineV2({
 
             {/* Month marks and labels */}
             {sliderMarks.map((mark, idx) => {
-              const markPct = (mark.week / (WEEKS_PER_YEAR - 1)) * 100;
               let labelStyle: React.CSSProperties = {
                 position: 'absolute',
                 top: 20,
@@ -299,10 +307,10 @@ export default function InflowOutflowTimelineV2({
               }
               return (
                 <div
-                  key={mark.week}
+                  key={mark.label}
                   style={{
                     position: 'absolute',
-                    left: `calc(${markPct}% - 3px)`,
+                    left: `calc(${mark.value}% - 3px)`,
                     top: '50%',
                     transform: 'translateY(-50%)',
                     width: 6,
@@ -342,7 +350,7 @@ export default function InflowOutflowTimelineV2({
                     transform: 'translateX(-50%)',
                   }}
                 >
-                  {dateLabels[dataIndex]?.[spanStart]}
+                  {datasets[dataIndex][spanStart].label}
                 </div>
               )}
               <svg width={28} height={28}>
@@ -373,7 +381,7 @@ export default function InflowOutflowTimelineV2({
                     transform: 'translateX(-50%)',
                   }}
                 >
-                  {dateLabels[dataIndex]?.[spanEnd]}
+                  {datasets[dataIndex][spanEnd].label}
                 </div>
               )}
               <svg width="28" height="28" viewBox="0 0 24 24">
