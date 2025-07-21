@@ -290,10 +290,12 @@ function About() {
   );
 
   const TabMenu = (
-    <div className="flex gap-2 justify-center mb-8">
+    <div className="sticky top-0 z-20 bg-white/90 border-b border-blue-100 flex gap-2 justify-center py-3 mb-8 rounded-t-2xl shadow-sm">
       <button
-        className={`px-4 py-2 rounded-full font-semibold transition ${
-          tab === 'about' ? 'bg-blue-100 text-blue-700 ring-2 ring-blue-300' : 'hover:bg-blue-50 text-blue-700'
+        className={`px-5 py-2 rounded-full font-semibold transition ${
+          tab === 'about'
+            ? 'bg-blue-600 text-white shadow ring-2 ring-blue-300'
+            : 'hover:bg-blue-50 text-blue-700'
         }`}
         onClick={() => handleTabClick('about')}
         type="button"
@@ -301,8 +303,10 @@ function About() {
         About
       </button>
       <button
-        className={`px-4 py-2 rounded-full font-semibold transition ${
-          tab === 'feedback' ? 'bg-blue-100 text-blue-700 ring-2 ring-blue-300' : 'hover:bg-blue-50 text-blue-700'
+        className={`px-5 py-2 rounded-full font-semibold transition ${
+          tab === 'feedback'
+            ? 'bg-blue-600 text-white shadow ring-2 ring-blue-300'
+            : 'hover:bg-blue-50 text-blue-700'
         }`}
         onClick={() => handleTabClick('feedback')}
         type="button"
@@ -310,7 +314,7 @@ function About() {
         Feedback
       </button>
       <button
-        className="px-4 py-2 rounded-full font-semibold transition hover:bg-blue-50 text-blue-700"
+        className="px-5 py-2 rounded-full font-semibold transition hover:bg-blue-50 text-blue-700"
         onClick={() => handleTabClick('swagger')}
         type="button"
       >
