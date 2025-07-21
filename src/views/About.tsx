@@ -1,8 +1,20 @@
 import { Link } from 'react-router-dom';
 import { IconStack2 } from "@tabler/icons-react";
 import BirdSVG from '../assets/Bird.svg';
+import { useState } from 'react';
+import FeedbackForm from './Feedback';
 
 function About() {
+  const [tab, setTab] = useState<'about' | 'feedback' | 'swagger'>('about');
+
+  const handleTabClick = (selectedTab: typeof tab) => {
+    if (selectedTab === 'swagger') {
+      window.open('https://www.birdfluapi.com/__docs__/', '_blank', 'noopener,noreferrer');
+      return;
+    }
+    setTab(selectedTab);
+  };
+
   const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
     <section className="mb-8">
       <h2 className="text-xl font-semibold text-blue-500 mb-3">{title}</h2>
@@ -277,6 +289,36 @@ function About() {
     </Section>
   );
 
+  const TabMenu = (
+    <div className="flex gap-2 justify-center mb-8">
+      <button
+        className={`px-4 py-2 rounded-full font-semibold transition ${
+          tab === 'about' ? 'bg-blue-100 text-blue-700 ring-2 ring-blue-300' : 'hover:bg-blue-50 text-blue-700'
+        }`}
+        onClick={() => handleTabClick('about')}
+        type="button"
+      >
+        About
+      </button>
+      <button
+        className={`px-4 py-2 rounded-full font-semibold transition ${
+          tab === 'feedback' ? 'bg-blue-100 text-blue-700 ring-2 ring-blue-300' : 'hover:bg-blue-50 text-blue-700'
+        }`}
+        onClick={() => handleTabClick('feedback')}
+        type="button"
+      >
+        Feedback
+      </button>
+      <button
+        className="px-4 py-2 rounded-full font-semibold transition hover:bg-blue-50 text-blue-700"
+        onClick={() => handleTabClick('swagger')}
+        type="button"
+      >
+        Test REST API
+      </button>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center py-8 px-2 font-sans">
       <div className="relative bg-white/95 max-w-3xl w-full rounded-2xl shadow-xl px-8 py-10 overflow-hidden border border-blue-100">
@@ -323,14 +365,20 @@ function About() {
           <h1 className="text-3xl font-bold text-blue-500 m-0 text-center font-sans">Avian Influenza</h1>
         </div>
 
-
-        {AboutThisSite}
-        {/* {Data}
-        {Species}
-        {Outbreaks}
-        {MoreInformation}
-        {Disclaimer}
-        {Citations} */}
+        {TabMenu}
+        {tab === 'about' && (
+          <>
+            {AboutThisSite}
+            {/* {Data}
+            {Species}
+            {Outbreaks}
+            {MoreInformation}
+            {Disclaimer}
+            {Citations} */}
+          </>
+        )}
+        {tab === 'feedback' && <FeedbackForm />}
+        {/* Swagger tab does not render content, just opens the link */}
       </div>
     </div>
   );
