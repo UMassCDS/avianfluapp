@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { IconStack2 } from "@tabler/icons-react";
+import BirdSVG from '../assets/Bird.svg';
 
 function About() {
   const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
@@ -195,8 +196,15 @@ function About() {
       </p>
       <h4 className="text-md font-semibold text-blue-500 mb-1">Species</h4>
       <p>
-        Each of the image layers can be displayed either for an individual species or for the total across all 9 species - controlled with the species selection button. All of the image data has a resolution of 100 km – values are set for pixels that are 100 x 100 km.
-      </p>
+  Each of the image layers can be displayed either for an individual species or for the total across all 9 species — controlled with the species selection button{' '}
+  <img
+    src={BirdSVG}
+    alt="Bird icon"
+    className="inline align-middle"
+    style={{ width: 24, height: 24 }}
+  />. All of the image data has a resolution of 100 km – values are set for pixels that are 100 × 100 km.
+</p>
+
       <h4 className="text-md font-semibold text-blue-500 mb-1">Active Date</h4>
       <p>
         All of the image data varies over time and the displayed date is controlled by sliding the active date indicator along the timeline at the bottom, or pressing the play button to animate over time.
