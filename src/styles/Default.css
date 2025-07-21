@@ -36,3 +36,60 @@ body {
 .header-title {
   font-family: 'Playfair Display', serif;
 }
+
+    .timeline-marker {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 80px;
+        height: 28px;
+        border-radius: 9999px; /* pill shape */
+        background-color: white;
+        border: 2px solid #228be6;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        transition: border 0.2s ease, color 0.2s ease;
+    }
+
+    .timeline-marker-label {
+        font-size: 13px;
+        font-weight: 500;
+        color: #228be6;
+        white-space: nowrap;
+    }
+
+    .timeline-marker:hover {
+        border: 2px solid #1864ab;
+    }
+
+    .timeline-label {
+        margin-bottom: 4px;
+        background-color: black;
+        color: white;
+        padding: 2px 8px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 500;
+        white-space: nowrap;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+        opacity: 0.9;
+    }
+
+    .timeline-marker-dot {
+        margin-top: 4px;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background-color: white;
+    }
+
+    .timeline-today-marker {
+        position: absolute;
+        top: 32px;
+        width: 2px;
+        height: 10px;
+        background-color: red;
+        border-radius: 2px;
+        z-index: 3;
+        pointer-events: none;
+    }
