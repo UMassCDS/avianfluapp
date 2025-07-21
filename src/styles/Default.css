@@ -14,7 +14,7 @@ body {
 /* Remove .DefaultPage, .AboutCard, and related custom classes if you are using Tailwind for layout and styling */
 
 .flap-bird {
-  width: 88px;
+  /* width: 88px;
   height: 125px;
   background-image: url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/174479/bird-cells-new.svg');
   background-size: auto 100%;
@@ -24,7 +24,16 @@ body {
   bottom: -50%;
   transform: translateX(-50%);
   filter: hue-rotate(-30deg) brightness(1.1) saturate(1.4);
-  z-index: 1;
+  z-index: 1; */
+
+  width: 40px;
+  height: 40px;
+  background-image: url('../assets/Bird.svg');
+  background-size: auto 100%;
+  background-position: 0 0; /* first frame, change X for other frames */
+  display: block;
+  margin: 0 auto;
+  filter: hue-rotate(-30deg) brightness(1.1) saturate(1.4);
 }
 
 @keyframes flap-cycle {
