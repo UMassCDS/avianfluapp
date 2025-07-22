@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../store/store";
 import { dataInfo } from "../hooks/dataUrl";
 import { toggleOutbreaks } from "../store/slices/mapSlice";
+import { Tooltip } from "@mantine/core";
 
 type ControlBarProps = {
   checkInputTypes: (dataTypeIdx: number, speciesIdx: number) => void;
@@ -57,17 +58,19 @@ export default function ControlBar({
     <div className="flex flex-col items-end gap-2">
       {/* Data Type Dropdown */}
       <div ref={dataTypeRef} className="relative">
-        <button
-          className="bg-gradient-to-br from-blue-100 to-blue-300 hover:from-blue-200 hover:to-blue-400 shadow-xl rounded-xl border-2 border-blue-400 transition-all duration-200 flex items-center justify-center p-0"
-          style={{ width: 54, height: 54 }}
-          onClick={() => setOpenDataType((v) => !v)}
-          aria-label="Show data type controls"
-          type="button"
-        >
-          <span className="flex items-center justify-center w-full h-full">
-            <IconStack2 size={32} className="text-blue-700" />
-          </span>
-        </button>
+        <Tooltip label="Select data type" position="left" withArrow>
+          <button
+            className="bg-gradient-to-br from-blue-100 to-blue-300 hover:from-blue-200 hover:to-blue-400 shadow-xl rounded-xl border-2 border-blue-400 transition-all duration-200 flex items-center justify-center p-0"
+            style={{ width: 54, height: 54 }}
+            onClick={() => setOpenDataType((v) => !v)}
+            aria-label="Show data type controls"
+            type="button"
+          >
+            <span className="flex items-center justify-center w-full h-full">
+              <IconStack2 size={32} className="text-blue-700" />
+            </span>
+          </button>
+        </Tooltip>
         {openDataType && (
           <div className="absolute right-0 mt-3 w-64 rounded-2xl bg-white/95 shadow-2xl border-2 border-blue-200 p-5 flex flex-col gap-4 animate-fade-in z-50">
             {/* Outbreaks Section */}
@@ -119,35 +122,37 @@ export default function ControlBar({
 
       {/* Species Dropdown */}
       <div ref={speciesRef} className="relative">
-        <button
-          className="bg-gradient-to-br from-blue-100 to-blue-300 hover:from-blue-200 hover:to-blue-400 shadow-xl rounded-xl border-2 border-blue-400 transition-all duration-200 flex items-center justify-center p-0"
-          style={{ width: 54, height: 54 }}
-          onClick={() => setOpenSpecies((v) => !v)}
-          aria-label="Show species controls"
-          type="button"
-        >
-         <span className="flex items-center justify-center w-full h-full">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="28"
-              height="28"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="rgb(29 78 216)"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="inline-block"
-            >
-              <path d="M16 7h.01"></path>
-              <path d="M3.4 18H12a8 8 0 0 0 8-8V7a4 4 0 0 0-7.28-2.3L2 20"></path>
-              <path d="m20 7 2 .5-2 .5"></path>
-              <path d="M10 18v3"></path>
-              <path d="M14 17.75V21"></path>
-              <path d="M7 18a6 6 0 0 0 3.84-10.61"></path>
-            </svg>
-          </span>
-        </button>
+        <Tooltip label="Select species" position="left" withArrow>
+          <button
+            className="bg-gradient-to-br from-blue-100 to-blue-300 hover:from-blue-200 hover:to-blue-400 shadow-xl rounded-xl border-2 border-blue-400 transition-all duration-200 flex items-center justify-center p-0"
+            style={{ width: 54, height: 54 }}
+            onClick={() => setOpenSpecies((v) => !v)}
+            aria-label="Show species controls"
+            type="button"
+          >
+            <span className="flex items-center justify-center w-full h-full">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="rgb(29 78 216)"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="inline-block"
+              >
+                <path d="M16 7h.01"></path>
+                <path d="M3.4 18H12a8 8 0 0 0 8-8V7a4 4 0 0 0-7.28-2.3L2 20"></path>
+                <path d="m20 7 2 .5-2 .5"></path>
+                <path d="M10 18v3"></path>
+                <path d="M14 17.75V21"></path>
+                <path d="M7 18a6 6 0 0 0 3.84-10.61"></path>
+              </svg>
+            </span>
+          </button>
+        </Tooltip>
         {openSpecies && (
           <div className="absolute right-0 mt-3 w-64 rounded-2xl bg-white/95 shadow-2xl border-2 border-blue-200 p-5 flex flex-col gap-2 animate-fade-in z-50">
             <div className="mb-2 text-xs text-blue-500 font-bold uppercase tracking-wide flex items-center gap-1">
