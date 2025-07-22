@@ -58,7 +58,7 @@ export default function ControlBar({
     <div className="flex flex-col items-end gap-2">
       {/* Data Type Dropdown */}
       <div ref={dataTypeRef} className="relative">
-        <Tooltip label="Select data type" position="left" withArrow>
+        <Tooltip label="Control what data is displayed" position="left" withArrow>
           <button
             className="bg-gradient-to-br from-blue-100 to-blue-300 hover:from-blue-200 hover:to-blue-400 shadow-xl rounded-xl border-2 border-blue-400 transition-all duration-200 flex items-center justify-center p-0"
             style={{ width: 54, height: 54 }}
@@ -122,7 +122,7 @@ export default function ControlBar({
 
       {/* Species Dropdown */}
       <div ref={speciesRef} className="relative">
-        <Tooltip label="Select species" position="left" withArrow>
+        <Tooltip label="Select species to display" position="left" withArrow>
           <button
             className="bg-gradient-to-br from-blue-100 to-blue-300 hover:from-blue-200 hover:to-blue-400 shadow-xl rounded-xl border-2 border-blue-400 transition-all duration-200 flex items-center justify-center p-0"
             style={{ width: 54, height: 54 }}
