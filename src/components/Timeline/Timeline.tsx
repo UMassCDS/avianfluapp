@@ -242,28 +242,69 @@ export default function Timeline({
             ))}
 
             {/* Thumbs: static blue circle (left) and blue arrow (right) */}
-            {/* LEFT (circle) */}
-            <TimelineThumb 
-              positionPct={leftPct}
-              type='circle'
-              label={datasets[dataIndex][spanStart].label}
-              showLabel={showSpanLabels && !isNear(spanStart, markerWeek)}
-              isDraggable={mode === 'outflow'}
-              isPlaying={isPlaying}
-              color={mode === 'outflow' ? 'white' : '#228be6'}
-              setupDragHandlers={mode === 'outflow' ? setupDragHandlers: undefined}
-            />
-            {/* RIGHT (circle or arrow) */}
-            <TimelineThumb 
-              positionPct={rightPct}
-              type={mode === 'inflow' || mode === 'outflow' ? 'arrow' : 'circle'}
-              label={datasets[dataIndex][spanEnd].label}
-              showLabel={showSpanLabels && !isNear(spanEnd, markerWeek)}
-              isDraggable={mode === 'inflow'}
-              isPlaying={isPlaying}
-              color={mode === 'inflow' ? 'white' : '#228be6'}
-              setupDragHandlers={mode === 'inflow' ? setupDragHandlers: undefined}
-            />
+            {/* LEFT (circle) - Outflow */}
+            <div
+              className="group"
+              style={{
+                position: 'absolute',
+                left: `calc(${leftPct}% - 14px)`,
+                top: '50%',
+                transform: 'translateY(-50%)',
+                zIndex: 4,
+                width: 28,
+                height: 28,
+                pointerEvents: !isPlaying ? 'auto' : 'none',
+              }}
+            >
+              <TimelineThumb 
+                positionPct={leftPct}
+                type='circle'
+                label={datasets[dataIndex][spanStart].label}
+                showLabel={showSpanLabels && !isNear(spanStart, markerWeek)}
+                isDraggable={mode === 'outflow'}
+                isPlaying={isPlaying}
+                color={mode === 'outflow' ? 'white' : '#228be6'}
+                setupDragHandlers={mode === 'outflow' ? setupDragHandlers: undefined}
+              />
+              {/* Tooltip below thumb, only when white */}
+              {mode === 'outflow' && (
+                <div className="absolute left-1/2 top-full translate-x-[-50%] mt-2 px-2 py-1 rounded bg-black text-white text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-95 transition pointer-events-none">
+                  Flow start date; drag to change
+                </div>
+              )}
+            </div>
+
+            {/* RIGHT (arrow) - Inflow */}
+            <div
+              className="group"
+              style={{
+                position: 'absolute',
+                left: `calc(${rightPct}% - 14px)`,
+                top: '50%',
+                transform: 'translateY(-50%)',
+                zIndex: 4,
+                width: 28,
+                height: 28,
+                pointerEvents: !isPlaying ? 'auto' : 'none',
+              }}
+            >
+              <TimelineThumb 
+                positionPct={rightPct}
+                type={mode === 'inflow' || mode === 'outflow' ? 'arrow' : 'circle'}
+                label={datasets[dataIndex][spanEnd].label}
+                showLabel={showSpanLabels && !isNear(spanEnd, markerWeek)}
+                isDraggable={mode === 'inflow'}
+                isPlaying={isPlaying}
+                color={mode === 'inflow' ? 'white' : '#228be6'}
+                setupDragHandlers={mode === 'inflow' ? setupDragHandlers: undefined}
+              />
+              {/* Tooltip below thumb, only when white */}
+              {mode === 'inflow' && (
+                <div className="absolute left-1/2 top-full translate-x-[-50%] mt-2 px-2 py-1 rounded bg-black text-white text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-95 transition pointer-events-none">
+                  Flow start date; drag to change
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
