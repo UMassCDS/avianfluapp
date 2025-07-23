@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Combobox, ComboboxStore, useCombobox } from '@mantine/core';
+import { Combobox, ComboboxStore, useCombobox, Tooltip } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import L from 'leaflet';
 import AboutButtons from '../components/AboutButtons';
@@ -29,6 +29,7 @@ import {
   updateOverlayByWeek,
   clearOverlayUrl,
 } from '../store/slices/mapSlice';
+import { IconClick, IconSearch } from '@tabler/icons-react';
 
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-geosearch/dist/geosearch.css';
@@ -86,6 +87,7 @@ const HomePage = () => {
   const fontHeight = useSelector((state: RootState) => state.ui.fontHeight);
 
   const [location, setLocation] = useState<string[]>([]);
+  const [useSearchMode, setUseSearchMode] = useState(false);
 
   // Callback passed to MapView
   const handleLocationSelect = (latLon: string | null) => {
@@ -94,6 +96,8 @@ const HomePage = () => {
     dispatch(clearFlowResults());
     dispatch(clearOverlayUrl());
   };
+
+  const toggleMode = () => setUseSearchMode((prev) => !prev);
 
   function handleWindowSizeChange() {
     if (window.innerWidth <  MIN_REG_WINDOW_WIDTH) {
@@ -215,6 +219,34 @@ const HomePage = () => {
         <MapOverlayPanel>
           {dataIndex >= 2 && (
             <div className="flex flex-row items-center justify-center gap-4">
+              {/* Switch to Search/Click Mode Button */}
+              <Tooltip label="Flow start location" position="top" withArrow offset={8}>
+                <button
+                  onClick={toggleMode}
+                  type="button"
+                  className={`flex items-center gap-2 p-1 rounded-xl border-2 transition font-semibold shadow-md
+                    ${useSearchMode
+                      ? 'bg-white border-blue-400 text-blue-500 hover:bg-blue-50 hover:border-blue-500 active:bg-blue-100'
+                      : 'bg-white border-blue-400 text-blue-500 hover:bg-blue-50 hover:border-blue-500 active:bg-blue-100'
+                    }
+                    text-base sm:text-base`
+                  }
+                  style={{ marginTop: 'var(--mantine-spacing-md)' }}
+                >
+                  {useSearchMode ? (
+                    <>
+                      <IconClick size={20} className="text-blue-500 sm:w-5 sm:h-5 w-5 h-5" />
+                      <span className="hidden sm:inline">Switch to Click Mode</span>
+                    </>
+                  ) : (
+                    <>
+                      <IconSearch size={16} className="text-blue-500 sm:w-4 sm:h-4 w-4 h-4" />
+                      <span className="hidden sm:inline">Switch to Search Mode</span>
+                    </>
+                  )}
+                </button>
+              </Tooltip>
+              {/* Inflow/Outflow Calculate Button */}
               <InflowOutflowCalculateButton
                 dataIndex={dataIndex}
                 week={week}
