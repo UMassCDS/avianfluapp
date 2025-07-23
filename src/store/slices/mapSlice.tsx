@@ -6,15 +6,22 @@ interface FlowResult {
   legend: string;
 }
 
+interface FlowResultsPayload {
+  result: FlowResult[];
+  geotiff?: string;
+};
+
 interface MapState {
   overlayUrl: string;
   flowResults: FlowResult[]; // stores all API Flow results
+  flowGeoTiffUrl: string;
   showOutbreaks: boolean;
 }
 
 const initialState: MapState = {
   overlayUrl: "",
   flowResults: [],
+  flowGeoTiffUrl: "",
   showOutbreaks: true,
 };
 
@@ -28,11 +35,13 @@ const mapSlice = createSlice({
     clearOverlayUrl(state) {
       state.overlayUrl = "";
     },
-    setFlowResults(state, action: PayloadAction<FlowResult[]>) {
-      state.flowResults = action.payload;
+    setFlowResults(state, action: PayloadAction<FlowResultsPayload>) {
+      state.flowResults = action.payload.result;
+      state.flowGeoTiffUrl = action.payload.geotiff || "";
     },
     clearFlowResults(state) {
       state.flowResults = [];
+      state.flowGeoTiffUrl = "";
     },
     updateOverlayByWeek(state, action: PayloadAction<number>) {
       if (state.flowResults.length === 0) return;
