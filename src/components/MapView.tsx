@@ -163,7 +163,8 @@ export default function MapView({ week, dataIndex, onLocationSelect }: MapViewPr
 
   return (
     <div style={{ position: "relative" }}>
-      {/* Toggle Button */}
+      {/* Toggle Button moved to Home.tsx */}
+      {/*
       {isInflowOutflowView && (
         <Tooltip label="Flow start location" position="top" withArrow offset={8}>
           <button
@@ -188,7 +189,7 @@ export default function MapView({ week, dataIndex, onLocationSelect }: MapViewPr
             )}
           </button>
         </Tooltip>
-      )}
+      )} */}
     <MapContainer
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
