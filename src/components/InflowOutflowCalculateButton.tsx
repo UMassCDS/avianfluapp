@@ -41,8 +41,7 @@ const InflowOutflowCalculateButton: React.FC<Props> = ({
       console.log('API Response:', data);
 
       if (data.status === 'success') {
-        const result = data.result;
-        dispatch(setFlowResults(result));
+        dispatch(setFlowResults(data));
         dispatch(updateOverlayByWeek(week));
       } else if (data.status === 'outside mask') {
         notifications.show({
@@ -89,9 +88,9 @@ const InflowOutflowCalculateButton: React.FC<Props> = ({
       type="button"
     >
       {dataIndex === 2 ? (
-        <IconArrowDownCircle size={22} className="text-blue-500" />
+        <IconArrowDownCircle size={22} className={disabled ? "text-gray-400" : "text-blue-500"} />
       ) : (
-        <IconArrowUpCircle size={22} className="text-blue-500" />
+        <IconArrowUpCircle size={22} className={disabled ? "text-gray-400" : "text-blue-500"} />
       )}
       Calculate {dataIndex === 2 ? 'Inflow' : 'Outflow'}
     </Button>

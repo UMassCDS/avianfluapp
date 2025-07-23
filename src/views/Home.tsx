@@ -6,6 +6,7 @@ import L from 'leaflet';
 import AboutButtons from '../components/AboutButtons';
 import ControlBar from '../components/ControlBar';
 import InflowOutflowCalculateButton from '../components/InflowOutflowCalculateButton';
+import FlowDownloadButton from '../components/FlowDownloadButton';
 import Legend from '../components/Legend';
 import MapOverlayPanel from '../components/MapOverlayPanel';
 import MapView from '../components/MapView';
@@ -212,9 +213,8 @@ const HomePage = () => {
       {/* Top center overlay panel */}
       <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[1100] max-w-lg w-[90vw]">
         <MapOverlayPanel>
-          <div className="flex flex-col items-center gap-4">
-            {/* Heading is always shown by MapOverlayPanel */}
-            {dataIndex >= 2 && (
+          {dataIndex >= 2 && (
+            <div className="flex flex-row items-center justify-center gap-4">
               <InflowOutflowCalculateButton
                 dataIndex={dataIndex}
                 week={week}
@@ -224,8 +224,9 @@ const HomePage = () => {
                 speciesOptions={taxa}
                 disabled={location.length === 0 || (Array.isArray(flowResults) && flowResults.length > 0)}
               />
-            )}
-          </div>
+              <FlowDownloadButton />
+            </div>
+          )}
         </MapOverlayPanel>
       </div>
 
