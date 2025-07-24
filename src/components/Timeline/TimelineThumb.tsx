@@ -2,7 +2,7 @@ import React from 'react';
 
 interface TimelineThumbProps {
   positionPct: number;
-  type: 'circle' | 'arrow';
+  type: 'circle' | 'arrow' | 'inflow_arrow'; // add inflow_arrow
   label?: string;
   showLabel?: boolean;
   color?: string;
@@ -65,6 +65,16 @@ export const TimelineThumb: React.FC<TimelineThumbProps> = ({
       {type === 'circle' ? (
         <svg width={28} height={28}>
           <circle cx={14} cy={14} r={10} fill={color} stroke='#228be6' strokeWidth={2} />
+        </svg>
+      ) : type === 'inflow_arrow' ? (
+        <svg width={28} height={28} viewBox="0 0 24 24" style={{ transform: 'rotate(180deg)' }}>
+          <polygon
+            points="6,6 22,12 6,18"
+            fill={color}
+            stroke='#228be6'
+            strokeWidth={2}
+            strokeLinejoin="round"
+          />
         </svg>
       ) : (
         <svg width={28} height={28} viewBox="0 0 24 24">
