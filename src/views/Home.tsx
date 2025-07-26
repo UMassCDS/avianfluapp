@@ -128,6 +128,17 @@ const HomePage = () => {
     };
   }, []);
 
+  // Prompt for location if in inflow/outflow and none selected
+  useEffect(() => {
+    if (dataIndex >= 2 && location.length === 0) {
+      notifications.show({
+        title: 'Select a Location',
+        message: 'Please select a location on the map to begin inflow/outflow analysis.',
+        color: 'blue',
+      });
+    }
+  }, [dataIndex, location.length]);
+
   async function checkImage(thisWeek: number): Promise<boolean> {
     // Skip check for inflow/outflow
     if (dataIndex >= 2) {
@@ -267,6 +278,7 @@ const HomePage = () => {
           week={week}
           dataIndex={dataIndex}
           onLocationSelect={handleLocationSelect}
+          useSearchMode={useSearchMode} // <-- add this
         />
       </div>
       {showOutbreaks && (

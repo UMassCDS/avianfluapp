@@ -19,6 +19,7 @@ interface MapViewProps {
   week: number;
   dataIndex: number;
   onLocationSelect: (latLonString: string | null) => void;
+  useSearchMode: boolean; // <-- add this
 }
 
 // @ts-ignore
@@ -122,20 +123,18 @@ function SearchField({ onLocationSelect, setMarkerPosition }: any) {
 - ImageOverlay component: Displays a heatmap-style overlay image based on the selected week
 - OutbreakMarkers function: Renders disease outbreak markers dynamically for the selected week
 */
-export default function MapView({ week, dataIndex, onLocationSelect }: MapViewProps): JSX.Element {
+export default function MapView({ week, dataIndex, onLocationSelect, useSearchMode }: MapViewProps): JSX.Element {
   const dispatch = useDispatch();
 
   const overlayUrl = useSelector((state: RootState) => state.map.overlayUrl);
   const showOutbreaks = useSelector((state: RootState) => state.map.showOutbreaks); // Get the toggle state
   const [markerPosition, setMarkerPosition] = useState<{ lat: number, lng: number } | null>(null);
-  const [useSearchMode, setUseSearchMode] = useState(false);
 
   const position = { lat: 45, lng: -95 };
 
   const isInflowOutflowView = dataIndex >= 2;
 
   const toggleMode = () => {
-    setUseSearchMode((prev) => !prev);
     // Clear any existing marker on the map
     setMarkerPosition(null);
 
