@@ -267,6 +267,7 @@ const HomePage = () => {
           week={week}
           dataIndex={dataIndex}
           onLocationSelect={handleLocationSelect}
+          useSearchMode={useSearchMode} // <-- add this
         />
       </div>
       {showOutbreaks && (
