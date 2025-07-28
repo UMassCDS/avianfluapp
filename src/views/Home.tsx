@@ -231,7 +231,7 @@ const HomePage = () => {
           {dataIndex >= 2 && (
             <div className="flex flex-row items-center justify-center gap-4">
               {/* Switch to Search/Click Mode Button */}
-              <Tooltip label="Flow start location" position="top" withArrow offset={8}>
+              <Tooltip label="Select flow start location" position="top" withArrow offset={8}>
                 <button
                   onClick={toggleMode}
                   type="button"

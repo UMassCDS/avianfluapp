@@ -47,11 +47,11 @@ export default function ControlBar({
 
   function handleDataTypeSelect(idx: number) {
     checkInputTypes(idx, selectedSpecies);
-    // Do not close dropdown on select to allow toggling outbreaks
+    setOpenDataType(false); 
   }
   function handleSpeciesSelect(idx: number) {
     checkSpecies(String(idx), speciesCombo);
-    setOpenSpecies(false);
+    setOpenSpecies(false); 
   }
 
   return (
@@ -122,7 +122,7 @@ export default function ControlBar({
 
       {/* Species Dropdown */}
       <div ref={speciesRef} className="relative">
-        <Tooltip label="Select species to display" position="left" withArrow>
+        <Tooltip label='Select species to display or "Total" for all.' position="left" withArrow>
           <button
             className="bg-gradient-to-br from-blue-100 to-blue-300 hover:from-blue-200 hover:to-blue-400 shadow-xl rounded-xl border-2 border-blue-400 transition-all duration-200 flex items-center justify-center p-0"
             style={{ width: 54, height: 54 }}
