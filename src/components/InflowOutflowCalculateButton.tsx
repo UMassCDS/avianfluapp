@@ -3,8 +3,9 @@ import { IconArrowDownCircle, IconArrowUpCircle } from '@tabler/icons-react';
 import { Button, Tooltip } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import axios from 'axios';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setFlowResults, updateOverlayByWeek } from '../store/slices/mapSlice';
+import { RootState } from '../store/store';
 
 const BirdflowRApiBaseUrl = "https://www.birdfluapi.com/mock"; // BirdflowR REST API base URL
 
@@ -28,25 +29,29 @@ const InflowOutflowCalculateButton: React.FC<Props> = ({
   disabled,
 }) => {
   const dispatch = useDispatch();
+  // Get flowResults from Redux to determine if calculation has already been done
+  const flowResults = useSelector((state: RootState) => state.map.flowResults);
 
-  // Get inflow/outflow label
   const flowType = dataIndex === 2 ? 'inflow' : 'outflow';
 
   // Tooltip logic
   let tooltipLabel = `Select start location to calculate ${flowType}`;
-  if (location && location.length > 0) {
-    // Parse lat/lon and round to 1 decimal
+  const hasLocation = location && location.length > 0;
+  const hasResults = Array.isArray(flowResults) && flowResults.length > 0;
+
+  if (!hasLocation) {
+    tooltipLabel = `Select start location to calculate ${flowType}`;
+  } else if (disabled && hasResults) {
+    tooltipLabel = "Reselect new location for calculating";
+  } else if (hasLocation) {
     const [lat, lon] = location[0].split(',').map(Number);
     const latStr = `${lat.toFixed(1)} N`;
     const lonStr = `${Math.abs(lon).toFixed(1)} W`;
-    // Get start date label from speciesOptions or pass as prop if needed
-    // Here, assume you have a week label array or can get it from props
-    // For now, just show week number (replace with actual date label if available)
     tooltipLabel = `Calculate flow from ${latStr} ${lonStr}, week ${week}`;
   }
 
   const handleClick = async () => {
-    if (!location || location.length === 0) {
+    if (!hasLocation) {
       notifications.show({
         title: 'Select a Location',
         message: 'Please select a location on the map to begin inflow/outflow analysis.',
@@ -54,16 +59,19 @@ const InflowOutflowCalculateButton: React.FC<Props> = ({
       });
       return;
     }
+    if (disabled && hasResults) {
+      // Prevent unnecessary API call
+      return;
+    }
 
     const functionName = dataIndex === 2 ? 'inflow' : 'outflow';
     const taxa = speciesOptions[speciesIndex]?.value || 'total';
-    const locParam = location.join(';'); // support multiple if needed
+    const locParam = location.join(';');
     const url = `${BirdflowRApiBaseUrl}/${functionName}?loc=${locParam}&week=${week}&taxa=${taxa}&n=${nFlowWeeks}`;
 
     try {
       const response = await axios.get(url);
       const data = response.data;
-      console.log('API Response:', data);
 
       if (data.status === 'success') {
         dispatch(setFlowResults(data));
@@ -88,7 +96,6 @@ const InflowOutflowCalculateButton: React.FC<Props> = ({
         });
       }
     } catch (error) {
-      console.error('API Error:', error);
       notifications.show({
         title: 'Connection error',
         message: 'Unable to contact the server. Please check your internet connection.',
