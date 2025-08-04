@@ -99,8 +99,6 @@ export default function Timeline({
     onChangeWeek(newMarkerWeek);
   };
 
-
-
   const startPlayback = () => {
     let current = markerWeek;
 
@@ -183,6 +181,8 @@ export default function Timeline({
     const current = mode === 'inflow' ? spanEnd : spanStart;
     if (flowResults.length === 0) onChangeWeek(current);
     else setMarkerWeek(current);
+    // Stop playback if no flow results are available
+    if (flowResults.length === 0 && (mode !== 'abundance' && mode !== 'movement')) stopPlayback();
   }, [flowResults, spanStart]);
 
   useEffect(() => {
