@@ -62,6 +62,7 @@ export default function Timeline({
 
   const todayPct = useMemo(() => getTimelinePosition(new Date()), []);
 
+  const [hasInitialized, setHasInitialized] = useState(false);
   const updateMarkerAndSpan = () => {
     const getWeekFromDate = (date: Date): number => {
       const jan1 = new Date(date.getFullYear(), 0, 1);
@@ -79,11 +80,13 @@ export default function Timeline({
 
     let newSpanStart = spanStart;
     let newSpanEnd = (spanStart + localNFlowWeeks) % WEEKS_PER_YEAR;
-    let newMarkerWeek = mode === 'inflow' ? getWeekFromDate(new Date()) % WEEKS_PER_YEAR : spanStart;
+    let newMarkerWeek = mode === 'inflow' ? spanEnd : spanStart;
 
-    if (mode === 'inflow') {
-      newSpanStart = (newMarkerWeek - localNFlowWeeks + WEEKS_PER_YEAR) % WEEKS_PER_YEAR;
-      newSpanEnd = newMarkerWeek;
+    if (mode === 'inflow' && !hasInitialized) {
+      newSpanEnd = getWeekFromDate(new Date()) % WEEKS_PER_YEAR;
+      newSpanStart = (newSpanEnd - localNFlowWeeks + WEEKS_PER_YEAR) % WEEKS_PER_YEAR;
+      newMarkerWeek = newSpanEnd;
+      setHasInitialized(true);
     }
 
     const wrapped = newSpanEnd < newSpanStart;
@@ -95,6 +98,7 @@ export default function Timeline({
     setRightPct(getTimelinePosition(datasets[dataIndex][newSpanEnd].date));
     onChangeWeek(newMarkerWeek);
   };
+
 
 
   const startPlayback = () => {
