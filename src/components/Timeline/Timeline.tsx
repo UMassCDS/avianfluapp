@@ -63,12 +63,6 @@ export default function Timeline({
   const todayPct = useMemo(() => getTimelinePosition(new Date()), []);
 
   const updateMarkerAndSpan = () => {
-    const getWeekFromDate = (date: Date): number => {
-      const jan1 = new Date(date.getFullYear(), 0, 1);
-      const days = Math.floor((date.getTime() - jan1.getTime()) / (1000 * 60 * 60 * 24));
-      return Math.floor(days / 7);
-    };
-
     if (mode === 'abundance' || mode === 'movement') {
       setSpanStart(0);
       setSpanEnd(MAX_WEEK);
@@ -77,25 +71,16 @@ export default function Timeline({
       return;
     }
 
-    let newSpanStart = spanStart;
-    let newSpanEnd = (spanStart + localNFlowWeeks) % WEEKS_PER_YEAR;
-    let newMarkerWeek = mode === 'inflow' ? getWeekFromDate(new Date()) % WEEKS_PER_YEAR : spanStart;
+    const spanEnd = (spanStart + localNFlowWeeks) % WEEKS_PER_YEAR;
+    const wrapped = spanEnd < spanStart;
+    const current = mode === 'inflow' ? spanEnd : spanStart;
 
-    if (mode === 'inflow') {
-      newSpanStart = (newMarkerWeek - localNFlowWeeks + WEEKS_PER_YEAR) % WEEKS_PER_YEAR;
-      newSpanEnd = newMarkerWeek;
-    }
-
-    const wrapped = newSpanEnd < newSpanStart;
-
-    setSpanStart(newSpanStart);
-    setSpanEnd(newSpanEnd);
+    setSpanEnd(spanEnd);
     setIsWrapped(wrapped);
-    setLeftPct(getTimelinePosition(datasets[dataIndex][newSpanStart].date));
-    setRightPct(getTimelinePosition(datasets[dataIndex][newSpanEnd].date));
-    onChangeWeek(newMarkerWeek);
+    setLeftPct(getTimelinePosition(datasets[dataIndex][spanStart].date));
+    setRightPct(getTimelinePosition(datasets[dataIndex][spanEnd].date));
+    onChangeWeek(current);
   };
-
 
   const startPlayback = () => {
     let current = markerWeek;
