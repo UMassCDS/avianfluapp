@@ -108,7 +108,7 @@ const InflowOutflowCalculateButton: React.FC<Props> = ({
   };
 
   return (
-    <Tooltip label={tooltipLabel} position="top" withArrow offset={8}>
+    <Tooltip label={tooltipLabel} position="bottom" withArrow offset={8}>
       <Button       
         onClick={handleClick} 
         variant="outline" 
