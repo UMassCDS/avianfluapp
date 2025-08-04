@@ -31,6 +31,7 @@ export default function MapOverlayPanel({ children, location }: MapOverlayPanelP
   }
   // Results displayed?
   const resultsDisplayed = Array.isArray(flowResults) && flowResults.length > 0 ? 'Results displayed' : 'No results';
+  const mode = dataInfo[dataIndex]?.datatype; // 'inflow', 'outflow', 'abundance', 'movement'
 
   return (
     <div className="bg-white/30 rounded-xl shadow-lg p-4 w-full">
@@ -40,11 +41,13 @@ export default function MapOverlayPanel({ children, location }: MapOverlayPanelP
         <br/>
         <strong>Species:</strong> {taxa[speciesIndex].label}
       </div>
-      <div className="text-xs text-gray-700 mb-2 text-center">
-        {dateLabel && <span>Start Date: {dateLabel}</span>}
-        <span> &nbsp;|&nbsp; Start Location: {locationLabel}</span>
-        <span> &nbsp;|&nbsp; {resultsDisplayed}</span>
-      </div>
+      {(mode === 'inflow' || mode === 'outflow') && (
+        <div className="text-xs text-gray-700 mb-2 text-center">
+          {dateLabel && <span>Start Date: {dateLabel}</span>}
+          <span> &nbsp;|&nbsp; Start Location: {locationLabel}</span>
+          <span> &nbsp;|&nbsp; {resultsDisplayed}</span>
+        </div>
+      )}
       {children}
     </div>
   );
