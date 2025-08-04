@@ -242,9 +242,61 @@ export default function Timeline({
             ))}
 
             {/* Thumbs: static blue circle (left) and blue arrow (right) */}
-            {mode === 'inflow' ? (
+            {(mode === 'abundance' || mode === 'movement') ? (
+  <>
+    {/* LEFT blue circle */}
+    <div
+      className="group"
+      style={{
+        position: 'absolute',
+        left: `calc(${leftPct}% - 14px)`,
+        top: '50%',
+        transform: 'translateY(-50%)',
+        zIndex: 4,
+        width: 28,
+        height: 28,
+        pointerEvents: 'none',
+      }}
+    >
+      <TimelineThumb 
+        positionPct={leftPct}
+        type="circle"
+        label={datasets[dataIndex][spanStart].label}
+        showLabel={showSpanLabels}
+        isDraggable={false}
+        isPlaying={isPlaying}
+        color="#228be6"
+      />
+    </div>
+
+    {/* RIGHT blue circle */}
+    <div
+      className="group"
+      style={{
+        position: 'absolute',
+        left: `calc(${rightPct}% - 14px)`,
+        top: '50%',
+        transform: 'translateY(-50%)',
+        zIndex: 4,
+        width: 28,
+        height: 28,
+        pointerEvents: 'none',
+      }}
+    >
+      <TimelineThumb 
+        positionPct={rightPct}
+        type="circle"
+        label={datasets[dataIndex][spanEnd].label}
+        showLabel={showSpanLabels}
+        isDraggable={false}
+        isPlaying={isPlaying}
+        color="#228be6"
+      />
+    </div>
+  </>
+            ) : mode === 'inflow' ? (
               <>
-                {/* LEFT (arrow, not draggable, blue, flipped to point outward) */}
+                {/* LEFT (arrow, not draggable, blue) */}
                 <div
                   className="group"
                   style={{
@@ -260,7 +312,7 @@ export default function Timeline({
                 >
                   <TimelineThumb 
                     positionPct={leftPct}
-                    type="inflow_arrow" // <-- use the inflow_arrow type here
+                    type="inflow_arrow"
                     label={datasets[dataIndex][spanStart].label}
                     showLabel={showSpanLabels && !isNear(spanStart, markerWeek)}
                     isDraggable={false}
@@ -268,6 +320,7 @@ export default function Timeline({
                     color="#228be6"
                   />
                 </div>
+
                 {/* RIGHT (circle, draggable, white) */}
                 <div
                   className="group"
@@ -292,7 +345,6 @@ export default function Timeline({
                     color="white"
                     setupDragHandlers={setupDragHandlers}
                   />
-                  {/* Tooltip below thumb, only when white */}
                   <div className="absolute left-1/2 top-full translate-x-[-50%] mt-2 px-2 py-1 rounded bg-black text-white text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-95 transition pointer-events-none">
                     Flow start date; drag to change
                   </div>
@@ -324,11 +376,11 @@ export default function Timeline({
                     color="white"
                     setupDragHandlers={setupDragHandlers}
                   />
-                  {/* Tooltip below thumb, only when white */}
                   <div className="absolute left-1/2 top-full translate-x-[-50%] mt-2 px-2 py-1 rounded bg-black text-white text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-95 transition pointer-events-none">
                     Flow start date; drag to change
                   </div>
                 </div>
+
                 {/* RIGHT (arrow, not draggable, blue) */}
                 <div
                   className="group"
@@ -355,6 +407,7 @@ export default function Timeline({
                 </div>
               </>
             )}
+
           </div>
         </div>
       </div>
