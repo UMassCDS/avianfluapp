@@ -37,9 +37,9 @@ export default function MapOverlayPanel({ children, location }: MapOverlayPanelP
     <div className="bg-white/30 rounded-xl shadow-lg p-4 w-full">
       <AppHeader />
       <div className="text-sm text-blue-500 mb-2 text-center">
-        <strong>Data:</strong> {dataInfo[dataIndex]?.label}
-        <br/>
-        <strong>Species:</strong> {taxa[speciesIndex].label}
+        <span><strong>Data:</strong> {dataInfo[dataIndex]?.label}</span>
+        <span> &nbsp;|&nbsp; </span>
+        <span><strong>Species:</strong> {taxa[speciesIndex].label}</span>
       </div>
       {(mode === 'inflow' || mode === 'outflow') && (
         <div className="text-xs text-gray-700 mb-2 text-center">
