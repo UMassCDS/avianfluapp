@@ -63,6 +63,12 @@ export default function Timeline({
   const todayPct = useMemo(() => getTimelinePosition(new Date()), []);
 
   const updateMarkerAndSpan = () => {
+    const getWeekFromDate = (date: Date): number => {
+      const jan1 = new Date(date.getFullYear(), 0, 1);
+      const days = Math.floor((date.getTime() - jan1.getTime()) / (1000 * 60 * 60 * 24));
+      return Math.floor(days / 7);
+    };
+
     if (mode === 'abundance' || mode === 'movement') {
       setSpanStart(0);
       setSpanEnd(MAX_WEEK);
@@ -71,16 +77,25 @@ export default function Timeline({
       return;
     }
 
-    const spanEnd = (spanStart + localNFlowWeeks) % WEEKS_PER_YEAR;
-    const wrapped = spanEnd < spanStart;
-    const current = mode === 'inflow' ? spanEnd : spanStart;
+    let newSpanStart = spanStart;
+    let newSpanEnd = (spanStart + localNFlowWeeks) % WEEKS_PER_YEAR;
+    let newMarkerWeek = mode === 'inflow' ? getWeekFromDate(new Date()) % WEEKS_PER_YEAR : spanStart;
 
-    setSpanEnd(spanEnd);
+    if (mode === 'inflow') {
+      newSpanStart = (newMarkerWeek - localNFlowWeeks + WEEKS_PER_YEAR) % WEEKS_PER_YEAR;
+      newSpanEnd = newMarkerWeek;
+    }
+
+    const wrapped = newSpanEnd < newSpanStart;
+
+    setSpanStart(newSpanStart);
+    setSpanEnd(newSpanEnd);
     setIsWrapped(wrapped);
-    setLeftPct(getTimelinePosition(datasets[dataIndex][spanStart].date));
-    setRightPct(getTimelinePosition(datasets[dataIndex][spanEnd].date));
-    onChangeWeek(current);
+    setLeftPct(getTimelinePosition(datasets[dataIndex][newSpanStart].date));
+    setRightPct(getTimelinePosition(datasets[dataIndex][newSpanEnd].date));
+    onChangeWeek(newMarkerWeek);
   };
+
 
   const startPlayback = () => {
     let current = markerWeek;
@@ -242,69 +257,172 @@ export default function Timeline({
             ))}
 
             {/* Thumbs: static blue circle (left) and blue arrow (right) */}
-            {/* LEFT (circle) - Outflow */}
-            <div
-              className="group"
-              style={{
-                position: 'absolute',
-                left: `calc(${leftPct}% - 14px)`,
-                top: '50%',
-                transform: 'translateY(-50%)',
-                zIndex: 4,
-                width: 28,
-                height: 28,
-                pointerEvents: !isPlaying ? 'auto' : 'none',
-              }}
-            >
-              <TimelineThumb 
-                positionPct={leftPct}
-                type='circle'
-                label={datasets[dataIndex][spanStart].label}
-                showLabel={showSpanLabels && !isNear(spanStart, markerWeek)}
-                isDraggable={mode === 'outflow'}
-                isPlaying={isPlaying}
-                color={mode === 'outflow' ? 'white' : '#228be6'}
-                setupDragHandlers={mode === 'outflow' ? setupDragHandlers: undefined}
-              />
-              {/* Tooltip below thumb, only when white */}
-              {mode === 'outflow' && (
-                <div className="absolute left-1/2 top-full translate-x-[-50%] mt-2 px-2 py-1 rounded bg-black text-white text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-95 transition pointer-events-none">
-                  Flow start date; drag to change
-                </div>
-              )}
-            </div>
+            {(mode === 'abundance' || mode === 'movement') ? (
+  <>
+    {/* LEFT blue circle */}
+    <div
+      className="group"
+      style={{
+        position: 'absolute',
+        left: `calc(${leftPct}% - 14px)`,
+        top: '50%',
+        transform: 'translateY(-50%)',
+        zIndex: 4,
+        width: 28,
+        height: 28,
+        pointerEvents: 'none',
+      }}
+    >
+      <TimelineThumb 
+        positionPct={leftPct}
+        type="circle"
+        label={datasets[dataIndex][spanStart].label}
+        showLabel={showSpanLabels}
+        isDraggable={false}
+        isPlaying={isPlaying}
+        color="#228be6"
+      />
+    </div>
 
-            {/* RIGHT (arrow) - Inflow */}
-            <div
-              className="group"
-              style={{
-                position: 'absolute',
-                left: `calc(${rightPct}% - 14px)`,
-                top: '50%',
-                transform: 'translateY(-50%)',
-                zIndex: 4,
-                width: 28,
-                height: 28,
-                pointerEvents: !isPlaying ? 'auto' : 'none',
-              }}
-            >
-              <TimelineThumb 
-                positionPct={rightPct}
-                type={mode === 'inflow' || mode === 'outflow' ? 'arrow' : 'circle'}
-                label={datasets[dataIndex][spanEnd].label}
-                showLabel={showSpanLabels && !isNear(spanEnd, markerWeek)}
-                isDraggable={mode === 'inflow'}
-                isPlaying={isPlaying}
-                color={mode === 'inflow' ? 'white' : '#228be6'}
-                setupDragHandlers={mode === 'inflow' ? setupDragHandlers: undefined}
-              />
-              {/* Tooltip below thumb, only when white */}
-              {mode === 'inflow' && (
-                <div className="absolute left-1/2 top-full translate-x-[-50%] mt-2 px-2 py-1 rounded bg-black text-white text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-95 transition pointer-events-none">
-                  Flow start date; drag to change
+    {/* RIGHT blue circle */}
+    <div
+      className="group"
+      style={{
+        position: 'absolute',
+        left: `calc(${rightPct}% - 14px)`,
+        top: '50%',
+        transform: 'translateY(-50%)',
+        zIndex: 4,
+        width: 28,
+        height: 28,
+        pointerEvents: 'none',
+      }}
+    >
+      <TimelineThumb 
+        positionPct={rightPct}
+        type="circle"
+        label={datasets[dataIndex][spanEnd].label}
+        showLabel={showSpanLabels}
+        isDraggable={false}
+        isPlaying={isPlaying}
+        color="#228be6"
+      />
+    </div>
+  </>
+            ) : mode === 'inflow' ? (
+              <>
+                {/* LEFT (arrow, not draggable, blue) */}
+                <div
+                  className="group"
+                  style={{
+                    position: 'absolute',
+                    left: `calc(${leftPct}% - 14px)`,
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    zIndex: 4,
+                    width: 28,
+                    height: 28,
+                    pointerEvents: 'none',
+                  }}
+                >
+                  <TimelineThumb 
+                    positionPct={leftPct}
+                    type="inflow_arrow"
+                    label={datasets[dataIndex][spanStart].label}
+                    showLabel={showSpanLabels && !isNear(spanStart, markerWeek)}
+                    isDraggable={false}
+                    isPlaying={isPlaying}
+                    color="#228be6"
+                  />
                 </div>
-              )}
-            </div>
+
+                {/* RIGHT (circle, draggable, white) */}
+                <div
+                  className="group"
+                  style={{
+                    position: 'absolute',
+                    left: `calc(${rightPct}% - 14px)`,
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    zIndex: 4,
+                    width: 28,
+                    height: 28,
+                    pointerEvents: !isPlaying ? 'auto' : 'none',
+                  }}
+                >
+                  <TimelineThumb 
+                    positionPct={rightPct}
+                    type="circle"
+                    label={datasets[dataIndex][spanEnd].label}
+                    showLabel={showSpanLabels && !isNear(spanEnd, markerWeek)}
+                    isDraggable={true}
+                    isPlaying={isPlaying}
+                    color="white"
+                    setupDragHandlers={setupDragHandlers}
+                  />
+                  <div className="absolute left-1/2 top-full translate-x-[-50%] mt-2 px-2 py-1 rounded bg-black text-white text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-95 transition pointer-events-none">
+                    Flow start date; drag to change
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                {/* LEFT (circle, draggable, white) */}
+                <div
+                  className="group"
+                  style={{
+                    position: 'absolute',
+                    left: `calc(${leftPct}% - 14px)`,
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    zIndex: 4,
+                    width: 28,
+                    height: 28,
+                    pointerEvents: !isPlaying ? 'auto' : 'none',
+                  }}
+                >
+                  <TimelineThumb 
+                    positionPct={leftPct}
+                    type="circle"
+                    label={datasets[dataIndex][spanStart].label}
+                    showLabel={showSpanLabels && !isNear(spanStart, markerWeek)}
+                    isDraggable={true}
+                    isPlaying={isPlaying}
+                    color="white"
+                    setupDragHandlers={setupDragHandlers}
+                  />
+                  <div className="absolute left-1/2 top-full translate-x-[-50%] mt-2 px-2 py-1 rounded bg-black text-white text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-95 transition pointer-events-none">
+                    Flow start date; drag to change
+                  </div>
+                </div>
+
+                {/* RIGHT (arrow, not draggable, blue) */}
+                <div
+                  className="group"
+                  style={{
+                    position: 'absolute',
+                    left: `calc(${rightPct}% - 14px)`,
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    zIndex: 4,
+                    width: 28,
+                    height: 28,
+                    pointerEvents: 'none',
+                  }}
+                >
+                  <TimelineThumb 
+                    positionPct={rightPct}
+                    type="arrow"
+                    label={datasets[dataIndex][spanEnd].label}
+                    showLabel={showSpanLabels && !isNear(spanEnd, markerWeek)}
+                    isDraggable={false}
+                    isPlaying={isPlaying}
+                    color="#228be6"
+                  />
+                </div>
+              </>
+            )}
+
           </div>
         </div>
       </div>
