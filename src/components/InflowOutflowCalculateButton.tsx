@@ -6,6 +6,8 @@ import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { setFlowResults, updateOverlayByWeek } from '../store/slices/mapSlice';
 import { RootState } from '../store/store';
+import ab_dates from '../assets/abundance_dates.json';
+import mv_dates from '../assets/movement_dates.json';
 
 const BirdflowRApiBaseUrl = "https://www.birdfluapi.com/mock"; // BirdflowR REST API base URL
 
@@ -47,7 +49,8 @@ const InflowOutflowCalculateButton: React.FC<Props> = ({
     const [lat, lon] = location[0].split(',').map(Number);
     const latStr = `${lat.toFixed(1)} N`;
     const lonStr = `${Math.abs(lon).toFixed(1)} W`;
-    tooltipLabel = `Calculate flow from ${latStr} ${lonStr}, week ${week}`;
+    const dateLabel = datasets[dataIndex][week]?.label || datasets[dataIndex][week]?.date || `week ${week}`;
+    tooltipLabel = `Calculate flow from ${latStr} ${lonStr}, ${dateLabel}`;
   }
 
   const handleClick = async () => {
@@ -130,5 +133,7 @@ const InflowOutflowCalculateButton: React.FC<Props> = ({
     </Tooltip>
   );
 };
+
+const datasets = [ab_dates, mv_dates, ab_dates, ab_dates];
 
 export default InflowOutflowCalculateButton;
