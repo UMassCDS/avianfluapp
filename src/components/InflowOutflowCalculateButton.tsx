@@ -44,7 +44,7 @@ const InflowOutflowCalculateButton: React.FC<Props> = ({
   if (!hasLocation) {
     tooltipLabel = `Select start location to calculate ${flowType}`;
   } else if (disabled && hasResults) {
-    tooltipLabel = "Reselect new location for calculating";
+    tooltipLabel = "Change start date or location for new results";
   } else if (hasLocation) {
     const [lat, lon] = location[0].split(',').map(Number);
     const latStr = `${lat.toFixed(1)} N`;
