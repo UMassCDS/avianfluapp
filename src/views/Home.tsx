@@ -230,7 +230,7 @@ const HomePage = () => {
         <MapOverlayPanel>
           {dataIndex >= 2 && (
             <div className="flex flex-row items-center justify-center gap-4">
-              {/* Switch to Search/Click Mode Button */}
+              {/* Switch to Search/Click Mode Button
               <Tooltip label="Select flow start location" position="top" withArrow offset={8}>
                 <button
                   onClick={toggleMode}
@@ -256,7 +256,7 @@ const HomePage = () => {
                     </>
                   )}
                 </button>
-              </Tooltip>
+              </Tooltip> */}
               {/* Inflow/Outflow Calculate Button */}
               <InflowOutflowCalculateButton
                 dataIndex={dataIndex}

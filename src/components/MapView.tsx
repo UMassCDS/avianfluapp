@@ -200,17 +200,16 @@ export default function MapView({ week, dataIndex, onLocationSelect, useSearchMo
       maxBounds={imageBounds}
     >
       {isInflowOutflowView && (
-        useSearchMode ? (
+        <>
           <SearchField
             onLocationSelect={onLocationSelect}
             setMarkerPosition={setMarkerPosition}
           />
-        ) : (
           <MapClickHandler
             onLocationSelect={onLocationSelect}
             setMarkerPosition={setMarkerPosition}
           />
-        )
+        </>
       )}
 
       <TileLayer
