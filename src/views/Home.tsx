@@ -227,7 +227,7 @@ const HomePage = () => {
     <div className="Home">
       {/* Top center overlay panel */}
       <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[1100] max-w-lg w-[90vw]">
-        <MapOverlayPanel>
+        <MapOverlayPanel location={location}>
           {dataIndex >= 2 && (
             <div className="flex flex-row items-center justify-center gap-4">
               {/* Switch to Search/Click Mode Button
