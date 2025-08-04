@@ -98,7 +98,7 @@ export default function ControlBar({
 
             {/* Data Type Section */}
             <div>
-              <div className="mb-2 text-xs text-blue-700 font-bold uppercase tracking-wide">Data Type</div>
+              <div className="mb-2 text-xs text-blue-700 font-bold uppercase tracking-wide">Data</div>
               <div className="flex flex-col gap-1">
                 {dataTypes.map((dt, idx) => (
                   <button
