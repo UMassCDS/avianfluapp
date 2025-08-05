@@ -134,7 +134,7 @@ const HomePage = () => {
     if (dataIndex >= 2 && location.length === 0) {
       notifications.show({
         title: 'Select a Location',
-        message: 'Please select a location on the map to begin inflow/outflow analysis.',
+        message: 'To begin inflow or outflow analysis, please select a location on the map or use the search button.',
         color: 'blue',
       });
     }
