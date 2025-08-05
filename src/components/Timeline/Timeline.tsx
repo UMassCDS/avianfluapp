@@ -32,9 +32,11 @@ const isNear = (a: number, b: number, range: number = 2, max: number = MAX_WEEK)
 
 export default function Timeline({
   onChangeWeek,
+  onChangeStartWeek, 
   nFlowWeeks,
 }: {
   onChangeWeek: (week: number) => void;
+  onChangeStartWeek: (week: number) => void; 
   nFlowWeeks: number;
 }) {
   const dispatch = useDispatch();
@@ -126,11 +128,20 @@ export default function Timeline({
       ? (weekNum - localNFlowWeeks + WEEKS_PER_YEAR) % WEEKS_PER_YEAR
       : weekNum;
 
+    const end = (start + localNFlowWeeks) % WEEKS_PER_YEAR;
     const current = mode === "inflow" ? weekNum : start;
 
     setSpanStart(start);
+    setSpanEnd(end);
     setMarkerWeek(current);
     onChangeWeek(current);
+
+    // FIX: Use the new value, not the old state!
+    if (mode === "inflow") {
+      onChangeStartWeek(end);
+    } else {
+      onChangeStartWeek(start);
+    }
 
     dispatch(clearFlowResults());
     dispatch(clearOverlayUrl());
@@ -158,6 +169,11 @@ export default function Timeline({
     setMarkerWeek(curWeek);
     if (flowResults.length > 0 || mode === 'abundance' || mode === 'movement') onChangeWeek(curWeek);
   });
+
+  // When white circle is moved:
+  const handleWhiteCircleMove = (newStartWeek: number) => {
+    onChangeStartWeek(newStartWeek); // This updates Home's startWeek state
+  };
 
   useEffect(() => {
     const mode = dataInfo[dataIndex].datatype; // 'inflow', 'outflow', 'abundance', 'movement'

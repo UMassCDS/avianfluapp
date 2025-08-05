@@ -10,17 +10,17 @@ const datasets = [ab_dates, mv_dates, ab_dates, ab_dates];
 
 interface MapOverlayPanelProps {
   children?: React.ReactNode;
-  location: string[]; // <-- add this prop
+  location: string[];
+  startWeek: number;
 }
 
-export default function MapOverlayPanel({ children, location }: MapOverlayPanelProps) {
+export default function MapOverlayPanel({ children, location, startWeek }: MapOverlayPanelProps) {
   const dataIndex = useSelector((state: RootState) => state.species.dataIndex);
   const speciesIndex = useSelector((state: RootState) => state.species.speciesIndex);
-  const week = useSelector((state: RootState) => state.timeline.week);
   const flowResults = useSelector((state: RootState) => state.map.flowResults);
 
-  // Get start date label
-  const dateLabel = datasets[dataIndex][week]?.label || datasets[dataIndex][week]?.date || '';
+  // Use startWeek for Start Date
+  const dateLabel = datasets[dataIndex][startWeek]?.label || datasets[dataIndex][startWeek]?.date || '';
   // Get start location (like tooltip)
   let locationLabel = '-';
   if (location && location.length > 0 && location[0]) {

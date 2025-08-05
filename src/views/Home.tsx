@@ -88,6 +88,7 @@ const HomePage = () => {
 
   const [location, setLocation] = useState<string[]>([]);
   const [useSearchMode, setUseSearchMode] = useState(false);
+  const [startWeek, setStartWeek] = useState(week); // default to marker week
 
   // Callback passed to MapView
   const handleLocationSelect = (latLon: string | null) => {
@@ -227,7 +228,10 @@ const HomePage = () => {
     <div className="Home">
       {/* Top center overlay panel */}
       <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[1100] max-w-lg w-[90vw]">
-        <MapOverlayPanel location={location}>
+        <MapOverlayPanel
+          location={location}
+          startWeek={startWeek}
+        >
           {dataIndex >= 2 && (
             <div className="flex flex-row items-center justify-center gap-4">
               {/* Switch to Search/Click Mode Button
@@ -304,6 +308,7 @@ const HomePage = () => {
 
       <Timeline
         onChangeWeek={onChangeWeek}
+        onChangeStartWeek={setStartWeek}
         nFlowWeeks={N_FLOW_WEEKS}
       />
     </div>
