@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { IconStack2 } from "@tabler/icons-react";
+import { IconStack2, IconExternalLink, IconInfoCircle, IconMessageCircle } from "@tabler/icons-react";
 import BirdSVG from '../assets/Bird.svg';
 import { useState } from 'react';
 import FeedbackForm from './Feedback';
@@ -290,42 +290,49 @@ function About() {
   );
 
   const TabMenu = (
-    <div className="sticky top-0 z-20 bg-white/90 border-b border-blue-100 flex gap-2 justify-center py-3 mb-8 rounded-t-2xl shadow-sm">
+    <nav className="sticky top-0 z-30 bg-white/90 border-b border-blue-100 flex gap-2 justify-center py-3 mb-8 rounded-t-2xl shadow-sm">
       <button
-        className={`px-5 py-2 rounded-full font-semibold transition ${
-          tab === 'about'
-            ? 'bg-blue-600 text-white shadow ring-2 ring-blue-300'
-            : 'hover:bg-blue-50 text-blue-700'
-        }`}
+        className={`flex items-center gap-2 px-5 py-2 rounded-t-lg font-semibold transition
+          ${tab === 'about'
+            ? 'bg-blue-100 text-blue-700 shadow border-b-2 border-blue-600'
+            : 'text-blue-700 hover:bg-blue-50 hover:text-blue-600'
+          }`}
         onClick={() => handleTabClick('about')}
         type="button"
+        aria-current={tab === 'about' ? 'page' : undefined}
       >
+        <IconInfoCircle size={18} className="text-blue-500" />
         About
       </button>
       <button
-        className={`px-5 py-2 rounded-full font-semibold transition ${
-          tab === 'feedback'
-            ? 'bg-blue-600 text-white shadow ring-2 ring-blue-300'
-            : 'hover:bg-blue-50 text-blue-700'
-        }`}
+        className={`flex items-center gap-2 px-5 py-2 rounded-t-lg font-semibold transition
+          ${tab === 'feedback'
+            ? 'bg-blue-100 text-blue-700 shadow border-b-2 border-blue-600'
+            : 'text-blue-700 hover:bg-blue-50 hover:text-blue-600'
+          }`}
         onClick={() => handleTabClick('feedback')}
         type="button"
+        aria-current={tab === 'feedback' ? 'page' : undefined}
       >
+        <IconMessageCircle size={18} className="text-blue-500" />
         Feedback
       </button>
-      <button
-        className="px-5 py-2 rounded-full font-semibold transition hover:bg-blue-50 text-blue-700"
-        onClick={() => handleTabClick('swagger')}
-        type="button"
+      <a
+        href="https://www.birdfluapi.com/__docs__/"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center gap-2 px-5 py-2 rounded-t-lg font-semibold text-blue-700 hover:bg-blue-50 hover:text-blue-600 transition"
+        style={{ textDecoration: 'none' }}
       >
+        <IconExternalLink size={18} className="text-blue-500" />
         Test REST API
-      </button>
-    </div>
+      </a>
+    </nav>
   );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center py-8 px-2 font-sans">
-      <div className="relative bg-white/95 max-w-3xl w-full rounded-2xl shadow-xl px-8 py-10 overflow-hidden border border-blue-100">
+      <div className="relative bg-white/95 max-w-3xl w-full rounded-2xl shadow-xl px-8 py-10 overflow-auto border border-blue-100" style={{ maxHeight: '90vh' }}>
         {/* Back arrow in top left */}
         <Link
           to="/"
@@ -369,7 +376,46 @@ function About() {
           <h1 className="text-3xl font-bold text-blue-500 m-0 text-center font-sans">Avian Influenza</h1>
         </div>
 
-        {TabMenu}
+        {/* Tab menu: sticky inside card */}
+        <nav className="sticky top-0 z-30 bg-white/90 border-b border-blue-100 flex gap-2 justify-center py-3 mb-8 rounded-t-2xl shadow-sm">
+          <button
+            className={`flex items-center gap-2 px-5 py-2 rounded-t-lg font-semibold transition
+              ${tab === 'about'
+                ? 'bg-blue-100 text-blue-700 shadow border-b-2 border-blue-600'
+                : 'text-blue-700 hover:bg-blue-50 hover:text-blue-600'
+              }`}
+            onClick={() => handleTabClick('about')}
+            type="button"
+            aria-current={tab === 'about' ? 'page' : undefined}
+          >
+            <IconInfoCircle size={18} className="text-blue-500" />
+            About
+          </button>
+          <button
+            className={`flex items-center gap-2 px-5 py-2 rounded-t-lg font-semibold transition
+              ${tab === 'feedback'
+                ? 'bg-blue-100 text-blue-700 shadow border-b-2 border-blue-600'
+                : 'text-blue-700 hover:bg-blue-50 hover:text-blue-600'
+              }`}
+            onClick={() => handleTabClick('feedback')}
+            type="button"
+            aria-current={tab === 'feedback' ? 'page' : undefined}
+          >
+            <IconMessageCircle size={18} className="text-blue-500" />
+            Feedback
+          </button>
+          <a
+            href="https://www.birdfluapi.com/__docs__/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-5 py-2 rounded-t-lg font-semibold text-blue-700 hover:bg-blue-50 hover:text-blue-600 transition"
+            style={{ textDecoration: 'none' }}
+          >
+            <IconExternalLink size={18} className="text-blue-500" />
+            Test REST API
+          </a>
+        </nav>
+
         {tab === 'about' && (
           <>
             {AboutThisSite}
