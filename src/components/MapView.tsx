@@ -1,14 +1,12 @@
-import { ImageOverlay, MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { OutbreakMarkers } from "./OutbreakPoints";
+import { ImageOverlay, MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
+import { HistoricOutbreakMarkers, RecentOutbreakMarkers } from "./OutbreakPoints";
 import { GeoSearchControl, OpenStreetMapProvider } from "leaflet-geosearch";
 import "leaflet-geosearch/dist/geosearch.css";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { clearFlowResults, clearOverlayUrl } from '../store/slices/mapSlice';
-import { IconClick, IconSearch } from "@tabler/icons-react";
-import { Tooltip } from '@mantine/core';
 
 const imageBounds = [
   [9.622994, -170.291626],
@@ -127,7 +125,8 @@ export default function MapView({ week, dataIndex, onLocationSelect, useSearchMo
   const dispatch = useDispatch();
 
   const overlayUrl = useSelector((state: RootState) => state.map.overlayUrl);
-  const showOutbreaks = useSelector((state: RootState) => state.map.showOutbreaks); // Get the toggle state
+  const showRecentOutbreaks = useSelector((state: RootState) => state.map.showRecentOutbreaks);
+  const showHistoricOutbreaks = useSelector((state: RootState) => state.map.showHistoricOutbreaks);
   const [markerPosition, setMarkerPosition] = useState<{ lat: number, lng: number } | null>(null);
 
   const position = { lat: 45, lng: -95 };
@@ -162,33 +161,6 @@ export default function MapView({ week, dataIndex, onLocationSelect, useSearchMo
 
   return (
     <div style={{ position: "relative" }}>
-      {/* Toggle Button moved to Home.tsx */}
-      {/*
-      {isInflowOutflowView && (
-        <Tooltip label="Flow start location" position="top" withArrow offset={8}>
-          <button
-            className="absolute top-4 left-12 z-[1200] flex items-center gap-2
-              px-2 py-2 sm:px-4 sm:py-2
-              rounded-xl border-2 border-blue-400 bg-white/90 text-blue-500 font-semibold shadow-md
-              hover:bg-blue-50 hover:border-blue-500 transition
-              text-base sm:text-base"
-            onClick={toggleMode}
-            type="button"
-          >
-            {useSearchMode ? (
-              <>
-                <IconClick size={20} className="text-blue-500 sm:w-5 sm:h-5 w-5 h-5" />
-                <span className="hidden sm:inline">Switch to Click Mode</span>
-              </>
-            ) : (
-              <>
-                <IconSearch size={20} className="text-blue-500 sm:w-5 sm:h-5 w-5 h-5" />
-                <span className="hidden sm:inline">Switch to Search Mode</span>
-              </>
-            )}
-          </button>
-        </Tooltip>
-      )} */}
     <MapContainer
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
@@ -235,9 +207,8 @@ export default function MapView({ week, dataIndex, onLocationSelect, useSearchMo
           </Popup>
         </Marker>
       )}
-
-      {/* This line now correctly hides/shows the markers */}
-      {showOutbreaks && OutbreakMarkers(week)}
+      {showRecentOutbreaks && RecentOutbreakMarkers(week)}
+      {showHistoricOutbreaks && HistoricOutbreakMarkers(week)}
     </MapContainer>
     </div>
   );

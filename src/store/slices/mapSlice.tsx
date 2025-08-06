@@ -15,14 +15,16 @@ interface MapState {
   overlayUrl: string;
   flowResults: FlowResult[]; // stores all API Flow results
   flowGeoTiffUrl: string;
-  showOutbreaks: boolean;
+  showRecentOutbreaks: boolean;
+  showHistoricOutbreaks: boolean;
 }
 
 const initialState: MapState = {
   overlayUrl: "",
   flowResults: [],
   flowGeoTiffUrl: "",
-  showOutbreaks: true,
+  showRecentOutbreaks: true,
+  showHistoricOutbreaks: false,
 };
 
 const mapSlice = createSlice({
@@ -48,8 +50,11 @@ const mapSlice = createSlice({
       const match = state.flowResults.find((r) => r.week === action.payload);
       state.overlayUrl = match ? match.url : "";
     },
-    toggleOutbreaks(state) {
-      state.showOutbreaks = !state.showOutbreaks;
+    toggleRecentOutbreaks(state) {
+      state.showRecentOutbreaks = !state.showRecentOutbreaks;
+    },
+    toggleHistoricOutbreaks(state) {
+      state.showHistoricOutbreaks = !state.showHistoricOutbreaks;
     },
   },
 });
@@ -60,7 +65,8 @@ export const {
   setFlowResults,
   clearFlowResults,
   updateOverlayByWeek,
-  toggleOutbreaks,
+  toggleRecentOutbreaks,
+  toggleHistoricOutbreaks,
 } = mapSlice.actions;
 
 export default mapSlice.reducer;
