@@ -4,7 +4,7 @@ import taxa from "../assets/taxa.json";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../store/store";
 import { dataInfo } from "../hooks/dataUrl";
-import { toggleOutbreaks } from "../store/slices/mapSlice";
+import { toggleRecentOutbreaks, toggleHistoricOutbreaks } from "../store/slices/mapSlice";
 import { Tooltip } from "@mantine/core";
 
 type ControlBarProps = {
@@ -28,7 +28,8 @@ export default function ControlBar({
 
   const selectedDataType = useSelector((state: RootState) => state.species.dataIndex);
   const selectedSpecies = useSelector((state: RootState) => state.species.speciesIndex);
-  const showOutbreaks = useSelector((state: RootState) => state.map.showOutbreaks);
+  const showRecentOutbreaks = useSelector((state: RootState) => state.map.showRecentOutbreaks);
+  const showHistoricOutbreaks = useSelector((state: RootState) => state.map.showHistoricOutbreaks);
   const dataTypes = dataInfo.map((dt, idx) => ({ value: idx, label: dt.label }));
 
   // Close dropdowns on outside click
@@ -78,18 +79,37 @@ export default function ControlBar({
               <div className="mb-2 text-xs text-blue-700 font-bold uppercase tracking-wide">Outbreaks</div>
               <div className="flex items-center justify-between bg-blue-50/50 p-2 rounded-lg">
                 <label htmlFor="outbreak-toggle" className="font-medium text-blue-800 text-sm">
-                  Show HPAI Outbreaks
+                  Recent
                 </label>
                 <button
                   id="outbreak-toggle"
-                  onClick={() => dispatch(toggleOutbreaks())}
+                  onClick={() => dispatch(toggleRecentOutbreaks())}
                   className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors ${
-                    showOutbreaks ? 'bg-blue-500' : 'bg-gray-300'
+                    showRecentOutbreaks ? 'bg-blue-500' : 'bg-gray-300'
                   }`}
                 >
                   <span
                     className={`inline-block w-4 h-4 transform bg-white rounded-full transition-transform ${
-                      showOutbreaks ? 'translate-x-6' : 'translate-x-1'
+                      showRecentOutbreaks ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between bg-blue-50/50 p-2 rounded-lg">
+                <label htmlFor="outbreak-toggle" className="font-medium text-blue-800 text-sm">
+                  Historic
+                </label>
+                <button
+                  id="outbreak-toggle"
+                  onClick={() => dispatch(toggleHistoricOutbreaks())}
+                  className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors ${
+                    showHistoricOutbreaks ? 'bg-blue-500' : 'bg-gray-300'
+                  }`}
+                >
+                  <span
+                    className={`inline-block w-4 h-4 transform bg-white rounded-full transition-transform ${
+                      showHistoricOutbreaks ? 'translate-x-6' : 'translate-x-1'
                     }`}
                   />
                 </button>

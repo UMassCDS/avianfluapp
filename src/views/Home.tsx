@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Combobox, ComboboxStore, useCombobox, Tooltip } from '@mantine/core';
+import { Combobox, ComboboxStore, useCombobox } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import L from 'leaflet';
 import AboutButtons from '../components/AboutButtons';
 import ControlBar from '../components/ControlBar';
 import InflowOutflowCalculateButton from '../components/InflowOutflowCalculateButton';
 import FlowDownloadButton from '../components/FlowDownloadButton';
-import Legend from '../components/Legend';
+import DataLegend from '../components/DataLegend';
 import MapOverlayPanel from '../components/MapOverlayPanel';
 import MapView from '../components/MapView';
 import Timeline from '../components/Timeline/Timeline';
@@ -29,7 +29,6 @@ import {
   updateOverlayByWeek,
   clearOverlayUrl,
 } from '../store/slices/mapSlice';
-import { IconClick, IconSearch } from '@tabler/icons-react';
 
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-geosearch/dist/geosearch.css';
@@ -77,7 +76,6 @@ const HomePage = () => {
   const speciesIndex = useSelector((state: RootState) => state.species.speciesIndex);
   const dataIndex = useSelector((state: RootState) => state.species.dataIndex);
   const flowResults = useSelector((state: RootState) => state.map.flowResults);
-  const showOutbreaks = useSelector((state: RootState) => state.map.showOutbreaks);
 
   // const [week, setWeek] = useState(MIN_WEEK);
   const week = useSelector((state: RootState) => state.timeline.week);
@@ -221,7 +219,7 @@ const HomePage = () => {
   // Shows the Legend component if:
 	// - dataIndex < 2 (e.g., for abundance or movement), or
 	// - flowResults is a non-empty array (e.g., for inflow or outflow when results exist).
-  const shouldShowLegend = dataIndex < 2 || (Array.isArray(flowResults) && flowResults.length > 0);
+  const shouldShowDataLegend = dataIndex < 2 || (Array.isArray(flowResults) && flowResults.length > 0);
 
 // Here is where you list the components and elements that you want rendered. 
   return (
@@ -282,18 +280,9 @@ const HomePage = () => {
           week={week}
           dataIndex={dataIndex}
           onLocationSelect={handleLocationSelect}
-          useSearchMode={useSearchMode} // <-- add this
+          useSearchMode={useSearchMode}
         />
       </div>
-      {showOutbreaks && (
-        <div className="widgets">
-          <div style={{ display: 'flex', flexDirection: 'row', gap: '1rem' }}>
-            <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center' }}>
-              <OutbreakLegend />
-            </div>
-          </div>
-        </div>
-      )}
       <div className="fixed top-4 right-4 z-50 flex flex-col gap-3 items-end">
         <AboutButtons />
         <ControlBar
@@ -304,7 +293,8 @@ const HomePage = () => {
         />
       </div>
 
-      {shouldShowLegend && <Legend />}
+      {shouldShowDataLegend && <DataLegend />}
+      <OutbreakLegend />
 
       <Timeline
         onChangeWeek={onChangeWeek}

@@ -30,7 +30,7 @@ import { RootState } from '../store/store';
 /*
 - This is the Birds/km^2 (or Birds/km/week) Legend on the bottom left of the screen.
 */
-function Legend() {
+function DataLegend() {
   const dataIndex = useSelector((state: RootState) => state.species.dataIndex);
   const speciesIndex = useSelector((state: RootState) => state.species.speciesIndex);
   const currentWeek = useSelector((state: RootState) => state.timeline.week);
@@ -94,9 +94,12 @@ function Legend() {
     />
   );
 
+
+  const dataLabel = dataInfo[dataIndex].label;
+
   return (
     <div
-      className="Legend"
+      className="DataLegend"
       style={{
         background: 'rgba(255, 255, 255, 0.6)',
         borderRadius: 10,
@@ -104,6 +107,9 @@ function Legend() {
         maxWidth: isMobile() ? '60px' : '120px',
       }}
     >
+      <div style={{ fontWeight: 'bold', textAlign: 'center', marginBottom: 6, fontSize: 12}}>
+        {dataLabel} Scale
+      </div>
       {isMobile() ? (
         <>
           <div style={{ textAlign: 'center', fontSize: 12 }}>{highLabel}</div>
@@ -134,4 +140,4 @@ function Legend() {
   );
 }
 
-export default Legend;
+export default DataLegend;
