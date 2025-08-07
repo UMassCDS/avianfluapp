@@ -22,7 +22,7 @@ const NUM_OUTBREAK_WEEKS = 3;
 const thisYear = new Date().getFullYear();
 
 const RECENT_COLOR = 'red'
-const HISTORIC_COLOR = '#57B9FF'
+const HISTORIC_COLOR = '#7e7e7eff'
 
 /**
  * Creates a circle-shaped Leaflet divIcon with the given color and opacity.
