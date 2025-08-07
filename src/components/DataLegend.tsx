@@ -94,9 +94,6 @@ function DataLegend() {
     />
   );
 
-
-  const dataLabel = dataInfo[dataIndex].label;
-
   return (
     <div
       className="DataLegend"
@@ -108,7 +105,7 @@ function DataLegend() {
       }}
     >
       <div style={{ fontWeight: 'bold', textAlign: 'center', marginBottom: 6, fontSize: 12}}>
-        {dataLabel} Scale
+        {dataInfo[dataIndex].label}
       </div>
       {isMobile() ? (
         <>
