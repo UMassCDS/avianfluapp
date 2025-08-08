@@ -96,8 +96,6 @@ const HomePage = () => {
     dispatch(clearOverlayUrl());
   };
 
-  const toggleMode = () => setUseSearchMode((prev) => !prev);
-
   function handleWindowSizeChange() {
     if (window.innerWidth <  MIN_REG_WINDOW_WIDTH) {
       // small window
@@ -276,12 +274,7 @@ const HomePage = () => {
       </div>
 
       <div className="relative w-full h-[100vh]">
-        <MapView
-          week={week}
-          dataIndex={dataIndex}
-          onLocationSelect={handleLocationSelect}
-          useSearchMode={useSearchMode}
-        />
+        <MapView onLocationSelect={handleLocationSelect} />
       </div>
       <div className="fixed top-4 right-4 z-50 flex flex-col gap-3 items-end">
         <AboutButtons />
