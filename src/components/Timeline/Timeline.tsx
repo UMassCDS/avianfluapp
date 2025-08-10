@@ -84,25 +84,18 @@ export default function Timeline({
     let newSpanEnd = (spanStart + localNFlowWeeks) % WEEKS_PER_YEAR;
     let newMarkerWeek = mode === 'inflow' ? spanEnd : spanStart;
 
-    // Inflow initialization
     if (mode === 'inflow' && !hasInitialized) {
-      newSpanEnd = week; // Snap inflow circle to current selected week
-      newSpanStart = (week - localNFlowWeeks + WEEKS_PER_YEAR) % WEEKS_PER_YEAR;
-      newMarkerWeek = week;
+      newSpanEnd = getWeekFromDate(new Date()) % WEEKS_PER_YEAR;
+      newSpanStart = (newSpanEnd - localNFlowWeeks + WEEKS_PER_YEAR) % WEEKS_PER_YEAR;
+      newMarkerWeek = newSpanEnd;
       setHasInitialized(true);
     }
 
-    // Outflow initialization
-    if (mode === 'outflow' && !hasInitialized) {
-      newSpanStart = week; // Snap outflow circle to current selected week
-      newSpanEnd = (week + localNFlowWeeks) % WEEKS_PER_YEAR;
-      newMarkerWeek = week;
-      setHasInitialized(true);
-    }
+    const wrapped = newSpanEnd < newSpanStart;
 
     setSpanStart(newSpanStart);
     setSpanEnd(newSpanEnd);
-    setIsWrapped(newSpanEnd < newSpanStart);
+    setIsWrapped(wrapped);
     setLeftPct(getTimelinePosition(datasets[dataIndex][newSpanStart].date));
     setRightPct(getTimelinePosition(datasets[dataIndex][newSpanEnd].date));
     onChangeWeek(newMarkerWeek);
@@ -187,7 +180,7 @@ export default function Timeline({
     setIsPlaying(false);
     setSpanStart(markerWeek);
     setMarkerPct(getTimelinePosition(datasets[dataIndex][markerWeek].date));
-    setHasInitialized(false);
+    setHasInitialized(false); // <-- Add this line!
   }, [dataIndex]);
 
   useEffect(updateMarkerAndSpan, [spanStart, mode]);
