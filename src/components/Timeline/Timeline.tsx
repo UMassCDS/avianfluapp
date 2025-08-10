@@ -85,9 +85,11 @@ export default function Timeline({
     let newMarkerWeek = mode === 'inflow' ? spanEnd : spanStart;
 
     if (mode === 'inflow' && !hasInitialized) {
-      newSpanEnd = getWeekFromDate(new Date()) % WEEKS_PER_YEAR;
-      newSpanStart = (newSpanEnd - localNFlowWeeks + WEEKS_PER_YEAR) % WEEKS_PER_YEAR;
-      newMarkerWeek = newSpanEnd;
+      // Only snap to red mark if marker hasn't been moved
+      const initialWeek = markerWeek === week ? week : markerWeek;
+      newSpanEnd = initialWeek;
+      newSpanStart = (initialWeek - localNFlowWeeks + WEEKS_PER_YEAR) % WEEKS_PER_YEAR;
+      newMarkerWeek = initialWeek;
       setHasInitialized(true);
     }
 
