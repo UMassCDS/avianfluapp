@@ -180,6 +180,7 @@ export default function Timeline({
     setIsPlaying(false);
     setSpanStart(markerWeek);
     setMarkerPct(getTimelinePosition(datasets[dataIndex][markerWeek].date));
+    setHasInitialized(false); // <-- Add this line!
   }, [dataIndex]);
 
   useEffect(updateMarkerAndSpan, [spanStart, mode]);
