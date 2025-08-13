@@ -109,6 +109,7 @@ export function RecentOutbreakMarkers(week: number) {
             <Marker icon={circleIcon(RECENT_COLOR, marker.opacity)}
                 position={marker.geoLoc}
                 key={i}
+                pane="recentPane"
             >
                 <Popup> {marker.label} </Popup>
             </Marker>
@@ -125,6 +126,7 @@ export function HistoricOutbreakMarkers(week: number) {
             <Marker icon={circleIcon(HISTORIC_COLOR, marker.opacity)}
                 position={marker.geoLoc}
                 key={i}
+                pane="historicPane"
             >
                 <Popup> {marker.label} </Popup>
             </Marker>

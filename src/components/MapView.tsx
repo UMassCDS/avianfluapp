@@ -13,6 +13,25 @@ const imageBounds = [
   [79.98956, -49.783429],
 ];
 
+function OutbreakPanes() {
+  const map = useMap();
+
+  useEffect(() => {
+    // Historic outbreaks pane (lower z-index)
+    if (!map.getPane("historicPane")) {
+      map.createPane("historicPane");
+      map.getPane("historicPane")!.style.zIndex = "400";
+    }
+
+    // Recent outbreaks pane (higher z-index)
+    if (!map.getPane("recentPane")) {
+      map.createPane("recentPane");
+      map.getPane("recentPane")!.style.zIndex = "500";
+    }
+  }, [map]);
+
+  return null;
+}
 
 function MapClickHandler({ setMarker }: { setMarker: (lat: number, lng: number, label: string) => void }) {
   const map = useMap();
@@ -152,6 +171,7 @@ export default function MapView({ onLocationSelect }: {onLocationSelect: (latLon
           </Marker>
         )}
 
+        <OutbreakPanes />
         {showRecentOutbreaks && RecentOutbreakMarkers(week)}
         {showHistoricOutbreaks && HistoricOutbreakMarkers(week)}
       </MapContainer>
