@@ -1,10 +1,13 @@
 import React from 'react';
 import { IconArrowDownCircle, IconArrowUpCircle } from '@tabler/icons-react';
-import { Button } from '@mantine/core';
+import { Button, Tooltip } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import axios from 'axios';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setFlowResults, updateOverlayByWeek } from '../store/slices/mapSlice';
+import { RootState } from '../store/store';
+import ab_dates from '../assets/abundance_dates.json';
+import mv_dates from '../assets/movement_dates.json';
 
 const BirdflowRApiBaseUrl = "https://www.birdfluapi.com/mock"; // BirdflowR REST API base URL
 
@@ -28,21 +31,53 @@ const InflowOutflowCalculateButton: React.FC<Props> = ({
   disabled,
 }) => {
   const dispatch = useDispatch();
+  // Get flowResults from Redux to determine if calculation has already been done
+  const flowResults = useSelector((state: RootState) => state.map.flowResults);
+
+  const flowType = dataIndex === 2 ? 'inflow' : 'outflow';
+
+  // Tooltip logic
+  let tooltipLabel = `Select start location to calculate ${flowType}`;
+  const hasLocation = location && location.length > 0;
+  const hasResults = Array.isArray(flowResults) && flowResults.length > 0;
+
+  if (!hasLocation) {
+    tooltipLabel = `Select start location to calculate ${flowType}`;
+  } else if (disabled && hasResults) {
+    tooltipLabel = "Change start date or location for new results";
+  } else if (hasLocation) {
+    const [lat, lon] = location[0].split(',').map(Number);
+    const latStr = `${lat.toFixed(1)} N`;
+    const lonStr = `${Math.abs(lon).toFixed(1)} W`;
+    const dateLabel = datasets[dataIndex][week]?.label || datasets[dataIndex][week]?.date || `week ${week}`;
+    tooltipLabel = `Calculate flow from ${latStr} ${lonStr}, ${dateLabel}`;
+  }
 
   const handleClick = async () => {
+    if (!hasLocation) {
+      notifications.show({
+        title: 'Select a Location',
+        message: 'To begin inflow or outflow analysis, please select a location on the map or use the search button.',
+        color: 'blue',
+      });
+      return;
+    }
+    if (disabled && hasResults) {
+      // Prevent unnecessary API call
+      return;
+    }
+
     const functionName = dataIndex === 2 ? 'inflow' : 'outflow';
     const taxa = speciesOptions[speciesIndex]?.value || 'total';
-    const locParam = location.join(';'); // support multiple if needed
+    const locParam = location.join(';');
     const url = `${BirdflowRApiBaseUrl}/${functionName}?loc=${locParam}&week=${week}&taxa=${taxa}&n=${nFlowWeeks}`;
 
     try {
       const response = await axios.get(url);
       const data = response.data;
-      console.log('API Response:', data);
 
       if (data.status === 'success') {
-        const result = data.result;
-        dispatch(setFlowResults(result));
+        dispatch(setFlowResults(data));
         dispatch(updateOverlayByWeek(week));
       } else if (data.status === 'outside mask') {
         notifications.show({
@@ -64,7 +99,6 @@ const InflowOutflowCalculateButton: React.FC<Props> = ({
         });
       }
     } catch (error) {
-      console.error('API Error:', error);
       notifications.show({
         title: 'Connection error',
         message: 'Unable to contact the server. Please check your internet connection.',
@@ -74,28 +108,32 @@ const InflowOutflowCalculateButton: React.FC<Props> = ({
   };
 
   return (
-    <Button       
-      onClick={handleClick} 
-      variant="outline" 
-      color="blue" 
-      mt="md"
-      disabled={disabled}
-      className={`flex items-center gap-2 p-[6px] rounded-xl border-2 transition 
-        font-semibold shadow-md 
-        ${disabled
-          ? 'bg-gray-200 border-gray-300 text-gray-400 cursor-not-allowed'
-          : 'bg-white border-blue-400 text-blue-500 hover:bg-blue-50 hover:border-blue-500 active:bg-blue-100'}
-      `}
-      type="button"
-    >
-      {dataIndex === 2 ? (
-        <IconArrowDownCircle size={22} className="text-blue-500" />
-      ) : (
-        <IconArrowUpCircle size={22} className="text-blue-500" />
-      )}
-      Calculate {dataIndex === 2 ? 'Inflow' : 'Outflow'}
-    </Button>
+    <Tooltip label={tooltipLabel} position="bottom" withArrow offset={8}>
+      <Button       
+        onClick={handleClick} 
+        variant="outline" 
+        color="blue" 
+        mt="md"
+        disabled={disabled}
+        className={`flex items-center gap-2 p-[6px] rounded-xl border-2 transition 
+          font-semibold shadow-md 
+          ${disabled
+            ? 'bg-gray-200 border-gray-300 text-gray-400 cursor-not-allowed'
+            : 'bg-white border-blue-400 text-blue-500 hover:bg-blue-50 hover:border-blue-500 active:bg-blue-100'}
+        `}
+        type="button"
+      >
+        {dataIndex === 2 ? (
+          <IconArrowDownCircle size={22} className={disabled ? "text-gray-400" : "text-blue-500"} />
+        ) : (
+          <IconArrowUpCircle size={22} className={disabled ? "text-gray-400" : "text-blue-500"} />
+        )}
+        Calculate {dataIndex === 2 ? 'Inflow' : 'Outflow'}
+      </Button>
+    </Tooltip>
   );
 };
+
+const datasets = [ab_dates, mv_dates, ab_dates, ab_dates];
 
 export default InflowOutflowCalculateButton;

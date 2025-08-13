@@ -6,6 +6,15 @@ export const WEEKS_PER_YEAR = 52;
 export const MIN_WEEK = 0;   // week index
 export const MAX_WEEK = WEEKS_PER_YEAR -1;  
 
+
+// Original month marks: year is irrelevant
+const baseMonthMarks = [
+  { date: '2022-01-01', label: 'Jan' }, { date: '2022-02-01', label: 'Feb' }, { date: '2022-03-01', label: 'Mar' },
+  { date: '2022-04-01', label: 'Apr' }, { date: '2022-05-01', label: 'May' }, { date: '2022-06-01', label: 'Jun' },
+  { date: '2022-07-01', label: 'Jul' }, { date: '2022-08-01', label: 'Aug' }, { date: '2022-09-01', label: 'Sep' },
+  { date: '2022-10-01', label: 'Oct' }, { date: '2022-11-01', label: 'Nov' }, { date: '2022-12-01', label: 'Dec' }
+];
+
 export function isMobile():boolean|undefined {
     return useMediaQuery(`(max-width: ${em(750)})`);
 }
@@ -20,3 +29,56 @@ export function monthDayToWeek(month:number, day:number):number {
     // the year doesn't matter, only looking for the week within the year
     return dateToWeek(new Date(2025, month-1, day));
 }
+
+/**
+ * Returns the timeline position (from 0 to 100) for a given date,
+ * based on how far into the current year the date's month and day occur.
+ *
+ * The function uses the current year for all calculations, regardless of the
+ * year in the input date.
+ *
+ * @param {Date | string} dateInput - A JavaScript Date object or a string in `YYYY-MM-DD` format.
+ * @returns {number} A number between 0 and 100 indicating percentage position on the timeline.
+ *
+ * @example
+ * getTimelinePosition("2020-07-12"); // → 52.88 (for July 12 in the current year)
+ * getTimelinePosition(new Date());  // → today's percentage position in the year
+ */
+export function getTimelinePosition(dateInput: Date | string): number {
+  const now = new Date();
+  let month: number;
+  let day: number;
+
+  if (typeof dateInput === 'string') {
+    const [yearStr, monthStr, dayStr] = dateInput.split('-');
+    month = parseInt(monthStr, 10) - 1; // JS months are 0-based
+    day = parseInt(dayStr, 10);
+  } else {
+    month = dateInput.getMonth();
+    day = dateInput.getDate();
+  }
+
+  const targetDate = new Date(now.getFullYear(), month, day);
+  const startOfYear = new Date(now.getFullYear(), 0, 1);
+
+  const dayOfYear = Math.floor((targetDate.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+
+  // Determine if current year is a leap year
+  const isLeapYear = (year: number) => (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
+  const totalDays = isLeapYear(now.getFullYear()) ? 366 : 365;
+
+  // Return timeline position
+  return dayOfYear / totalDays * 100;
+}
+
+
+/**
+ * Transforms base month marks by computing their timeline position (0–100)
+ * based on the current year, while keeping the month/day.
+ *
+ * @returns Array of marks with percentage `value` and text `label`
+ */
+export const monthMarks = baseMonthMarks.map(({ date, label }) => ({
+  value: getTimelinePosition(date),
+  label,
+}));
