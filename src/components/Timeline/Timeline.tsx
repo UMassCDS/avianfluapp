@@ -65,43 +65,48 @@ export default function Timeline({
   const todayPct = useMemo(() => getTimelinePosition(new Date()), []);
 
   const [hasInitialized, setHasInitialized] = useState(false);
-  const updateMarkerAndSpan = () => {
-    const getWeekFromDate = (date: Date): number => {
-      const jan1 = new Date(date.getFullYear(), 0, 1);
-      const days = Math.floor((date.getTime() - jan1.getTime()) / (1000 * 60 * 60 * 24));
-      return Math.floor(days / 7);
-    };
 
-    if (mode === 'abundance' || mode === 'movement') {
-      setSpanStart(0);
-      setSpanEnd(MAX_WEEK);
-      setLeftPct(0);
-      setRightPct(100);
-      return;
+
+const updateMarkerAndSpan = () => {
+  if (mode === 'abundance' || mode === 'movement') {
+    setSpanStart(0);
+    setSpanEnd(MAX_WEEK);
+    setLeftPct(0);
+    setRightPct(100);
+    return;
+  }
+
+  let newSpanStart = spanStart;
+  let newSpanEnd = (spanStart + localNFlowWeeks) % WEEKS_PER_YEAR;
+  let newMarkerWeek = markerWeek;
+
+  // INITIALIZE circle at TODAY only the first time
+  if (!hasInitialized) {
+    if (mode === 'inflow') {
+      newSpanEnd = week; // TODAY
+      newSpanStart = (week - localNFlowWeeks + WEEKS_PER_YEAR) % WEEKS_PER_YEAR;
+      newMarkerWeek = week; // marker starts at today
+      // Set white circle position using todayPct, just like TimelineTodayMarker
+      setRightPct(todayPct);
+    } else if (mode === 'outflow') {
+      newSpanStart = week; // TODAY
+      newSpanEnd = (week + localNFlowWeeks) % WEEKS_PER_YEAR;
+      newMarkerWeek = week;
+      // Set white circle position using todayPct, just like TimelineTodayMarker
+      setLeftPct(todayPct);
     }
+    setHasInitialized(true); // mark initialization done
+  }
 
-    let newSpanStart = spanStart;
-    let newSpanEnd = (spanStart + localNFlowWeeks) % WEEKS_PER_YEAR;
-    let newMarkerWeek = mode === 'inflow' ? spanEnd : spanStart;
+  const wrapped = newSpanEnd < newSpanStart;
 
-    if (mode === 'inflow' && !hasInitialized) {
-      // Only snap to red mark if marker hasn't been moved
-      const initialWeek = markerWeek === week ? week : markerWeek;
-      newSpanEnd = initialWeek;
-      newSpanStart = (initialWeek - localNFlowWeeks + WEEKS_PER_YEAR) % WEEKS_PER_YEAR;
-      newMarkerWeek = initialWeek;
-      setHasInitialized(true);
-    }
-
-    const wrapped = newSpanEnd < newSpanStart;
-
-    setSpanStart(newSpanStart);
-    setSpanEnd(newSpanEnd);
-    setIsWrapped(wrapped);
-    setLeftPct(getTimelinePosition(datasets[dataIndex][newSpanStart].date));
-    setRightPct(getTimelinePosition(datasets[dataIndex][newSpanEnd].date));
-    onChangeWeek(newMarkerWeek);
-  };
+  setSpanStart(newSpanStart);
+  setSpanEnd(newSpanEnd);
+  setIsWrapped(wrapped);
+  setLeftPct(getTimelinePosition(datasets[dataIndex][newSpanStart].date));
+  setRightPct(getTimelinePosition(datasets[dataIndex][newSpanEnd].date));
+  onChangeWeek(newMarkerWeek);
+};
 
   const startPlayback = () => {
     let current = markerWeek;
