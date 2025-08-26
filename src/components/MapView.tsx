@@ -2,10 +2,14 @@ import "leaflet/dist/leaflet.css";
 import "leaflet-geosearch/dist/geosearch.css";
 import { MapContainer, TileLayer, Marker, Popup, ImageOverlay, useMap } from "react-leaflet";
 import { GeoSearchControl, OpenStreetMapProvider } from "leaflet-geosearch";
+import { notifications } from '@mantine/notifications';
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { GeoTIFFImage } from "geotiff";
 import { RootState } from "../store/store";
 import { HistoricOutbreakMarkers, RecentOutbreakMarkers } from "./OutbreakPoints";
+import { lngLatToMercator } from '../utils/utils'
+import MaskGeoTIFFLayer from "./MaskGeoTIFFLayer";
 
 
 const imageBounds = [
@@ -37,9 +41,9 @@ function MapClickHandler({ setMarker }: { setMarker: (lat: number, lng: number, 
   const map = useMap();
 
   useEffect(() => {
-    const handleClick = (e: L.LeafletMouseEvent) => {
+    const handleClick = async (e: L.LeafletMouseEvent) => {
       const { lat, lng } = e.latlng;
-      setMarker(lat, lng, "Selected Location:");
+      await setMarker(lat, lng, "Selected Location:");
     };
 
     map.on("click", handleClick);
@@ -63,10 +67,9 @@ function SearchHandler({ setMarker }: { setMarker: (lat: number, lng: number, la
     });
 
     map.addControl(searchControl);
-
-    const handleSearch = (result: any) => {
+    const handleSearch = async (result: any) => {
       const { x, y, label } = result.location;
-      setMarker(y, x, label); // y = lat, x = lng
+      await setMarker(y, x, label); // y = lat, x = lng
     };
 
     map.on("geosearch/showlocation", handleSearch);
@@ -119,11 +122,50 @@ export default function MapView({ onLocationSelect }: {onLocationSelect: (latLon
   const overlayUrl = useSelector((state: RootState) => state.map.overlayUrl);
   const showRecentOutbreaks = useSelector((state: RootState) => state.map.showRecentOutbreaks);
   const showHistoricOutbreaks = useSelector((state: RootState) => state.map.showHistoricOutbreaks);
+  const [flowMaskGeoTIFFImage, setFlowMaskGeoTIFFImage]  = useState<GeoTIFFImage | null>(null);
 
   const [markerInfo, setmarkerInfo] = useState<{ lat: number; lng: number; label: string } | null>(null);
   const isInflowOutflowView = dataIndex >= 2;
 
-  const setMarker = (lat: number, lng: number, label: string) => {
+  // Utility to check if a marker is in valid mask region
+  const isValidMaskPoint = async (lat: number, lng: number) => {
+    if (!flowMaskGeoTIFFImage) return true; // if no mask, allow
+
+    const bounds = flowMaskGeoTIFFImage.getBoundingBox();
+    const width = flowMaskGeoTIFFImage.getWidth();
+    const height = flowMaskGeoTIFFImage.getHeight();
+    const [xMin, yMin, xMax, yMax] = bounds;
+    const [mx, my] = lngLatToMercator(lng, lat);
+
+    const px = Math.round(((mx - xMin) / (xMax - xMin)) * (width - 1));
+    const py = Math.round(((yMax - my) / (yMax - yMin)) * (height - 1));
+
+    if (px < 0 || py < 0 || px >= width || py >= height) return false;
+    try {
+      // Read current week's band
+      const raster = await flowMaskGeoTIFFImage.readRasters({ samples: [week + 1] });
+      const data = raster[0];
+      return data[py * width + px] === 1;
+    } catch (err) {
+      return true; // fallback, allow
+    }
+  };
+
+  // Modify setMarker to check mask
+  const setMarker = async (lat: number, lng: number, label: string) => {
+    if (isInflowOutflowView) {
+      const valid = await isValidMaskPoint(lat, lng);
+      if (!valid) {
+      notifications.show({
+        title: 'Select a Location',
+        message: 'Please select a location within the highlighted area.',
+        color: 'orange',
+      });
+        setmarkerInfo(null);
+        onLocationSelect(null);
+        return;
+      }
+    }
     const latLon = `${lat.toFixed(5)},${lng.toFixed(5)}`;
     setmarkerInfo({ lat, lng, label });
     onLocationSelect(latLon);
@@ -152,11 +194,11 @@ export default function MapView({ onLocationSelect }: {onLocationSelect: (latLon
           // @ts-ignore
           attribution='Abundance data © <a target="_blank" href="https://ebird.org/science/status-and-trends">eBird</a> | <a target="_blank" href="https://birdflow-science.github.io/">BirdFlow</a>'
         />
-        {/* @ts-ignore */}
-        <ImageOverlay url={overlayUrl} bounds={imageBounds} opacity={0.7} />
+        {overlayUrl && <ImageOverlay url={overlayUrl} bounds={imageBounds} opacity={0.7} />}
 
         {isInflowOutflowView && (
           <>
+            <MaskGeoTIFFLayer setFlowMaskGeoTIFFImage={setFlowMaskGeoTIFFImage}/>
             <SearchHandler setMarker={setMarker} />
             <MapClickHandler setMarker={setMarker} />
           </>

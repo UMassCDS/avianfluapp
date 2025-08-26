@@ -82,3 +82,17 @@ export const monthMarks = baseMonthMarks.map(({ date, label }) => ({
   value: getTimelinePosition(date),
   label,
 }));
+
+export function mercatorToLatLng(x: number, y: number) {
+  const lng = (x / 20037508.34) * 180;
+  let lat = (y / 20037508.34) * 180;
+  lat = (180 / Math.PI) * (2 * Math.atan(Math.exp((lat * Math.PI) / 180)) - Math.PI / 2);
+  return [lat, lng];
+}
+
+export function lngLatToMercator(lng: number, lat: number) {
+  const x = (lng * 20037508.34) / 180;
+  let y = Math.log(Math.tan(((90 + lat) * Math.PI) / 360)) / (Math.PI / 180);
+  y = (y * 20037508.34) / 180;
+  return [x, y];
+}
