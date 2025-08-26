@@ -6,16 +6,25 @@ interface FlowResult {
   legend: string;
 }
 
+interface FlowResultsPayload {
+  result: FlowResult[];
+  geotiff?: string;
+};
+
 interface MapState {
   overlayUrl: string;
   flowResults: FlowResult[]; // stores all API Flow results
-  showOutbreaks: boolean;
+  flowGeoTiffUrl: string;
+  showRecentOutbreaks: boolean;
+  showHistoricOutbreaks: boolean;
 }
 
 const initialState: MapState = {
   overlayUrl: "",
   flowResults: [],
-  showOutbreaks: true,
+  flowGeoTiffUrl: "",
+  showRecentOutbreaks: true,
+  showHistoricOutbreaks: false,
 };
 
 const mapSlice = createSlice({
@@ -28,22 +37,24 @@ const mapSlice = createSlice({
     clearOverlayUrl(state) {
       state.overlayUrl = "";
     },
-    setFlowResults(state, action: PayloadAction<FlowResult[]>) {
-      state.flowResults = action.payload;
+    setFlowResults(state, action: PayloadAction<FlowResultsPayload>) {
+      state.flowResults = action.payload.result;
+      state.flowGeoTiffUrl = action.payload.geotiff || "";
     },
     clearFlowResults(state) {
       state.flowResults = [];
+      state.flowGeoTiffUrl = "";
     },
     updateOverlayByWeek(state, action: PayloadAction<number>) {
+      if (state.flowResults.length === 0) return;
       const match = state.flowResults.find((r) => r.week === action.payload);
-      if (match) {
-        state.overlayUrl = match.url;
-      } else {
-        state.overlayUrl = "";
-      }
+      state.overlayUrl = match ? match.url : "";
     },
-    toggleOutbreaks(state) {
-      state.showOutbreaks = !state.showOutbreaks;
+    toggleRecentOutbreaks(state) {
+      state.showRecentOutbreaks = !state.showRecentOutbreaks;
+    },
+    toggleHistoricOutbreaks(state) {
+      state.showHistoricOutbreaks = !state.showHistoricOutbreaks;
     },
   },
 });
@@ -54,7 +65,8 @@ export const {
   setFlowResults,
   clearFlowResults,
   updateOverlayByWeek,
-  toggleOutbreaks,
+  toggleRecentOutbreaks,
+  toggleHistoricOutbreaks,
 } = mapSlice.actions;
 
 export default mapSlice.reducer;
