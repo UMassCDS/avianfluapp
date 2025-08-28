@@ -63,7 +63,7 @@ export function loadOutbreaks() {
             yearsAgo: thisYear - year,
             week: monthDayToWeek(month, day),
             geoLoc: [outbreak.GeoLoc[0], outbreak.GeoLoc[1]],
-            label: `${outbreak.Confirmed}: ${outbreak.Production} (${outbreak.NumInfected})`,
+            label: `${outbreak.Confirmed}: ${outbreak.Production}${outbreak.NumInfected ? ` (${outbreak.NumInfected})` : ''}`,
         });
     });
 }
