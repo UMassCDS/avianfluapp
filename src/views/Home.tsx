@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { useAppDispatch } from '../store/store';
 import { Combobox, ComboboxStore, useCombobox } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import L from 'leaflet';
@@ -72,7 +73,7 @@ const N_FLOW_WEEKS = 20; // can be made configurable later
 
 /* Right now, HomePage() component is where most of the logic lives (for example, things like play/pause button to display data every week over the range provided by timeline slider) */
 const HomePage = () => {  
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const speciesIndex = useSelector((state: RootState) => state.species.speciesIndex);
   const dataIndex = useSelector((state: RootState) => state.species.dataIndex);
   const flowResults = useSelector((state: RootState) => state.map.flowResults);
@@ -117,7 +118,7 @@ const HomePage = () => {
   // Called once on startup. Adds a listener for user keyboard events. 
   // Note: it appears this is not called when using Firefox on the iPhone PM 11/9/2024
   useEffect(() => {
-    loadOutbreaks();
+    loadOutbreaks(dispatch);
     handleWindowSizeChange();
     window.addEventListener('resize', handleWindowSizeChange);
     return () => {

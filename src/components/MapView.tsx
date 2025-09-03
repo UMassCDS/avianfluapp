@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { GeoTIFFImage } from "geotiff";
 import { RootState } from "../store/store";
-import { HistoricOutbreakMarkers, RecentOutbreakMarkers } from "./OutbreakPoints";
+import { OutbreakMarkers } from "./OutbreakPoints";
 import { lngLatToMercator } from '../utils/utils'
 import MaskGeoTIFFLayer from "./MaskGeoTIFFLayer";
 
@@ -113,7 +113,7 @@ function SearchHandler({ setMarker }: { setMarker: (lat: number, lng: number, la
 - MapClickHandler component: Listens for user clicks on the map and extracts lat/lon for callbacks
 - TileLayer component: Provides the base map (e.g. OSM tiles)
 - ImageOverlay component: Displays a heatmap-style overlay image based on the selected week
-- RecentOutbreakMarkers / HistoricOutbreakMarkers functions: Renders disease outbreak markers dynamically for the selected week
+- OutbreakMarkers function: Renders disease outbreak markers dynamically for the selected week
 */
 export default function MapView({ onLocationSelect }: {onLocationSelect: (latLonString: string | null) => void} ): JSX.Element {
   const dataIndex = useSelector((state: RootState) => state.species.dataIndex);
@@ -214,8 +214,7 @@ export default function MapView({ onLocationSelect }: {onLocationSelect: (latLon
         )}
 
         <OutbreakPanes />
-        {showRecentOutbreaks && RecentOutbreakMarkers(week)}
-        {showHistoricOutbreaks && HistoricOutbreakMarkers(week)}
+        <OutbreakMarkers />
       </MapContainer>
     </div>
   );
