@@ -9,22 +9,32 @@ interface FlowResult {
 interface FlowResultsPayload {
   result: FlowResult[];
   geotiff?: string;
-};
+}
+
+type OutbreakType = 'poultry' | 'bovine' | 'wild_birds';
 
 interface MapState {
   overlayUrl: string;
-  flowResults: FlowResult[]; // stores all API Flow results
+  flowResults: FlowResult[];
   flowGeoTiffUrl: string;
-  showRecentOutbreaks: boolean;
-  showHistoricOutbreaks: boolean;
+  showRecentOutbreaks: Record<OutbreakType, boolean>;
+  showHistoricOutbreaks: Record<OutbreakType, boolean>;
 }
 
 const initialState: MapState = {
   overlayUrl: "",
   flowResults: [],
   flowGeoTiffUrl: "",
-  showRecentOutbreaks: true,
-  showHistoricOutbreaks: false,
+  showRecentOutbreaks: {
+    poultry: true,
+    bovine: false,
+    wild_birds: false,
+  },
+  showHistoricOutbreaks: {
+    poultry: false,
+    bovine: false,
+    wild_birds: false,
+  },
 };
 
 const mapSlice = createSlice({
@@ -50,11 +60,13 @@ const mapSlice = createSlice({
       const match = state.flowResults.find((r) => r.week === action.payload);
       state.overlayUrl = match ? match.url : "";
     },
-    toggleRecentOutbreaks(state) {
-      state.showRecentOutbreaks = !state.showRecentOutbreaks;
+    toggleRecentOutbreaks(state, action: PayloadAction<OutbreakType>) {
+      const type = action.payload;
+      state.showRecentOutbreaks[type] = !state.showRecentOutbreaks[type];
     },
-    toggleHistoricOutbreaks(state) {
-      state.showHistoricOutbreaks = !state.showHistoricOutbreaks;
+    toggleHistoricOutbreaks(state, action: PayloadAction<OutbreakType>) {
+      const type = action.payload;
+      state.showHistoricOutbreaks[type] = !state.showHistoricOutbreaks[type];
     },
   },
 });

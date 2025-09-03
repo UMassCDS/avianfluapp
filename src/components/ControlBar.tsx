@@ -14,6 +14,12 @@ type ControlBarProps = {
   speciesOptions: any;
 };
 
+const outbreakTypes = [
+  { key: 'poultry', label: 'Poultry' },
+  { key: 'bovine', label: 'Bovine' },
+  { key: 'wild_birds', label: 'Wild birds' },
+] as const;
+
 export default function ControlBar({
   checkInputTypes,
   speciesCombo,
@@ -77,43 +83,41 @@ export default function ControlBar({
             {/* Outbreaks Section */}
             <div>
               <div className="mb-2 text-xs text-blue-700 font-bold uppercase tracking-wide">Outbreaks</div>
-              <div className="flex items-center justify-between bg-blue-50/50 p-2 rounded-lg">
-                <label htmlFor="outbreak-toggle" className="font-medium text-blue-800 text-sm">
-                  Recent
-                </label>
-                <button
-                  id="outbreak-toggle"
-                  onClick={() => dispatch(toggleRecentOutbreaks())}
-                  className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors ${
-                    showRecentOutbreaks ? 'bg-blue-500' : 'bg-gray-300'
-                  }`}
-                >
-                  <span
-                    className={`inline-block w-4 h-4 transform bg-white rounded-full transition-transform ${
-                      showRecentOutbreaks ? 'translate-x-6' : 'translate-x-1'
-                    }`}
-                  />
-                </button>
-              </div>
-
-              <div className="flex items-center justify-between bg-blue-50/50 p-2 rounded-lg">
-                <label htmlFor="outbreak-toggle" className="font-medium text-blue-800 text-sm">
-                  Historic
-                </label>
-                <button
-                  id="outbreak-toggle"
-                  onClick={() => dispatch(toggleHistoricOutbreaks())}
-                  className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors ${
-                    showHistoricOutbreaks ? 'bg-blue-500' : 'bg-gray-300'
-                  }`}
-                >
-                  <span
-                    className={`inline-block w-4 h-4 transform bg-white rounded-full transition-transform ${
-                      showHistoricOutbreaks ? 'translate-x-6' : 'translate-x-1'
-                    }`}
-                  />
-                </button>
-              </div>
+              {outbreakTypes.map((typeObj) => (
+                <div key={typeObj.key} className="flex flex-col mb-2 bg-blue-50/50 p-2 rounded-lg">
+                  <div className="text-blue-800 font-bold text-xs uppercase mb-1">{typeObj.label}</div>
+                  <div className="flex items-center justify-between">
+                    <label className="font-medium text-blue-800 text-xs">Recent</label>
+                    <button
+                      onClick={() => dispatch(toggleRecentOutbreaks(typeObj.key))}
+                      className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors ${
+                        showRecentOutbreaks[typeObj.key] ? 'bg-blue-500' : 'bg-gray-300'
+                      }`}
+                    >
+                      <span
+                        className={`inline-block w-4 h-4 transform bg-white rounded-full transition-transform ${
+                          showRecentOutbreaks[typeObj.key] ? 'translate-x-6' : 'translate-x-1'
+                        }`}
+                      />
+                    </button>
+                  </div>
+                  <div className="flex items-center justify-between mt-1">
+                    <label className="font-medium text-blue-800 text-xs">Historic</label>
+                    <button
+                      onClick={() => dispatch(toggleHistoricOutbreaks(typeObj.key))}
+                      className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors ${
+                        showHistoricOutbreaks[typeObj.key] ? 'bg-blue-500' : 'bg-gray-300'
+                      }`}
+                    >
+                      <span
+                        className={`inline-block w-4 h-4 transform bg-white rounded-full transition-transform ${
+                          showHistoricOutbreaks[typeObj.key] ? 'translate-x-6' : 'translate-x-1'
+                        }`}
+                      />
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
 
             {/* Data Type Section */}
