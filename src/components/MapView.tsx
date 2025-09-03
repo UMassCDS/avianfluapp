@@ -145,6 +145,7 @@ export default function MapView({ onLocationSelect }: {onLocationSelect: (latLon
       // Read current week's band
       const raster = await flowMaskGeoTIFFImage.readRasters({ samples: [week + 1] });
       const data = raster[0];
+      // @ts-ignore 
       return data[py * width + px] === 1;
     } catch (err) {
       return true; // fallback, allow
@@ -194,6 +195,7 @@ export default function MapView({ onLocationSelect }: {onLocationSelect: (latLon
           // @ts-ignore
           attribution='Abundance data © <a target="_blank" href="https://ebird.org/science/status-and-trends">eBird</a> | <a target="_blank" href="https://birdflow-science.github.io/">BirdFlow</a>'
         />
+        {/* @ts-ignore */}
         {overlayUrl && <ImageOverlay url={overlayUrl} bounds={imageBounds} opacity={0.7} />}
 
         {isInflowOutflowView && (
