@@ -238,7 +238,7 @@ const updateMarkerAndSpan = () => {
       onMouseEnter={() => setShowSpanLabels(true)}
       onMouseLeave={() => setShowSpanLabels(false)}
     >
-      <div className="flex items-center w-full">
+      <div className={`flex items-center w-full ${!isMonitor ? 'scale-75' : ''}`}>
         {/* Play/Pause Button */}
         <PlayPauseButton 
           isPlaying={isPlaying}

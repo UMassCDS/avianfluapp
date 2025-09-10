@@ -40,6 +40,8 @@ function DataLegend() {
   const [lowLabel, setLowLabel] = useState<number>(0);
   const [midLabel, setMidLabel] = useState<number>(50);
   const [highLabel, setHighLabel] = useState<number>(100);
+  const [fontSize, setfontSize] = useState<number>(12);
+  const mobile = isMobile()
 
   const getJSON = async (url: string) => {
     const response = await fetch(url);
@@ -78,6 +80,10 @@ function DataLegend() {
     }
   }, [dataIndex, speciesIndex, flowResults, currentWeek]);
 
+    useEffect(() => {
+      setfontSize(mobile ? 8 : 12)
+  }, [mobile]);
+
   const renderUnits = () => {
     const units = dataInfo[dataIndex].units;
     return isMobile() ? units.split('/').join('/\n') : units;
@@ -104,16 +110,16 @@ function DataLegend() {
         maxWidth: isMobile() ? '60px' : '120px',
       }}
     >
-      <div style={{ fontWeight: 'bold', textAlign: 'center', marginBottom: 6, fontSize: 12}}>
+      <div style={{ fontWeight: 'bold', textAlign: 'center', marginBottom: 6, fontSize: fontSize}}>
         {dataInfo[dataIndex].label}
       </div>
       {isMobile() ? (
         <>
-          <div style={{ textAlign: 'center', fontSize: 12 }}>{highLabel}</div>
+          <div style={{ textAlign: 'center', fontSize: fontSize }}>{highLabel}</div>
           {ColorBar}
-          <div style={{ textAlign: 'center', fontSize: 12 }}>{lowLabel}</div>
+          <div style={{ textAlign: 'center', fontSize: fontSize }}>{lowLabel}</div>
           <Tooltip label="Average of 10 years of data.">
-            <div style={{ textAlign: 'center', fontSize: 12 }}>{renderUnits()}</div>
+            <div style={{ textAlign: 'center', fontSize: fontSize }}>{renderUnits()}</div>
           </Tooltip>
         </>
       ) : (

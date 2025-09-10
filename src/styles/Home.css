@@ -33,7 +33,7 @@
 
     .OutbreakLegend {
         position: absolute;
-        bottom: 430px;
+        bottom: 460px;
         left: 10px;
         z-index: 20;
         white-space: pre-line;

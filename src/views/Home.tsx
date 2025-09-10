@@ -35,6 +35,7 @@ import 'leaflet/dist/leaflet.css';
 import 'leaflet-geosearch/dist/geosearch.css';
 import '../styles/Home.css';
 import taxa from '../assets/taxa.json';
+import { isMobile } from '../utils/utils';
 
 // Fix for missing marker icon in production
 // Import marker images
@@ -88,6 +89,7 @@ const HomePage = () => {
   const [location, setLocation] = useState<string[]>([]);
   const [useSearchMode, setUseSearchMode] = useState(false);
   const [startWeek, setStartWeek] = useState(week); // default to marker week
+  const mobile = isMobile();
 
   // Callback passed to MapView
   const handleLocationSelect = (latLon: string | null) => {
@@ -224,40 +226,16 @@ const HomePage = () => {
   return (
     <div className="Home">
       {/* Top center overlay panel */}
-      <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[1100] max-w-lg w-[90vw]">
+      <div  className={
+          `fixed top-4 left-1/2 -translate-x-1/2 z-10 w-[90vw] max-w-lg ${mobile ? 'scale-75' : ''}`
+        }
+      >
         <MapOverlayPanel
           location={location}
           startWeek={startWeek}
         >
           {dataIndex >= 2 && (
             <div className="flex flex-row items-center justify-center gap-4">
-              {/* Switch to Search/Click Mode Button
-              <Tooltip label="Select flow start location" position="top" withArrow offset={8}>
-                <button
-                  onClick={toggleMode}
-                  type="button"
-                  className={`flex items-center gap-2 p-1 rounded-xl border-2 transition font-semibold shadow-md
-                    ${useSearchMode
-                      ? 'bg-white border-blue-400 text-blue-500 hover:bg-blue-50 hover:border-blue-500 active:bg-blue-100'
-                      : 'bg-white border-blue-400 text-blue-500 hover:bg-blue-50 hover:border-blue-500 active:bg-blue-100'
-                    }
-                    text-base sm:text-base`
-                  }
-                  style={{ marginTop: 'var(--mantine-spacing-md)' }}
-                >
-                  {useSearchMode ? (
-                    <>
-                      <IconClick size={20} className="text-blue-500 sm:w-5 sm:h-5 w-5 h-5" />
-                      <span className="hidden sm:inline">Switch to Click Mode</span>
-                    </>
-                  ) : (
-                    <>
-                      <IconSearch size={16} className="text-blue-500 sm:w-4 sm:h-4 w-4 h-4" />
-                      <span className="hidden sm:inline">Switch to Search Mode</span>
-                    </>
-                  )}
-                </button>
-              </Tooltip> */}
               {/* Inflow/Outflow Calculate Button */}
               <InflowOutflowCalculateButton
                 dataIndex={dataIndex}
@@ -277,7 +255,12 @@ const HomePage = () => {
       <div className="relative w-full h-[100vh]">
         <MapView onLocationSelect={handleLocationSelect} />
       </div>
-      <div className="fixed top-4 right-4 z-50 flex flex-col gap-3 items-end">
+      <div
+        className={
+          `fixed top-4 right-4 z-50 flex flex-col gap-3 items-end
+          ${mobile ? 'right-1 scale-75 max-w-[60px]' : ''}`
+        }
+      >
         <AboutButtons />
         <ControlBar
           checkInputTypes={checkInputTypes}
@@ -288,7 +271,7 @@ const HomePage = () => {
       </div>
 
       {shouldShowDataLegend && <DataLegend />}
-      <OutbreakLegend />
+      { !mobile && <OutbreakLegend /> }
 
       <Timeline
         onChangeWeek={onChangeWeek}
