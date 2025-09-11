@@ -9,7 +9,7 @@ import { RootState } from '../store/store';
 import ab_dates from '../assets/abundance_dates.json';
 import mv_dates from '../assets/movement_dates.json';
 
-const BirdflowRApiBaseUrl = "https://www.birdfluapi.com/mock"; // BirdflowR REST API base URL
+const BirdflowRApiBaseUrl = "https://www.birdfluapi.com/api"; // BirdflowR REST API base URL
 
 type Props = {
   dataIndex: number; // 2 for inflow, 3 for outflow
