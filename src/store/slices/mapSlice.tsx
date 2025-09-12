@@ -57,7 +57,7 @@ const mapSlice = createSlice({
     },
     updateOverlayByWeek(state, action: PayloadAction<number>) {
       if (state.flowResults.length === 0) return;
-      const match = state.flowResults.find((r) => r.week === action.payload);
+      const match = state.flowResults.find((r) => (r.week-1) === action.payload);
       state.overlayUrl = match ? match.url : "";
     },
     toggleRecentOutbreaks(state, action: PayloadAction<OutbreakType>) {

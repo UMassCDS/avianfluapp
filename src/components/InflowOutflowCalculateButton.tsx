@@ -9,7 +9,7 @@ import { RootState } from '../store/store';
 import ab_dates from '../assets/abundance_dates.json';
 import mv_dates from '../assets/movement_dates.json';
 
-const BirdflowRApiBaseUrl = "https://www.birdfluapi.com/mock"; // BirdflowR REST API base URL
+const BirdflowRApiBaseUrl = "https://www.birdfluapi.com/api"; // BirdflowR REST API base URL
 
 type Props = {
   dataIndex: number; // 2 for inflow, 3 for outflow
@@ -70,7 +70,13 @@ const InflowOutflowCalculateButton: React.FC<Props> = ({
     const functionName = dataIndex === 2 ? 'inflow' : 'outflow';
     const taxa = speciesOptions[speciesIndex]?.value || 'total';
     const locParam = location.join(';');
-    const url = `${BirdflowRApiBaseUrl}/${functionName}?loc=${locParam}&week=${week}&taxa=${taxa}&n=${nFlowWeeks}`;
+    const url = `${BirdflowRApiBaseUrl}/${functionName}?loc=${locParam}&week=${week+1}&taxa=${taxa}&n=${nFlowWeeks}`;
+
+    notifications.show({
+      title: 'Calculation in Progress',
+      message: 'Calculation started. Please wait, results will be shown on the map.',
+      color: 'green',
+    });
 
     try {
       const response = await axios.get(url);
@@ -88,7 +94,7 @@ const InflowOutflowCalculateButton: React.FC<Props> = ({
       } else if (data.status === 'error') {
         notifications.show({
           title: 'Error from backend',
-          message: 'Something went wrong on the server. Please try again later.',
+          message:  data.message || 'Something went wrong on the server. Please try again later.',
           color: 'red',
         });
       } else {
