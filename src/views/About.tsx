@@ -1,8 +1,36 @@
+
 import { Link } from 'react-router-dom';
 import { IconStack2, IconExternalLink, IconInfoCircle, IconMessageCircle } from "@tabler/icons-react";
 import BirdSVG from '../assets/Bird.svg';
 import { useState } from 'react';
 import FeedbackForm from './Feedback';
+
+// Scoped CSS for About page links
+const aboutPageStyle = `
+  .timeline-marker {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 80px;
+    height: 20px;
+    border-radius: 9999px; /* pill shape */
+    background-color: white;
+    border: 2px solid #228be6;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: border 0.2s ease, color 0.2s ease;
+  }
+
+  a {
+    color: #1976d2;
+    text-decoration: underline;
+    transition: color 0.2s;
+  }
+   a:hover {
+    color: #1565c0;
+    text-decoration: underline;
+  }
+
+`;
 
 function About() {
   const [tab, setTab] = useState<'about' | 'feedback' | 'swagger'>('about');
@@ -162,113 +190,131 @@ function About() {
           </a>.
           Accessed on 2024-04-29.
         </li>
-        <li>
-          Development of this application was funded by the USDA and USGS.
-        </li>
       </ul>
     </Section>
   );
 
   const AboutThisSite = (
-    <Section title="About this site">
+    <Section title="About the Site">
       <p>
-        This site informs poultry producers and others about wild bird movement, abundance, and current Avian Influenza outbreaks with the goal of informing risk management for avian influenza. The application displays five distinct types of information that all relate to and serve as indicators of risk but does not (yet) model or display risk directly.
+        This site informs users, poultry producers, and others about wild bird movement and abundance, and current Avian Influenza outbreaks with the goal of informing risk management for avian influenza. The application displays five distinct types of information that all relate to and serve as indicators of risk but does not (yet) model or display risk directly.
       </p>
-      <h3 className="text-lg font-semibold text-blue-500 mb-1">Data Layers</h3>
+      <h2 className="text-xl font-semibold text-blue-500 mt-6 mb-3">Data Layers</h2>
       <p>
-        Data display is controlled by the{' '}
-        <span className="inline-flex items-center justify-center align-middle bg-blue-100 border border-blue-400 rounded-md p-0.5">
-          <IconStack2 size={18} className="text-blue-700" />
-        </span>{' '}
-        layer button. The application can display known outbreak locations as markers over several types of information on wild birds, which are displayed one at a time as images.
+        Data display is controlled by the {' '}
+        <button className="bg-gradient-to-br from-blue-100 to-blue-300 hover:from-blue-200 hover:to-blue-400 shadow-xl rounded-xl border-2 border-blue-400 transition-all duration-200 flex items-center justify-center p-0" aria-label="Show data type controls" type="button" style={{ width: '28px', height: '28px', marginLeft: '4px', verticalAlign: 'middle', display: 'inline-flex' }}>
+          <span className="flex items-center justify-center w-full h-full">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="tabler-icon tabler-icon-stack-2 text-blue-700"><path d="M12 4l-8 4l8 4l8 -4l-8 -4"></path><path d="M4 12l8 4l8 -4"></path><path d="M4 16l8 4l8 -4"></path></svg>
+          </span>
+        </button> button. 
+         The top half of the menu “Outbreaks” controls the display of outbreak locations (and wild bird detections), each of which can be controlled independently—allowing none or multiple datasets to be displayed. The bottom half “Data” controls the primary raster data layer that is displayed, only one of which can be active at a time.
       </p>
-      <h3 className="text-lg font-semibold text-blue-500 mb-1">Outbreaks Locations</h3>
+      <h3 className="text-lg font-semibold text-blue-500 mt-4 mb-1">Outbreaks</h3>
       <p>
-        Known outbreaks of High Pathogenic Avian Influenza (HPAI) appear as markers on the map above the image data, and can be toggled on and off independently. The data are from the USDA Animal and Plant Health Inspection Service (APHIS). Outbreak locations are displayed near the center of the county they are associated with. Each outbreak is separately randomly offset slightly from its county center so multiple outbreaks in the county do not all overlap each other. Thus although each outbreak is shown at a precise location (if you zoom way in) this is NOT the actual location of the outbreak.
-      </p>
-      <h3 className="text-lg font-semibold text-blue-500 mb-1">Recent Outbreaks</h3>
-      <p>
-        These markers indicate counties with High Pathogenic Avian Influenza (HPAI) outbreaks at poultry farms and backyard flocks within the current calendar year. The transparency is adjusted relative to the active display date or in the case of inflow and outflow the projection start date as follows:
+        Three different types of detections of High Pathogenic Avian Influenza (HPAI) can be displayed as circles on the map above the image data. They can be toggled on and off independently allowing users to view multiple outbreaks at a time. For each type there are two different layers: “Recent” includes outbreaks for the current calendar year, “Historic” includes outbreaks from preceding years.
       </p>
       <ul className="list-disc ml-6">
-        <li>Preceding 3 weeks (fully opaque)</li>
-        <li>Earlier than 3 weeks before the active, displayed date (25% transparent)</li>
-        <li>After the active display date (50% transparent)</li>
+        <li><strong>Poultry:</strong> These markers indicate counties with HPAI <a href='https://www.aphis.usda.gov/livestock-poultry-disease/avian/avian-influenza/hpai-detections/commercial-backyard-flocks'>outbreaks at poultry farms and backyard flocks.</a> The data exists only at the county level and each point is shown randomly offset slightly from the county center. The exact location is NOT accurate.</li>
+        <li><strong>Bovine:</strong> This displays <a href='https://www.aphis.usda.gov/livestock-poultry-disease/avian/avian-influenza/hpai-detections/hpai-confirmed-cases-livestock'>HPAI outbreaks in livestock</a> tracked by APHIS. This data exists only at the state level and each outbreak is displayed at a location randomly offset from the center of the state.</li>
+        <li><strong>Wild Bird:</strong> This dataset shows HPAI detections in <a href='https://www.aphis.usda.gov/livestock-poultry-disease/avian/avian-influenza/hpai-detections/wild-birds'>wild birds</a> as tracked by APHIS. As with the poultry outbreaks, the locations are only specified at the county level and the application displays each outbreak randomly offset from the county center it occurred in. Note sampling and testing for outbreaks in wild birds is not uniform so this dataset is not a complete picture of the occurrence or prevalence of HPAI in wild birds.</li>
       </ul>
       <p>
-        Thus sliding the display date or changing the reference date will change which outbreaks are emphasized with the most emphasis on those immediately preceding the display date.
+        All three datasets are from the USDA Animal and Plant Health Inspection Service (APHIS) and are updated once per day to match the APHIS data. Consult <a href='https://www.aphis.usda.gov/h5n1-hpai'>their website</a> for more detailed information.
       </p>
-      <h3 className="text-lg font-semibold text-blue-500 mb-1">Historical Outbreaks</h3>
       <p>
-        These represent outbreaks at poultry farms prior to the current calendar year - those not shown in the Recent Outbreak layer. They are always displayed 35% transparent.
+        Outbreak locations are displayed near the center of either the county or state they occurred in. Each outbreak is separately randomly offset slightly from the county or state center so multiple outbreaks in the same geography do not all overlap each other. 
+        <span style={{ textDecoration: 'underline' }}>Although each outbreak is shown at a precise location (if you zoom way in) this is NOT the actual location of the outbreak or detection.</span>
       </p>
-      <h3 className="text-lg font-semibold text-blue-500 mb-1">Image Data</h3>
+      <h3 className="text-lg font-semibold text-blue-500 mt-4 mb-1">Image Data</h3>
       <p>
-        Each image dataset covers a large portion of the map with pixels that vary in color to indicate the values in the associated data. For instance with the abundance data the color indicates the density of birds (birds/km). Because this data covers large portions of the map only one image data set can be displayed at a time and selecting any one of them with the layer button will switch to that layer - turning off the prior image layer. All of the image data has a resolution of roughly 100 km – values are set for pixels that are about 100 x 100 km.
+        Each image dataset covers a large portion of the map with varying colors that indicate the values in the associated data set. For instance, with the abundance data the color indicates the density of birds (birds/km²). Only one image data set can be displayed at a time. All of the image data has a resolution of roughly 100 km – values are set for pixels that are about 100 x 100 km. The four different image data types are described below.
       </p>
-      <h4 className="text-md font-semibold text-blue-500 mb-1">Species</h4>
+      <ul className="list-disc ml-6">
+        <li><strong>Abundance:</strong> Abundance is the expected density of birds in birds/km² for the selected species or total. Abundance is from eBird weekly relative abundance (Fink et al. 2022) combined with population estimates from Partners in Flight (2020). The resolution of the data is 100 km - each cell is 100 km on a side - and thus does show fine scale variation in habitat that might make areas within each cell higher or lower than the cell value. The abundance data for each species is derived from 10 years of citizen science observations and thus represents how many birds tend to be in the area at the given week of year. It does not incorporate any real time information.</li>
+        <li><strong>Movement:</strong> Movement represents migratory traffic through each part of the landscape in birds/km/week - how many birds are expected to migrate over a kilometer long transect in a week. It is estimated using BirdFlow models which are built using the same eBird data displayed in abundance, and likewise represents generalized patterns derived from ten years of eBird data, and does not incorporate any real time information.</li>
+        <li><strong>Inflow/Outflow:</strong> These layers represent projections of where birds that are at a given location on a given date might be coming from (inflow) or going (outflow). In both cases the result is an estimate of the number of birds that were at the reference location and date that are likely to be in each part of the landscape at the projected time in birds/km². Unlike the other image data this projection is made in response to user input so whenever either the starting location or date changes new predictions will need to be made.</li>
+      </ul>
+      <h4 className="text-md font-semibold text-blue-500 mt-3 mb-1">Process for calculating and viewing inflow and outflow</h4>
+      <ol className="list-decimal ml-6">
+        <li>Select either Inflow or Outflow using the data {' '}
+        <button className="bg-gradient-to-br from-blue-100 to-blue-300 hover:from-blue-200 hover:to-blue-400 shadow-xl rounded-xl border-2 border-blue-400 transition-all duration-200 flex items-center justify-center p-0" aria-label="Show data type controls" type="button" style={{ width: '28px', height: '28px', marginLeft: '4px', verticalAlign: 'middle', display: 'inline-flex' }}>
+          <span className="flex items-center justify-center w-full h-full">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="tabler-icon tabler-icon-stack-2 text-blue-700"><path d="M12 4l-8 4l8 4l8 -4l-8 -4"></path><path d="M4 12l8 4l8 -4"></path><path d="M4 16l8 4l8 -4"></path></svg>
+          </span>
+        </button> button in the top right.</li>
+        <li>
+          Select the starting week for the projection by sliding the white circle that anchors the projection arrow (
+          <span style={{ display: 'inline-block', verticalAlign: 'middle', margin: '0 2px' }}>
+            <svg width="20" height="20" style={{ verticalAlign: 'middle' }}>
+              <circle cx="10" cy="10" r="8" fill="white" stroke="#228be6" strokeWidth="2"></circle>
+            </svg>
+          </span>
+          ) to the desired week.
+        </li>
+        <li>
+          Select the starting location either by clicking on the map or using the search button (
+          <span className="leaflet-bar-part leaflet-bar-part-single" title="Enter address" style={{ display: 'inline-block', verticalAlign: 'middle', width: '22px', height: '22px', background: '#fff', border: '1px solid #228be6', borderRadius: '4px', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', textAlign: 'center', lineHeight: '22px', margin: '0 2px' }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#228be6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ verticalAlign: 'middle' }}>
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+          </span>
+          ) in the upper left corner to look up an address. Note projections can only be made from locations where birds are expected to be; this varies by date and species and is displayed in green if a prediction hasn’t yet been made.
+        </li>
+        <li>Click the “Calculate inflow” or “Calculate outflow” button.</li>
+        <li>
+          Slide the display date indicator
+          <span className="timeline-marker" style={{ display: 'inline-flex', verticalAlign: 'middle', cursor: 'pointer', margin: '0 6px', width: 'auto', height: '28px', padding: '0 16px' }}>
+            <span className="timeline-marker-label">Jan 4</span>
+          </span>
+          along the blue arrow to view projections of where birds from the starting location and date will be or have been on other dates.
+        </li>
+      </ol>
+      <h3 className="text-lg font-semibold text-blue-500 mt-4 mb-1">Species selection</h3>
       <p>
-        Each of the image layers can be displayed either for an individual species or for the total across all 9 species — controlled with the species selection button{' '}
-        <img
-          src={BirdSVG}
-          alt="Bird icon"
-          className="inline align-middle"
-          style={{ width: 24, height: 24 }}
-        />. All of the image data has a resolution of 100 km – values are set for pixels that are 100 × 100 km.
+        For all four image data types the species selection button
+        <button className="bg-gradient-to-br from-blue-100 to-blue-300 hover:from-blue-200 hover:to-blue-400 shadow-xl rounded-xl border-2 border-blue-400 transition-all duration-200 flex items-center justify-center p-0" aria-label="Show species controls" type="button" style={{ width: '32px', height: '32px', verticalAlign: 'middle', margin: '0 6px', display: 'inline-flex' }}>
+          <span className="flex items-center justify-center w-full h-full">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgb(29 78 216)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="inline-block">
+              <path d="M16 7h.01"></path>
+              <path d="M3.4 18H12a8 8 0 0 0 8-8V7a4 4 0 0 0-7.28-2.3L2 20"></path>
+              <path d="m20 7 2 .5-2 .5"></path>
+              <path d="M10 18v3"></path>
+              <path d="M14 17.75V21"></path>
+              <path d="M7 18a6 6 0 0 0 3.84-10.61"></path>
+            </svg>
+          </span>
+        </button>
+         controls which individual species—or the total of all species—data are displayed. The species were selected as being important hosts and possible vectors for HPAI (Miller, 2024). Four species from the original species list were dropped: two species, Mottled Duck and Mexican Duck, because they were non-migratory; two others, Cinnamon Teal and Long-tailed Duck, due to poor model performance.
       </p>
-
-      <h4 className="text-md font-semibold text-blue-500 mb-1">Active Date</h4>
+        
+      <h3 className="text-lg font-semibold text-blue-500 mt-4 mb-1">Display Date</h3>
       <p>
-        All of the image data varies over time and the displayed date is controlled by sliding the active date indicator{' '}
-        <span
-          className="timeline-marker"
-          style={{
-            display: 'inline-flex',
-            verticalAlign: 'middle',
-          }}
-        >
-          <span className="timeline-marker-label">Apr 26</span>
-        </span>{' '}
-        along the timeline at the bottom, or pressing the play button to animate over time.
+        All of the image data varies over time and the displayed date is controlled by sliding the display date indicator
+         <span className="timeline-marker" style={{ display: 'inline-flex', verticalAlign: 'middle', cursor: 'pointer', margin: '0 6px', width: 'auto', height: '28px', padding: '0 16px' }}>
+            <span className="timeline-marker-label">Jan 4</span>
+          </span>
+         along the timeline at the bottom, or pressing the play button to animate over time.
       </p>
-
-
-      <h3 className="text-lg font-semibold text-blue-500 mb-1">Abundance</h3>
+      <h3 className="text-lg font-semibold text-blue-500 mt-4 mb-1">More Information</h3>
       <p>
-        Abundance is the expected density of birds in birds/km² for the selected species or total. Abundance is from eBird weekly relative abundance (Fink et al. 2022) combined with population estimates from Partners in Flight (2020). The resolution of the data is 100 km - each cell is 100 km on a side - and thus does show fine scale variation in habitat that might make areas within each cell higher or lower than the cell value. The abundance data for each species is derived from 10 years of observations and thus represents how many birds tend to be in the area at the given week of year. It does not incorporate any real time information.
+        <a href='https://birdflow-science.github.io/'>BirdFlow</a> is a joint project between the <a href='https://www.cics.umass.edu/'>University of Massachusetts Amherst</a> and the <a href='https://www.birds.cornell.edu/home'>Cornell Lab of Ornithology</a> funded by the <a href='https://www.nsf.gov'>US National Science Foundation.</a> 
+        <a href='https://birdflow-science.github.io/BirdFlowR/'>BirdFlowR</a> package was used to develop movement data and can be used to make predictions programmatically from BirdFlow models. Its documentation includes a page giving an <a href='https://birdflow-science.github.io/BirdFlowR/articles/BirdFlowOverview.html'>Overview of the Uses and Limititations</a> of BirdFlow models. <a href='https://birdflow-science.s3.amazonaws.com/avian_flu/index.html'>The Avian Influenza BirdFlow Model Collection</a> distributes the models used by this application for use with the BirdFlowR, R package.
       </p>
-      <h3 className="text-lg font-semibold text-blue-500 mb-1">Movement</h3>
+      <h3 className="text-lg font-semibold text-blue-500 mt-4 mb-1">Disclaimer</h3>
       <p>
-        Movement represents migratory traffic through each part of the landscape in birds/km/week - how many birds are expected to migrate over a kilometer long transect in a week. It is estimated using BirdFlow models which are built using the same eBird data displayed in abundance, and likewise represents generalized patterns derived from ten years of eBird data, and does not incorporate any real time information.
+        This material uses data from the eBird Status and Trends Project at the Cornell Lab of Ornithology, <a href='https://ebird.org'>eBird.org.</a> Any opinions, findings, and conclusions or recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the Cornell Lab of Ornithology.
       </p>
-      <h3 className="text-lg font-semibold text-blue-500 mb-1">Inflow/Outflow</h3>
-      <p>
-        These layers represent projections of where birds that are at a given location on a given date might be coming from (inflow) or going (outflow). In both cases the result is an estimate of the number of birds that were at the reference location and date that are likely to be in each part of the landscape at the projected time in birds/km². Unlike the other image data this projection is made in response to user input so whenever either the starting location or date changes new predictions will need to be made. For any prediction you can slide the display date forward and back over the projected time frame (blue arrow) to see how the predictions change over time.
-      </p>
-      <h3 className="text-lg font-semibold text-blue-500 mb-1">Species selection</h3>
-      <p>
-        The species shown in this model were selected as being important hosts and possible vectors for High Pathogenic Avian Influenza (Miller, 2024). Four species from the original species list were dropped—two species, Mottled Duck and Mexican Duck, because they were non-migratory; two others, Cinnamon Teal and Long-tailed Duck, because of poor model performance.
-      </p>
-      <h3 className="text-lg font-semibold text-blue-500 mb-1">More Information</h3>
-      <p>
-        BirdFlow is a joint project between the University of Massachusetts Amherst and the Cornell Lab of Ornithology funded by the US National Science Foundation.
-        BirdFlowR package was used to develop movement data and can be used to make predictions programmatically from BirdFlow models. Its documentation includes a page giving an Overview of the Uses and Limititations of BirdFlow models.
-        The Avian Influenza BirdFlow Model Collection distributes the models used by this application for use with the BirdFlowR, R package.
-      </p>
-      <h3 className="text-lg font-semibold text-blue-500 mb-1">Disclaimer</h3>
-      <p>
-        This material uses data from the eBird Status and Trends Project at the Cornell Lab of Ornithology, eBird.org. Any opinions, findings, and conclusions or recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the Cornell Lab of Ornithology.
-      </p>
-      <h3 className="text-lg font-semibold text-blue-500 mb-1">Citations</h3>
+      <h3 className="text-lg font-semibold text-blue-500 mt-4 mb-1">Citations</h3>
       <ul className="list-decimal ml-6 space-y-2 text-gray-700">
         <li>
-          Fink, D., T. Auer, A. Johnston, M. Strimas-Mackey, S. Ligocki, O. Robinson, W. Hochachka, L. Jaromczyk, C. Crowley, K. Dunham, A. Stillman, I. Davies, A. Rodewald, V. Ruiz-Gutierrez, C. Wood. 2023.eBird Status and Trends, Data Version: 2022; Released: 2023. Cornell Lab of Ornithology, Ithaca, New York.
+          Fink, D., T. Auer, A. Johnston, M. Strimas-Mackey, S. Ligocki, O. Robinson, W. Hochachka, L. Jaromczyk, C. Crowley, K. Dunham, A. Stillman, I. Davies, A. Rodewald, V. Ruiz-Gutierrez, C. Wood. 2023. <a href='https://ebird.org/science/status-and-trends'>eBird Status and Trends</a>, Data Version: 2022; Released: 2023. Cornell Lab of Ornithology, Ithaca, New York.
           <a href="https://doi.org/10.2173/ebirdst.2022" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-500 ml-1">
             https://doi.org/10.2173/ebirdst.2022
           </a>
         </li>
         <li>
-          Fuentes, Miguel, Benjamin M. Van Doren, Daniel Fink, and Daniel Sheldon. BirdFlow: Learning seasonal bird movements from eBird data  Methods in Ecology and Evolution 14, no. 3 (2023): 923-938.
+          Fuentes, Miguel, Benjamin M. Van Doren, Daniel Fink, and Daniel Sheldon. BirdFlow: Learning seasonal bird movements from eBird data. Methods in Ecology and Evolution 14, no. 3 (2023): 923-938.
           <a href="https://doi.org/10.1111/2041-210X.14052" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-500 ml-1">
             https://doi.org/10.1111/2041-210X.14052
           </a>
@@ -282,13 +328,12 @@ function About() {
             https://pif.birdconservancy.org/population-estimates-database
           </a>. Accessed on 2024-04-29.
         </li>
-        <li>
-          Development of this application was funded by the USDA and USGS.
-        </li>
       </ul>
+        <em>Development of this application was funded by the USDA and USGS.</em>
     </Section>
   );
 
+  
   const TabMenu = (
     <nav className="sticky top-0 z-30 bg-white/90 border-b border-blue-100 flex gap-2 justify-center py-3 mb-8 rounded-t-2xl shadow-sm">
       <button
@@ -331,8 +376,10 @@ function About() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center py-8 px-2 font-sans">
-      <div className="relative bg-white/95 max-w-3xl w-full rounded-2xl shadow-xl px-8 py-10 overflow-auto border border-blue-100" style={{ maxHeight: '90vh' }}>
+    <>
+      <style>{aboutPageStyle}</style>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center py-8 px-2 font-sans about-page">
+        <div className="relative bg-white/95 max-w-3xl w-full rounded-2xl shadow-xl px-8 py-10 overflow-auto border border-blue-100" style={{ maxHeight: '90vh' }}>
         {/* Back arrow in top left */}
         <Link
           to="/"
@@ -376,7 +423,7 @@ function About() {
           <h1 className="text-3xl font-bold text-blue-500 m-0 text-center font-sans">Avian Influenza</h1>
         </div>
 
-        {/* Tab menu: sticky inside card */}
+  {/* Tab menu: sticky inside card */}
         <nav className="sticky top-0 z-30 bg-white/90 border-b border-blue-100 flex gap-2 justify-center py-3 mb-8 rounded-t-2xl shadow-sm">
           <button
             className={`flex items-center gap-2 px-5 py-2 rounded-t-lg font-semibold transition
@@ -430,7 +477,8 @@ function About() {
         {tab === 'feedback' && <FeedbackForm />}
         {/* Swagger tab does not render content, just opens the link */}
       </div>
-    </div>
+      </div>
+    </>
   );
 }
 
