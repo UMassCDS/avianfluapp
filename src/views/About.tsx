@@ -7,15 +7,29 @@ import FeedbackForm from './Feedback';
 
 // Scoped CSS for About page links
 const aboutPageStyle = `
-  .about-page a {
+  .timeline-marker {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 80px;
+    height: 20px;
+    border-radius: 9999px; /* pill shape */
+    background-color: white;
+    border: 2px solid #228be6;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: border 0.2s ease, color 0.2s ease;
+  }
+
+  a {
     color: #1976d2;
     text-decoration: underline;
     transition: color 0.2s;
   }
-  .about-page a:hover {
+   a:hover {
     color: #1565c0;
     text-decoration: underline;
   }
+
 `;
 
 function About() {
@@ -189,7 +203,13 @@ function About() {
       </p>
       <h2 className="text-xl font-semibold text-blue-500 mt-6 mb-3">Data Layers</h2>
       <p>
-        Data display is controlled by the layer button. The top half of the menu “Outbreaks” controls the display of outbreak locations (and wild bird detections), each of which can be controlled independently—allowing none or multiple datasets to be displayed. The bottom half “Data” controls the primary raster data layer that is displayed, only one of which can be active at a time.
+        Data display is controlled by the {' '}
+        <button className="bg-gradient-to-br from-blue-100 to-blue-300 hover:from-blue-200 hover:to-blue-400 shadow-xl rounded-xl border-2 border-blue-400 transition-all duration-200 flex items-center justify-center p-0" aria-label="Show data type controls" type="button" style={{ width: '28px', height: '28px', marginLeft: '4px', verticalAlign: 'middle', display: 'inline-flex' }}>
+          <span className="flex items-center justify-center w-full h-full">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="tabler-icon tabler-icon-stack-2 text-blue-700"><path d="M12 4l-8 4l8 4l8 -4l-8 -4"></path><path d="M4 12l8 4l8 -4"></path><path d="M4 16l8 4l8 -4"></path></svg>
+          </span>
+        </button> button. 
+         The top half of the menu “Outbreaks” controls the display of outbreak locations (and wild bird detections), each of which can be controlled independently—allowing none or multiple datasets to be displayed. The bottom half “Data” controls the primary raster data layer that is displayed, only one of which can be active at a time.
       </p>
       <h3 className="text-lg font-semibold text-blue-500 mt-4 mb-1">Outbreaks</h3>
       <p>
@@ -218,19 +238,65 @@ function About() {
       </ul>
       <h4 className="text-md font-semibold text-blue-500 mt-3 mb-1">Process for calculating and viewing inflow and outflow</h4>
       <ol className="list-decimal ml-6">
-        <li>Select either Inflow or Outflow using the data layer button in the top right.</li>
-        <li>Select the starting week for the projection by sliding the white circle that anchors the projection arrow to the desired week.</li>
-        <li>Select the starting location either by clicking on the map or using the search button in the upper left corner to look up an address. Note projections can only be made from locations where birds are expected to be; this varies by date and species and is displayed in green if a prediction hasn’t yet been made.</li>
+        <li>Select either Inflow or Outflow using the data {' '}
+        <button className="bg-gradient-to-br from-blue-100 to-blue-300 hover:from-blue-200 hover:to-blue-400 shadow-xl rounded-xl border-2 border-blue-400 transition-all duration-200 flex items-center justify-center p-0" aria-label="Show data type controls" type="button" style={{ width: '28px', height: '28px', marginLeft: '4px', verticalAlign: 'middle', display: 'inline-flex' }}>
+          <span className="flex items-center justify-center w-full h-full">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="tabler-icon tabler-icon-stack-2 text-blue-700"><path d="M12 4l-8 4l8 4l8 -4l-8 -4"></path><path d="M4 12l8 4l8 -4"></path><path d="M4 16l8 4l8 -4"></path></svg>
+          </span>
+        </button> button in the top right.</li>
+        <li>
+          Select the starting week for the projection by sliding the white circle that anchors the projection arrow (
+          <span style={{ display: 'inline-block', verticalAlign: 'middle', margin: '0 2px' }}>
+            <svg width="20" height="20" style={{ verticalAlign: 'middle' }}>
+              <circle cx="10" cy="10" r="8" fill="white" stroke="#228be6" strokeWidth="2"></circle>
+            </svg>
+          </span>
+          ) to the desired week.
+        </li>
+        <li>
+          Select the starting location either by clicking on the map or using the search button (
+          <span className="leaflet-bar-part leaflet-bar-part-single" title="Enter address" style={{ display: 'inline-block', verticalAlign: 'middle', width: '22px', height: '22px', background: '#fff', border: '1px solid #228be6', borderRadius: '4px', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', textAlign: 'center', lineHeight: '22px', margin: '0 2px' }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#228be6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ verticalAlign: 'middle' }}>
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+          </span>
+          ) in the upper left corner to look up an address. Note projections can only be made from locations where birds are expected to be; this varies by date and species and is displayed in green if a prediction hasn’t yet been made.
+        </li>
         <li>Click the “Calculate inflow” or “Calculate outflow” button.</li>
-        <li>Slide the display date indicator along the blue arrow to view projections of where birds from the starting location and date will be or have been on other dates.</li>
+        <li>
+          Slide the display date indicator
+          <span className="timeline-marker" style={{ display: 'inline-flex', verticalAlign: 'middle', cursor: 'pointer', margin: '0 6px', width: 'auto', height: '28px', padding: '0 16px' }}>
+            <span className="timeline-marker-label">Jan 4</span>
+          </span>
+          along the blue arrow to view projections of where birds from the starting location and date will be or have been on other dates.
+        </li>
       </ol>
       <h3 className="text-lg font-semibold text-blue-500 mt-4 mb-1">Species selection</h3>
       <p>
-        For all four image data types the species selection button controls which individual species—or the total of all species—data are displayed. The species were selected as being important hosts and possible vectors for HPAI (Miller, 2024). Four species from the original species list were dropped: two species, Mottled Duck and Mexican Duck, because they were non-migratory; two others, Cinnamon Teal and Long-tailed Duck, due to poor model performance.
+        For all four image data types the species selection button
+        <button className="bg-gradient-to-br from-blue-100 to-blue-300 hover:from-blue-200 hover:to-blue-400 shadow-xl rounded-xl border-2 border-blue-400 transition-all duration-200 flex items-center justify-center p-0" aria-label="Show species controls" type="button" style={{ width: '32px', height: '32px', verticalAlign: 'middle', margin: '0 6px', display: 'inline-flex' }}>
+          <span className="flex items-center justify-center w-full h-full">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgb(29 78 216)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="inline-block">
+              <path d="M16 7h.01"></path>
+              <path d="M3.4 18H12a8 8 0 0 0 8-8V7a4 4 0 0 0-7.28-2.3L2 20"></path>
+              <path d="m20 7 2 .5-2 .5"></path>
+              <path d="M10 18v3"></path>
+              <path d="M14 17.75V21"></path>
+              <path d="M7 18a6 6 0 0 0 3.84-10.61"></path>
+            </svg>
+          </span>
+        </button>
+         controls which individual species—or the total of all species—data are displayed. The species were selected as being important hosts and possible vectors for HPAI (Miller, 2024). Four species from the original species list were dropped: two species, Mottled Duck and Mexican Duck, because they were non-migratory; two others, Cinnamon Teal and Long-tailed Duck, due to poor model performance.
       </p>
+        
       <h3 className="text-lg font-semibold text-blue-500 mt-4 mb-1">Display Date</h3>
       <p>
-        All of the image data varies over time and the displayed date is controlled by sliding the display date indicator along the timeline at the bottom, or pressing the play button to animate over time.
+        All of the image data varies over time and the displayed date is controlled by sliding the display date indicator
+         <span className="timeline-marker" style={{ display: 'inline-flex', verticalAlign: 'middle', cursor: 'pointer', margin: '0 6px', width: 'auto', height: '28px', padding: '0 16px' }}>
+            <span className="timeline-marker-label">Jan 4</span>
+          </span>
+         along the timeline at the bottom, or pressing the play button to animate over time.
       </p>
       <h3 className="text-lg font-semibold text-blue-500 mt-4 mb-1">More Information</h3>
       <p>
