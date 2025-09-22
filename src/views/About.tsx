@@ -191,8 +191,6 @@ function About() {
           Accessed on 2024-04-29.
         </li>
       </ul>
-
-      <p>Development of this application was funded by the USDA and USGS.</p>
     </Section>
   );
 
@@ -331,7 +329,7 @@ function About() {
           </a>. Accessed on 2024-04-29.
         </li>
       </ul>
-      Development of this application was funded by the USDA and USGS.
+        <em>Development of this application was funded by the USDA and USGS.</em>
     </Section>
   );
 
