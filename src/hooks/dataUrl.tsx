@@ -10,7 +10,7 @@ export var dataInfo: {
   {
     datatype:'abundance', 
     label:'Abundance',
-    units: 'Birds/km^2',
+    units: 'Birds/km²',
   },
   {
     datatype: 'movement', 
@@ -20,12 +20,12 @@ export var dataInfo: {
   {
     datatype: 'inflow',
     label:'Inflow',
-    units: 'Birds/km/week',
+    units: 'Birds/km²',
   },
   {
     datatype: 'outflow', 
     label:'Outflow',
-    units: 'Birds/km/week',
+    units: 'Birds/km²',
   },
 ];
 
