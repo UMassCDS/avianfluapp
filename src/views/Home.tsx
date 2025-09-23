@@ -29,6 +29,7 @@ import {
   clearFlowResults,
   updateOverlayByWeek,
   clearOverlayUrl,
+  loadFlowResultsFromCache,
 } from '../store/slices/mapSlice';
 
 import 'leaflet/dist/leaflet.css';
@@ -171,7 +172,15 @@ const HomePage = () => {
     dispatch(clearOverlayUrl());
     dispatch(clearFlowResults());
     checkImage(week);
-  }, [dataIndex, speciesIndex]);
+    dispatch(loadFlowResultsFromCache({ dataIndex, speciesIndex, location, week }));
+    dispatch(updateOverlayByWeek(week));
+  }, [dataIndex, speciesIndex, location, dispatch]);
+
+  useEffect(() => {
+    dispatch(loadFlowResultsFromCache({ dataIndex, speciesIndex, location, week }));
+    dispatch(updateOverlayByWeek(week));
+  }, [week, dispatch]);
+
 
   async function checkInputTypes(d_index: number, s_index: number) {
     // Inflow/Outflow is handled separately via the InflowOutflowCalculateButton button component.

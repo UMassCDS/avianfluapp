@@ -170,13 +170,6 @@ export default function MapView({ onLocationSelect }: {onLocationSelect: (latLon
     onLocationSelect(latLon);
   };
 
-  useEffect(() => {
-    if (!isInflowOutflowView) {
-      setmarkerInfo(null);
-      onLocationSelect(null);
-    }
-  }, [isInflowOutflowView]);
-
   return (
     <div style={{ position: "relative" }}>
       <MapContainer
@@ -204,7 +197,7 @@ export default function MapView({ onLocationSelect }: {onLocationSelect: (latLon
           </>
         )}
 
-        {markerInfo && (
+        {markerInfo && isInflowOutflowView && (
           <Marker position={[markerInfo.lat, markerInfo.lng]}>
             <Popup>
               {markerInfo.label}<br />
