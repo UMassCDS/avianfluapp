@@ -87,7 +87,6 @@ const HomePage = () => {
   const fontHeight = useSelector((state: RootState) => state.ui.fontHeight);
 
   const [location, setLocation] = useState<string[]>([]);
-  const [useSearchMode, setUseSearchMode] = useState(false);
   const [startWeek, setStartWeek] = useState(week); // default to marker week
   const mobile = isMobile();
 
@@ -222,7 +221,7 @@ const HomePage = () => {
 	// - flowResults is a non-empty array (e.g., for inflow or outflow when results exist).
   const shouldShowDataLegend = dataIndex < 2 || (Array.isArray(flowResults) && flowResults.length > 0);
 
-// Here is where you list the components and elements that you want rendered. 
+  // Here is where you list the components and elements that you want rendered. 
   return (
     <div className="Home">
       {/* Top center overlay panel */}

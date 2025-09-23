@@ -175,11 +175,6 @@ const updateMarkerAndSpan = () => {
     if (flowResults.length > 0 || mode === 'abundance' || mode === 'movement') onChangeWeek(curWeek);
   });
 
-  // When white circle is moved:
-  const handleWhiteCircleMove = (newStartWeek: number) => {
-    onChangeStartWeek(newStartWeek); // This updates Home's startWeek state
-  };
-
   useEffect(() => {
     const mode = dataInfo[dataIndex].datatype; // 'inflow', 'outflow', 'abundance', 'movement'
     setMode(mode);
@@ -187,7 +182,7 @@ const updateMarkerAndSpan = () => {
     setIsPlaying(false);
     setSpanStart(markerWeek);
     setMarkerPct(getTimelinePosition(datasets[dataIndex][markerWeek].date));
-    setHasInitialized(false); // <-- Add this line!
+    setHasInitialized(false);
   }, [dataIndex]);
 
   useEffect(updateMarkerAndSpan, [spanStart, mode]);
