@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useMove } from '@mantine/hooks';
 import { RootState } from '../../store/store';
 import { clearOverlayUrl, clearFlowResults } from '../../store/slices/mapSlice';
-import {MAX_WEEK, WEEKS_PER_YEAR, getTimelinePosition, monthMarks} from '../../utils/utils'
+import {MIN_WEEK, MAX_WEEK, WEEKS_PER_YEAR, getTimelinePosition, monthMarks} from '../../utils/utils'
 import { dataInfo } from '../../hooks/dataUrl';
 import ab_dates from '../../assets/abundance_dates.json';
 import mv_dates from '../../assets/movement_dates.json';
@@ -69,10 +69,6 @@ export default function Timeline({
 
 const updateMarkerAndSpan = () => {
   if (mode === 'abundance' || mode === 'movement') {
-    setSpanStart(0);
-    setSpanEnd(MAX_WEEK);
-    setLeftPct(0);
-    setRightPct(100);
     return;
   }
 
@@ -113,7 +109,11 @@ const updateMarkerAndSpan = () => {
 
     playbackRef.current = setInterval(() => {
       current = (current + 1) % WEEKS_PER_YEAR;
-      if (!isWithinSpan(current, spanStart, spanEnd, isWrapped)) current = spanStart;
+      if (mode === 'abundance' || mode === 'movement') {
+        if (!isWithinSpan(current, MIN_WEEK, MAX_WEEK, isWrapped)) current = spanStart;
+      } else {
+        if (!isWithinSpan(current, spanStart, spanEnd, isWrapped)) current = spanStart;
+      }
       setMarkerWeek(current);
       onChangeWeek(current);
     }, 400);
@@ -267,7 +267,12 @@ const updateMarkerAndSpan = () => {
               alignItems: 'center',
             }}
           >
-            <TimelineFilledBar isWrapped={isWrapped} leftPct={leftPct} rightPct={rightPct} />
+
+            {(mode === 'abundance' || mode === 'movement') ? (
+              <TimelineFilledBar isWrapped={false} leftPct={0} rightPct={100} />
+            ) : (
+              <TimelineFilledBar isWrapped={isWrapped} leftPct={leftPct} rightPct={rightPct} />
+            )}
 
             {/* Month marks and labels */}
             {sliderMarks.map((mark, idx) => (
@@ -287,7 +292,7 @@ const updateMarkerAndSpan = () => {
       className="group"
       style={{
         position: 'absolute',
-        left: `calc(${leftPct}% - 14px)`,
+        left: `calc(${0}% - 14px)`,
         top: '50%',
         transform: 'translateY(-50%)',
         zIndex: 4,
@@ -297,9 +302,9 @@ const updateMarkerAndSpan = () => {
       }}
     >
       <TimelineThumb 
-        positionPct={leftPct}
+        positionPct={0}
         type="circle"
-        label={datasets[dataIndex][spanStart].label}
+        label={datasets[dataIndex][MIN_WEEK].label}
         showLabel={showSpanLabels}
         isDraggable={false}
         isPlaying={isPlaying}
@@ -312,7 +317,7 @@ const updateMarkerAndSpan = () => {
       className="group"
       style={{
         position: 'absolute',
-        left: `calc(${rightPct}% - 14px)`,
+        left: `calc(${100}% - 14px)`,
         top: '50%',
         transform: 'translateY(-50%)',
         zIndex: 4,
@@ -322,9 +327,9 @@ const updateMarkerAndSpan = () => {
       }}
     >
       <TimelineThumb 
-        positionPct={rightPct}
+        positionPct={100}
         type="circle"
-        label={datasets[dataIndex][spanEnd].label}
+        label={datasets[dataIndex][MAX_WEEK].label}
         showLabel={showSpanLabels}
         isDraggable={false}
         isPlaying={isPlaying}
