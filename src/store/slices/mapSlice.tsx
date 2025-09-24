@@ -12,11 +12,20 @@ interface FlowResultsPayload {
 }
 
 type OutbreakType = 'poultry' | 'bovine' | 'wild_birds';
+type FlowResultsCache = Record<string, FlowResultsPayload>;
+
+interface FlowResultsKey {
+  dataIndex: number;
+  speciesIndex: number;
+  location: string[];
+  week: number;
+}
 
 interface MapState {
   overlayUrl: string;
   flowResults: FlowResult[];
   flowGeoTiffUrl: string;
+  flowResultsCache: FlowResultsCache;
   showRecentOutbreaks: Record<OutbreakType, boolean>;
   showHistoricOutbreaks: Record<OutbreakType, boolean>;
 }
@@ -25,6 +34,7 @@ const initialState: MapState = {
   overlayUrl: "",
   flowResults: [],
   flowGeoTiffUrl: "",
+  flowResultsCache: {},
   showRecentOutbreaks: {
     poultry: true,
     bovine: false,
@@ -37,6 +47,10 @@ const initialState: MapState = {
   },
 };
 
+function makeCacheKey(key: FlowResultsKey): string {
+  return `${key.week}|${key.dataIndex}|${key.speciesIndex}|${key.location.join(';')}`;
+}
+
 const mapSlice = createSlice({
   name: 'map',
   initialState,
@@ -47,9 +61,21 @@ const mapSlice = createSlice({
     clearOverlayUrl(state) {
       state.overlayUrl = "";
     },
-    setFlowResults(state, action: PayloadAction<FlowResultsPayload>) {
-      state.flowResults = action.payload.result;
-      state.flowGeoTiffUrl = action.payload.geotiff || "";
+    setAndCacheFlowResults(state, action: PayloadAction<{data: FlowResultsPayload, key: FlowResultsKey}>) {
+      const {data, key} = action.payload;
+      const cacheKey = makeCacheKey(key);
+      state.flowResultsCache[cacheKey] = data;
+      state.flowResults = data.result;
+      state.flowGeoTiffUrl = data.geotiff || "";
+    },
+    loadFlowResultsFromCache(state, action: PayloadAction<FlowResultsKey>) {
+      const key = action.payload;
+      const cacheKey = makeCacheKey(key);
+      const cached = state.flowResultsCache[cacheKey];
+      if (cached) {
+        state.flowResults = cached.result;
+        state.flowGeoTiffUrl = cached.geotiff || "";
+      }
     },
     clearFlowResults(state) {
       state.flowResults = [];
@@ -74,7 +100,8 @@ const mapSlice = createSlice({
 export const {
   setOverlayUrl,
   clearOverlayUrl,
-  setFlowResults,
+  setAndCacheFlowResults,
+  loadFlowResultsFromCache,
   clearFlowResults,
   updateOverlayByWeek,
   toggleRecentOutbreaks,

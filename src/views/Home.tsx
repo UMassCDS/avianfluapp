@@ -29,6 +29,7 @@ import {
   clearFlowResults,
   updateOverlayByWeek,
   clearOverlayUrl,
+  loadFlowResultsFromCache,
 } from '../store/slices/mapSlice';
 
 import 'leaflet/dist/leaflet.css';
@@ -87,7 +88,6 @@ const HomePage = () => {
   const fontHeight = useSelector((state: RootState) => state.ui.fontHeight);
 
   const [location, setLocation] = useState<string[]>([]);
-  const [useSearchMode, setUseSearchMode] = useState(false);
   const [startWeek, setStartWeek] = useState(week); // default to marker week
   const mobile = isMobile();
 
@@ -172,7 +172,15 @@ const HomePage = () => {
     dispatch(clearOverlayUrl());
     dispatch(clearFlowResults());
     checkImage(week);
-  }, [dataIndex, speciesIndex]);
+    dispatch(loadFlowResultsFromCache({ dataIndex, speciesIndex, location, week }));
+    dispatch(updateOverlayByWeek(week));
+  }, [dataIndex, speciesIndex, location, dispatch]);
+
+  useEffect(() => {
+    dispatch(loadFlowResultsFromCache({ dataIndex, speciesIndex, location, week }));
+    dispatch(updateOverlayByWeek(week));
+  }, [week, dispatch]);
+
 
   async function checkInputTypes(d_index: number, s_index: number) {
     // Inflow/Outflow is handled separately via the InflowOutflowCalculateButton button component.
@@ -222,7 +230,7 @@ const HomePage = () => {
 	// - flowResults is a non-empty array (e.g., for inflow or outflow when results exist).
   const shouldShowDataLegend = dataIndex < 2 || (Array.isArray(flowResults) && flowResults.length > 0);
 
-// Here is where you list the components and elements that you want rendered. 
+  // Here is where you list the components and elements that you want rendered. 
   return (
     <div className="Home">
       {/* Top center overlay panel */}

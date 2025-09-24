@@ -120,8 +120,6 @@ export default function MapView({ onLocationSelect }: {onLocationSelect: (latLon
   const week = useSelector((state: RootState) => state.timeline.week);
 
   const overlayUrl = useSelector((state: RootState) => state.map.overlayUrl);
-  const showRecentOutbreaks = useSelector((state: RootState) => state.map.showRecentOutbreaks);
-  const showHistoricOutbreaks = useSelector((state: RootState) => state.map.showHistoricOutbreaks);
   const [flowMaskGeoTIFFImage, setFlowMaskGeoTIFFImage]  = useState<GeoTIFFImage | null>(null);
 
   const [markerInfo, setmarkerInfo] = useState<{ lat: number; lng: number; label: string } | null>(null);
@@ -172,13 +170,6 @@ export default function MapView({ onLocationSelect }: {onLocationSelect: (latLon
     onLocationSelect(latLon);
   };
 
-  useEffect(() => {
-    if (!isInflowOutflowView) {
-      setmarkerInfo(null);
-      onLocationSelect(null);
-    }
-  }, [isInflowOutflowView]);
-
   return (
     <div style={{ position: "relative" }}>
       <MapContainer
@@ -206,7 +197,7 @@ export default function MapView({ onLocationSelect }: {onLocationSelect: (latLon
           </>
         )}
 
-        {markerInfo && (
+        {markerInfo && isInflowOutflowView && (
           <Marker position={[markerInfo.lat, markerInfo.lng]}>
             <Popup>
               {markerInfo.label}<br />

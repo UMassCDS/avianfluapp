@@ -4,7 +4,7 @@ import { Button, Tooltip } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
-import { setFlowResults, updateOverlayByWeek } from '../store/slices/mapSlice';
+import { setAndCacheFlowResults, updateOverlayByWeek } from '../store/slices/mapSlice';
 import { RootState } from '../store/store';
 import ab_dates from '../assets/abundance_dates.json';
 import mv_dates from '../assets/movement_dates.json';
@@ -83,7 +83,7 @@ const InflowOutflowCalculateButton: React.FC<Props> = ({
       const data = response.data;
 
       if (data.status === 'success') {
-        dispatch(setFlowResults(data));
+        dispatch(setAndCacheFlowResults({data,  key: {dataIndex, speciesIndex, location, week}}));
         dispatch(updateOverlayByWeek(week));
       } else if (data.status === 'outside mask') {
         notifications.show({
