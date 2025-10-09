@@ -1,89 +1,84 @@
-import { ImageOverlay, MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { OutbreakMarkers } from "./OutbreakPoints";
-import { GeoSearchControl, OpenStreetMapProvider } from "leaflet-geosearch";
 import "leaflet-geosearch/dist/geosearch.css";
+import { MapContainer, TileLayer, Marker, Popup, ImageOverlay, useMap } from "react-leaflet";
+import { GeoSearchControl, OpenStreetMapProvider } from "leaflet-geosearch";
+import { notifications } from '@mantine/notifications';
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
+import { GeoTIFFImage } from "geotiff";
 import { RootState } from "../store/store";
-import { clearFlowResults, clearOverlayUrl } from '../store/slices/mapSlice';
-import { IconClick, IconSearch } from "@tabler/icons-react";
+import { OutbreakMarkers } from "./OutbreakPoints";
+import { lngLatToMercator } from '../utils/utils'
+import MaskGeoTIFFLayer from "./MaskGeoTIFFLayer";
+
 
 const imageBounds = [
   [9.622994, -170.291626],
   [79.98956, -49.783429],
 ];
 
-interface MapViewProps {
-  week: number;
-  dataIndex: number;
-  onLocationSelect: (latLonString: string | null) => void;
-}
-
-// @ts-ignore
-const searchControl = new GeoSearchControl({
-  provider: new OpenStreetMapProvider(),
-  style: 'button',
-  showPopup: true,
-  retainZoomLevel: true,
-  notFoundMessage: 'Sorry, that address could not be found.',
-});
-
-function MapClickHandler({ onLocationSelect, setMarkerPosition }: any) {
+function OutbreakPanes() {
   const map = useMap();
 
   useEffect(() => {
-    const handleClick = (e: L.LeafletMouseEvent) => {
-      const { lat, lng } = e.latlng;
-      const latLon = `${lat.toFixed(5)},${lng.toFixed(5)}`;
-      console.log('Clicked location:', latLon);
-      onLocationSelect(latLon);
-      setMarkerPosition({ lat, lng });
-    };
+    // Historic outbreaks pane (lower z-index)
+    if (!map.getPane("historicPane")) {
+      map.createPane("historicPane");
+      map.getPane("historicPane")!.style.zIndex = "400";
+    }
 
-    map.on('click', handleClick);
-    return () => {
-      map.off('click', handleClick);
-    };
-  }, [map, onLocationSelect]);
+    // Recent outbreaks pane (higher z-index)
+    if (!map.getPane("recentPane")) {
+      map.createPane("recentPane");
+      map.getPane("recentPane")!.style.zIndex = "500";
+    }
+  }, [map]);
 
   return null;
 }
 
-function SearchField({ onLocationSelect, setMarkerPosition }: any) {
+function MapClickHandler({ setMarker }: { setMarker: (lat: number, lng: number, label: string) => void }) {
   const map = useMap();
-  const [hasSearchMarker, setHasSearchMarker] = useState(false);
 
   useEffect(() => {
-    map.addControl(searchControl);
-
-    const handleSearch = (result: any) => {
-      const latLon = `${result.location.y.toFixed(5)},${result.location.x.toFixed(5)}`;
-      console.log('Search selected location:', latLon);
-      onLocationSelect(latLon);
-      setMarkerPosition(null);
-      setHasSearchMarker(true);
+    const handleClick = async (e: L.LeafletMouseEvent) => {
+      const { lat, lng } = e.latlng;
+      await setMarker(lat, lng, "Selected Location:");
     };
 
-    map.on('geosearch/showlocation', handleSearch);
+    map.on("click", handleClick);
+    return () => map.off("click", handleClick);
+  }, [map, setMarker]);
 
-    // Poll for changes in searchControl.markers
-    const interval = setInterval(() => {
-      const currentMarkers = searchControl.markers.getLayers().length;
+  return null;
+}
 
-      if (hasSearchMarker && currentMarkers === 0) {
-        console.log("Search marker removed → clearing location");
-        onLocationSelect(null);
-        setHasSearchMarker(false);
-      }
-    }, 300);
+function SearchHandler({ setMarker }: { setMarker: (lat: number, lng: number, label: string) => void }) {
+  const map = useMap();
+
+  useEffect(() => {
+    // @ts-ignore
+    const searchControl = new GeoSearchControl({
+      provider: new OpenStreetMapProvider(),
+      style: "button",
+      showMarker: false,
+      retainZoomLevel: true,
+      notFoundMessage: "Sorry, that address could not be found.",
+    });
+
+    map.addControl(searchControl);
+    const handleSearch = async (result: any) => {
+      const { x, y, label } = result.location;
+      await setMarker(y, x, label); // y = lat, x = lng
+    };
+
+    map.on("geosearch/showlocation", handleSearch);
 
     return () => {
       map.removeControl(searchControl);
-      map.off('geosearch/showlocation', handleSearch);
-      clearInterval(interval);
+      map.off("geosearch/showlocation", handleSearch);
     };
-  }, [map, onLocationSelect, hasSearchMarker]);
+  }, [map, setMarker]);
 
   return null;
 }
@@ -94,7 +89,6 @@ function SearchField({ onLocationSelect, setMarkerPosition }: any) {
  *
  * @param week - The current week to display outbreak markers for.
  * @param dataIndex - Index indicating which dataset is currently selected; controls search field visibility.
- * @param onLocationSelect - Callback function that receives a selected or clicked lat/lon string.
  * @returns JSX.Element representing the map view with overlays and controls.
  *
  * Features:
@@ -106,7 +100,7 @@ function SearchField({ onLocationSelect, setMarkerPosition }: any) {
  *
  * Subcomponents:
  * - MapClickHandler: Uses `useMap()` to attach a click listener to the map and return lat/lon.
- * - SearchField: Uses `leaflet-geosearch` to allow address-based location search with marker and callback.
+ * - SearchHandler: Uses `leaflet-geosearch` to allow address-based location search with marker and callback.
  *
  * Dependencies:
  * - Uses `react-redux`'s `useSelector` to access overlay URL from Redux state.
@@ -115,128 +109,106 @@ function SearchField({ onLocationSelect, setMarkerPosition }: any) {
  */
 
 /*
-- SearchField component: A geolocation search bar powered by leaflet-geosearch (https://smeijer.github.io/leaflet-geosearch/)
+- SearchHandler component: A geolocation search bar powered by leaflet-geosearch (https://smeijer.github.io/leaflet-geosearch/)
 - MapClickHandler component: Listens for user clicks on the map and extracts lat/lon for callbacks
 - TileLayer component: Provides the base map (e.g. OSM tiles)
 - ImageOverlay component: Displays a heatmap-style overlay image based on the selected week
 - OutbreakMarkers function: Renders disease outbreak markers dynamically for the selected week
 */
-export default function MapView({ week, dataIndex, onLocationSelect }: MapViewProps): JSX.Element {
-  const dispatch = useDispatch();
+export default function MapView({ onLocationSelect }: {onLocationSelect: (latLonString: string | null) => void} ): JSX.Element {
+  const dataIndex = useSelector((state: RootState) => state.species.dataIndex);
+  const week = useSelector((state: RootState) => state.timeline.week);
 
   const overlayUrl = useSelector((state: RootState) => state.map.overlayUrl);
-  const showOutbreaks = useSelector((state: RootState) => state.map.showOutbreaks); // Get the toggle state
-  const [markerPosition, setMarkerPosition] = useState<{ lat: number, lng: number } | null>(null);
-  const [useSearchMode, setUseSearchMode] = useState(false);
+  const [flowMaskGeoTIFFImage, setFlowMaskGeoTIFFImage]  = useState<GeoTIFFImage | null>(null);
 
-  const position = { lat: 45, lng: -95 };
-
+  const [markerInfo, setmarkerInfo] = useState<{ lat: number; lng: number; label: string } | null>(null);
   const isInflowOutflowView = dataIndex >= 2;
 
-  const toggleMode = () => {
-    setUseSearchMode((prev) => !prev);
-    // Clear any existing marker on the map
-    setMarkerPosition(null);
+  // Utility to check if a marker is in valid mask region
+  const isValidMaskPoint = async (lat: number, lng: number) => {
+    if (!flowMaskGeoTIFFImage) return true; // if no mask, allow
 
-    // Clear markers and search results from the search control
-    searchControl.markers.clearLayers();
-    searchControl.clearResults();
+    const bounds = flowMaskGeoTIFFImage.getBoundingBox();
+    const width = flowMaskGeoTIFFImage.getWidth();
+    const height = flowMaskGeoTIFFImage.getHeight();
+    const [xMin, yMin, xMax, yMax] = bounds;
+    const [mx, my] = lngLatToMercator(lng, lat);
 
-    // Reset selected location
-    onLocationSelect(null);
+    const px = Math.round(((mx - xMin) / (xMax - xMin)) * (width - 1));
+    const py = Math.round(((yMax - my) / (yMax - yMin)) * (height - 1));
 
-    // Clear previously fetched flow results and overlay image
-    dispatch(clearFlowResults());
-    dispatch(clearOverlayUrl());
+    if (px < 0 || py < 0 || px >= width || py >= height) return false;
+    try {
+      // Read current week's band
+      const raster = await flowMaskGeoTIFFImage.readRasters({ samples: [week + 1] });
+      const data = raster[0];
+      // @ts-ignore 
+      return data[py * width + px] === 1;
+    } catch (err) {
+      return true; // fallback, allow
+    }
   };
 
-  // clear the marker and search result when isInflowOutflowView becomes false
-  useEffect(() => {
-  if (!isInflowOutflowView) {
-    setMarkerPosition(null);
-    searchControl.markers.clearLayers();
-    searchControl.clearResults()
-    onLocationSelect(null);
-  }
-}, [isInflowOutflowView]);
+  // Modify setMarker to check mask
+  const setMarker = async (lat: number, lng: number, label: string) => {
+    if (isInflowOutflowView) {
+      const valid = await isValidMaskPoint(lat, lng);
+      if (!valid) {
+      notifications.show({
+        title: 'Select a Location',
+        message: 'Please select a location within the highlighted area.',
+        color: 'orange',
+      });
+        setmarkerInfo(null);
+        onLocationSelect(null);
+        return;
+      }
+    }
+    const latLon = `${lat.toFixed(5)},${lng.toFixed(5)}`;
+    setmarkerInfo({ lat, lng, label });
+    onLocationSelect(latLon);
+  };
 
   return (
     <div style={{ position: "relative" }}>
-      {/* Toggle Button */}
-      {isInflowOutflowView && (
-        <button
-          className="absolute top-4 left-12 z-[1200] flex items-center gap-2
-            px-2 py-2 sm:px-4 sm:py-2
-            rounded-xl border-2 border-blue-400 bg-white/90 text-blue-500 font-semibold shadow-md
-            hover:bg-blue-50 hover:border-blue-500 transition
-            text-base sm:text-base"
-          onClick={toggleMode}
-          type="button"
-        >
-          {useSearchMode ? (
-            <>
-              <IconClick size={20} className="text-blue-500 sm:w-5 sm:h-5 w-5 h-5" />
-              <span className="hidden sm:inline">Switch to Click Mode</span>
-            </>
-          ) : (
-            <>
-              <IconSearch size={20} className="text-blue-500 sm:w-5 sm:h-5 w-5 h-5" />
-              <span className="hidden sm:inline">Switch to Search Mode</span>
-            </>
-          )}
-        </button>
-      )}
-    <MapContainer
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      <MapContainer
       // @ts-ignore
-      center={position}
-      zoom={3.5}
-      style={{ height: '100vh', width: '100%' }}
-      className="Map"
-      keyboard={false}
-      maxBounds={imageBounds}
-    >
-      {isInflowOutflowView && (
-        useSearchMode ? (
-          <SearchField
-            onLocationSelect={onLocationSelect}
-            setMarkerPosition={setMarkerPosition}
-          />
-        ) : (
-          <MapClickHandler
-            onLocationSelect={onLocationSelect}
-            setMarkerPosition={setMarkerPosition}
-          />
-        )
-      )}
+        center={{ lat: 45, lng: -95 }}
+        zoom={3.5}
+        style={{ height: "100vh", width: "100%" }}
+        className="Map"
+        keyboard={false}
+        maxBounds={imageBounds}
+      >
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          // @ts-ignore
+          attribution='Abundance data © <a target="_blank" href="https://ebird.org/science/status-and-trends">eBird</a> | <a target="_blank" href="https://birdflow-science.github.io/">BirdFlow</a>'
+        />
+        {/* @ts-ignore */}
+        {overlayUrl && <ImageOverlay url={overlayUrl} bounds={imageBounds} opacity={0.7} />}
 
-      <TileLayer
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        attribution='Abundance data provided by <a target="_blank" href="https://ebird.org/science/status-and-trends ">Cornell Lab of Ornithology - eBird</a> | <a target="_blank" href="https://birdflow-science.github.io/"> BirdFlow </a>'
-      />
+        {isInflowOutflowView && (
+          <>
+            <MaskGeoTIFFLayer setFlowMaskGeoTIFFImage={setFlowMaskGeoTIFFImage}/>
+            <SearchHandler setMarker={setMarker} />
+            <MapClickHandler setMarker={setMarker} />
+          </>
+        )}
 
-      <ImageOverlay
-        url={overlayUrl}
-        bounds={imageBounds}
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        opacity={0.7}
-      />
+        {markerInfo && isInflowOutflowView && (
+          <Marker position={[markerInfo.lat, markerInfo.lng]}>
+            <Popup>
+              {markerInfo.label}<br />
+              {markerInfo.lat.toFixed(2)}, {markerInfo.lng.toFixed(2)}
+            </Popup>
+          </Marker>
+        )}
 
-      {markerPosition && (
-        <Marker position={[markerPosition.lat, markerPosition.lng]}>
-          <Popup>
-            Selected Location:<br />
-            {markerPosition.lat.toFixed(5)}, {markerPosition.lng.toFixed(5)}
-          </Popup>
-        </Marker>
-      )}
-
-      {/* This line now correctly hides/shows the markers */}
-      {showOutbreaks && OutbreakMarkers(week)}
-    </MapContainer>
+        <OutbreakPanes />
+        <OutbreakMarkers />
+      </MapContainer>
     </div>
   );
 }

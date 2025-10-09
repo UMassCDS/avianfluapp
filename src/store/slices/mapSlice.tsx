@@ -6,17 +6,50 @@ interface FlowResult {
   legend: string;
 }
 
+interface FlowResultsPayload {
+  result: FlowResult[];
+  geotiff?: string;
+}
+
+type OutbreakType = 'poultry' | 'bovine' | 'wild_birds';
+type FlowResultsCache = Record<string, FlowResultsPayload>;
+
+interface FlowResultsKey {
+  dataIndex: number;
+  speciesIndex: number;
+  location: string[];
+  week: number;
+}
+
 interface MapState {
   overlayUrl: string;
-  flowResults: FlowResult[]; // stores all API Flow results
-  showOutbreaks: boolean;
+  flowResults: FlowResult[];
+  flowGeoTiffUrl: string;
+  flowResultsCache: FlowResultsCache;
+  showRecentOutbreaks: Record<OutbreakType, boolean>;
+  showHistoricOutbreaks: Record<OutbreakType, boolean>;
 }
 
 const initialState: MapState = {
   overlayUrl: "",
   flowResults: [],
-  showOutbreaks: true,
+  flowGeoTiffUrl: "",
+  flowResultsCache: {},
+  showRecentOutbreaks: {
+    poultry: true,
+    bovine: false,
+    wild_birds: false,
+  },
+  showHistoricOutbreaks: {
+    poultry: false,
+    bovine: false,
+    wild_birds: false,
+  },
 };
+
+function makeCacheKey(key: FlowResultsKey): string {
+  return `${key.week}|${key.dataIndex}|${key.speciesIndex}|${key.location.join(';')}`;
+}
 
 const mapSlice = createSlice({
   name: 'map',
@@ -28,22 +61,38 @@ const mapSlice = createSlice({
     clearOverlayUrl(state) {
       state.overlayUrl = "";
     },
-    setFlowResults(state, action: PayloadAction<FlowResult[]>) {
-      state.flowResults = action.payload;
+    setAndCacheFlowResults(state, action: PayloadAction<{data: FlowResultsPayload, key: FlowResultsKey}>) {
+      const {data, key} = action.payload;
+      const cacheKey = makeCacheKey(key);
+      state.flowResultsCache[cacheKey] = data;
+      state.flowResults = data.result;
+      state.flowGeoTiffUrl = data.geotiff || "";
+    },
+    loadFlowResultsFromCache(state, action: PayloadAction<FlowResultsKey>) {
+      const key = action.payload;
+      const cacheKey = makeCacheKey(key);
+      const cached = state.flowResultsCache[cacheKey];
+      if (cached) {
+        state.flowResults = cached.result;
+        state.flowGeoTiffUrl = cached.geotiff || "";
+      }
     },
     clearFlowResults(state) {
       state.flowResults = [];
+      state.flowGeoTiffUrl = "";
     },
     updateOverlayByWeek(state, action: PayloadAction<number>) {
-      const match = state.flowResults.find((r) => r.week === action.payload);
-      if (match) {
-        state.overlayUrl = match.url;
-      } else {
-        state.overlayUrl = "";
-      }
+      if (state.flowResults.length === 0) return;
+      const match = state.flowResults.find((r) => (r.week-1) === action.payload);
+      state.overlayUrl = match ? match.url : "";
     },
-    toggleOutbreaks(state) {
-      state.showOutbreaks = !state.showOutbreaks;
+    toggleRecentOutbreaks(state, action: PayloadAction<OutbreakType>) {
+      const type = action.payload;
+      state.showRecentOutbreaks[type] = !state.showRecentOutbreaks[type];
+    },
+    toggleHistoricOutbreaks(state, action: PayloadAction<OutbreakType>) {
+      const type = action.payload;
+      state.showHistoricOutbreaks[type] = !state.showHistoricOutbreaks[type];
     },
   },
 });
@@ -51,10 +100,12 @@ const mapSlice = createSlice({
 export const {
   setOverlayUrl,
   clearOverlayUrl,
-  setFlowResults,
+  setAndCacheFlowResults,
+  loadFlowResultsFromCache,
   clearFlowResults,
   updateOverlayByWeek,
-  toggleOutbreaks,
+  toggleRecentOutbreaks,
+  toggleHistoricOutbreaks,
 } = mapSlice.actions;
 
 export default mapSlice.reducer;

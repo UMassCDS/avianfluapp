@@ -21,6 +21,7 @@
     "axios": "^1.7.9",
     "dayjs": "^1.11.10",
     "emailjs-com": "^3.2.0",
+    "geotiff": "^2.1.4-beta.0",
     "leaflet": "^1.9.4",
     "leaflet-geosearch": "^4.2.0",
     "moment": "^2.30.1",

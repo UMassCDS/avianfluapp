@@ -30,7 +30,7 @@ import { RootState } from '../store/store';
 /*
 - This is the Birds/km^2 (or Birds/km/week) Legend on the bottom left of the screen.
 */
-function Legend() {
+function DataLegend() {
   const dataIndex = useSelector((state: RootState) => state.species.dataIndex);
   const speciesIndex = useSelector((state: RootState) => state.species.speciesIndex);
   const currentWeek = useSelector((state: RootState) => state.timeline.week);
@@ -40,6 +40,8 @@ function Legend() {
   const [lowLabel, setLowLabel] = useState<number>(0);
   const [midLabel, setMidLabel] = useState<number>(50);
   const [highLabel, setHighLabel] = useState<number>(100);
+  const [fontSize, setfontSize] = useState<number>(12);
+  const mobile = isMobile()
 
   const getJSON = async (url: string) => {
     const response = await fetch(url);
@@ -78,6 +80,10 @@ function Legend() {
     }
   }, [dataIndex, speciesIndex, flowResults, currentWeek]);
 
+    useEffect(() => {
+      setfontSize(mobile ? 8 : 12)
+  }, [mobile]);
+
   const renderUnits = () => {
     const units = dataInfo[dataIndex].units;
     return isMobile() ? units.split('/').join('/\n') : units;
@@ -96,7 +102,7 @@ function Legend() {
 
   return (
     <div
-      className="Legend"
+      className="DataLegend"
       style={{
         background: 'rgba(255, 255, 255, 0.6)',
         borderRadius: 10,
@@ -104,13 +110,16 @@ function Legend() {
         maxWidth: isMobile() ? '60px' : '120px',
       }}
     >
+      <div style={{ fontWeight: 'bold', textAlign: 'center', marginBottom: 6, fontSize: fontSize}}>
+        {dataInfo[dataIndex].label}
+      </div>
       {isMobile() ? (
         <>
-          <div style={{ textAlign: 'center', fontSize: 12 }}>{highLabel}</div>
+          <div style={{ textAlign: 'center', fontSize: fontSize }}>{highLabel}</div>
           {ColorBar}
-          <div style={{ textAlign: 'center', fontSize: 12 }}>{lowLabel}</div>
+          <div style={{ textAlign: 'center', fontSize: fontSize }}>{lowLabel}</div>
           <Tooltip label="Average of 10 years of data.">
-            <div style={{ textAlign: 'center', fontSize: 12 }}>{renderUnits()}</div>
+            <div style={{ textAlign: 'center', fontSize: fontSize }}>{renderUnits()}</div>
           </Tooltip>
         </>
       ) : (
@@ -134,4 +143,4 @@ function Legend() {
   );
 }
 
-export default Legend;
+export default DataLegend;

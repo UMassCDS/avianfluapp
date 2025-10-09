@@ -1,12 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { MIN_WEEK } from '../../utils/utils';
+import { dateToWeek } from '../../utils/utils';
 
 interface TimelineState {
   week: number;
 }
 
 const initialState: TimelineState = {
-  week: MIN_WEEK,
+  week: dateToWeek(new Date()),
 };
 
 const timelineSlice = createSlice({
