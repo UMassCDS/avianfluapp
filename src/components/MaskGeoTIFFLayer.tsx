@@ -6,7 +6,7 @@ import * as GeoTIFF from "geotiff";
 import taxa from "../assets/taxa.json";
 import { mercatorToLatLng } from '../utils/utils'
 
-const USE_PREGENERATED_MASK_OVERLAY = false; // or false to use GeoTIFF
+const USE_PREGENERATED_MASK_OVERLAY = true; // or false to use GeoTIFF
 const BASE_URL = 'https://avianinfluenza.s3.us-east-2.amazonaws.com';
 
 
