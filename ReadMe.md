@@ -1,163 +1,139 @@
 # Avian Flu App
 
-A web application for visualizing avian influenza data, including bird abundance, movement patterns, and outbreak information across North America.
+A modern web application for visualizing avian influenza data, providing comprehensive insights into bird abundance, movement patterns, and outbreak information across North America.
 
 ## Overview
 
-This application provides an interactive visualization platform for avian influenza data, allowing users to:
+This application offers an interactive platform that enables users to:
 
-- View bird abundance and movement patterns across North America
-- Track avian influenza outbreaks
-- Analyze inflow and outflow patterns of bird populations
-- Visualize data across different time periods using an interactive timeline
+- Visualize bird abundance and movement data across North America with detailed timeline controls.
+- Track avian influenza outbreaks dynamically, including Poultry, Bovine, and Wild Bird categories.
+- Analyze inflow and outflow patterns for bird populations with advanced timeline playback and range selection.
+- Utilize high-performance data overlays leveraging pregenerated mask layers and cache-enabled flow calculations for smooth user experience.
+- Select geographic locations interactively through map clicks or address search for targeted analysis.
+- Download flow projection data as GeoTIFF files for external use.
+- Experience a responsive and accessible UI optimized for both desktop and mobile devices.
 
 ## Key Components
 
-### Core Components
-
 1. **HomePage (`src/views/Home.tsx`)**
 
-   - Main application view
-   - Manages the interactive map, timeline slider, and control widgets
+   - Central component managing the interactive map, timeline playback, and control widgets.
+   - Supports toggling search modes for location selection (map click or address search).
+   - Integrates the `MapOverlayPanel` for displaying active data type, species, date, and location information.
 
 2. **MapView (`src/components/MapView.tsx`)**
 
-   - Renders the interactive map using Leaflet
-   - Displays bird abundance and movement data overlays
-   - Shows outbreak points and geographic information
+   - Renders the interactive Leaflet map with support for:
+     - Bird abundance, movement, inflow/outflow overlays using pregenerated mask layers.
+     - Dynamic outbreak visualization for Poultry, Bovine, and Wild Bird outbreaks.
+     - Location selection via map click or address search, with state management reflecting choice.
+   - Improved marker handling for current vs historic data visuals.
+   - Responsive design enhancements for mobile layouts, including scalable legends and controls.
 
-3. **Timeline Components**
+3. **Timeline and Playback Components**
 
-   - **Timeline (`src/components/Timeline.tsx`)**
-
-     - Controls for abundance and movement data visualization
-     - Week selection and playback functionality
-     - Month labels and date navigation
-     - Detailed Notes:
-       - This timeline slider was built using Mantine's builtin RangeSlider() component.
-       - There are also many functionalities that Pam jampacked into this single file (Timeline.tsx) that I'm not too sure of, but the main ones I've noticed are: update image overlays, playback/pause button, and draggable date picker.
-       - The draggable date picker is actually a separate component from RangeSlider(). This picker is implemented internally by Pam using useMove() hook (which is also what I used to implement custom fixed range slider for inflow/outflow).
-
-   - **InflowOutflowTimeline (`src/components/InflowOutflowTimeline.tsx`)**
-     - Specialized timeline for inflow/outflow data
-     - Custom range slider for week selection
-     - Detailed Notes:
-       - The main difference of InflowOutflow slider compared to Timeline slider is that it only allows a fixed distance between the left and right thumb.
-       - Left thumb is the "real" thumb that can move, right thumb is just there for decorative purpose, to let users know what the end date for prediction is.
-       - The custom slider is implemented using the useMove() hook taken from the Mantine library. Put simply, the way it works is that when the user clicks anywhere on the parent container, useMove() will update its own internal state value, and this value is what you use to update the slider thumb's position.
+   - **Timeline (`src/components/Timeline`)**
+     - A highly modular timeline slider component supporting:
+       - Range selection for abundance and movement data visualization.
+       - Playback controls animating data progression over time (including 20-week projections for inflow/outflow).
+       - Draggable and tooltip-enhanced markers and thumbs with consistent UI styling.
+       - Support for all datasets with dynamic month labeling and hover info.
 
 4. **ControlBar (`src/components/ControlBar.tsx`)**
-   - Data type selection dropdown (abundance/movement/inflow/outflow)
-   - Species selection dropdown
 
-### Supporting Components
+   - Dropdown selectors enhanced with species icons and improved tooltip accessibility.
+   - Includes toggles to control visibility of outbreak types (Poultry, Bovine, Wild Bird).
+   - Streamlined styling and interaction for improved user experience.
 
-1. **Legend (`src/components/Legend.tsx`)**
+5. **MapOverlayPanel (`src/components/MapOverlayPanel.tsx`)**
 
-   - Displays data scale and color coding legend (bottom left)
+   - Displays current data context — data type, species, start date, and selected location.
+   - Integrates smoothly with timeline and map interactions.
 
-2. **OutbreakPoints (`src/components/OutbreakPoints.tsx`)**
+6. `InflowOutflowCalculateButton`:
+   - Compute button triggers server API calls for inflow/outflow calculations with progress and error notifications.
 
-   - Manages and displays avian influenza outbreak data
-   - Includes outbreak legend and point visualization
+7. **Legend (`src/components/DataLegend.tsx`)**
 
-3. **AboutButtons (`src/components/AboutButtons.tsx`)**
-   - Navigation controls for About and Feedback pages
-   - Test API functionality
+   - Displays data scale with updated, dynamic color coding and unit labels (`Birds/km²`).
+   - Supports inflow/outflow legends when relevant and adapts layout responsively.
 
-# Redux Store Documentation
+8. **OutbreakPoints (`src/components/OutbreakPoints.tsx`)**
 
-This directory contains the Redux store configuration and slices for the Avian Flu Application.
+   - Manages and renders multiple outbreak types with distinct icons and conditional styling.
+   - Distinguishes current-year (Recent) outbreaks from historic outbreaks with opacity and color variations for clarity.
+   - Integrates with map slice's outbreak visibility state.
 
-## Redux Store Structure
+9. **AboutButtons and About Section (`src/components/AboutButtons.tsx` and related views)**
 
-The store is configured using Redux Toolkit and consists of the following slices:
+   - Improved tabbed navigation and styling for About and Feedback pages.
+   - Added external links for API testing.
+   - Enhanced content describing avian influenza, data layers, and funding.
 
-### UI Slice (`uiSlice.tsx`)
+10. `FeedbackForm`
+   - User feedback with non-blocking Mantine notifications on submission.
 
-Manages UI-related state:
+## Redux Store Documentation
 
-- `isMonitor`: Boolean flag for monitor mode
-- `iconSize`: Mantine size for icons
-- `textSize`: Mantine size for text
-- `fontHeight`: Font height in pixels
-- `titleSize`: Title size in pixels
+### Store Structure
 
-### Species Slice (`speciesSlice.tsx`)
+- **uiSlice:** UI flags including monitor mode, icon/text sizing, font height, and title size.
+- **speciesSlice:** Bird species and related data management.
+- **timelineSlice:** Controls timeline state, including selected weeks, modes, and playback.
+- **mapSlice:** Map-related state including mask overlay usage, cached flow results (`flowResultsCache`), outbreak visibility (`showOutbreaks`), and location data.
+- **outbreaksSlice:** New slice managing outbreak toggle states by type (Poultry, Bovine, Wild Bird).
 
-Manages species and data-related (abundance/movement/inflow/outflow) state and data.
-
-### Timeline Slice (`timelineSlice.tsx`)
-
-Manages timeline-related state and data.
-
-### Map Slice (`mapSlice.tsx`)
-
-Manages map-related state and data.
-
-### Usage
-
-#### Accessing State
+### Usage Examples
 
 ```typescript
-import { useSelector } from 'react-redux';
-import { RootState } from './store';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState, AppDispatch } from './store';
+import { setShowOutbreaks } from './slices/outbreaksSlice';
 
-// In your component
-const uiState = useSelector((state: RootState) => state.ui);
-```
-
-#### Dispatching Actions
-
-```typescript
-import { useDispatch } from 'react-redux';
-import { AppDispatch } from './store';
-import { setIsMonitor } from './slices/uiSlice';
-
-// In your component
 const dispatch = useDispatch<AppDispatch>();
-dispatch(setIsMonitor(true));
+const showOutbreaks = useSelector((state: RootState) => state.map.showOutbreaks);
+
+// Toggle outbreak visibility
+dispatch(setShowOutbreaks({ poultry: true, bovine: false, wildBird: true }));
 ```
-
-#### Type Definitions
-
-The store exports two important types:
-
-- `RootState`: Type for the entire Redux state
-- `AppDispatch`: Type for the dispatch function
 
 ## Adding New Slices
 
-To add a new slice:
+To add new slices such as for additional data or UI state:
 
-1. Create a new file in the `slices` directory
-2. Define your state interface and initial state
-3. Create the slice using `createSlice`
-4. Add the reducer to the store configuration in `store.ts`
+1. Define the slice state interface and initial state in `slices/yourSlice.ts`.
+2. Create the slice with `createSlice`.
+3. Connect the reducer in `store.ts`.
+4. Use typed hooks with `RootState` and `AppDispatch` for safety.
 
 ## Installation
 
-1. Install Node.js at https://nodejs.org/en/download/package-manager
+### Prerequisites
 
-2. Install dependencies:
+- Node.js (install via https://nodejs.org/en/download/package-manager)
+
+### Steps
+1. Clone the repository and change to project directory.
+2. Install dependencies, including new additions @mantine/notifications and Tailwind CSS packages:
 
 ```bash
 npm install
 ```
 
-3. Run in development mode:
+3. Run dev server:
 
 ```bash
 npm run dev
 ```
 
-4. Create a production build:
+4. Build for production:
 
 ```bash
 npm run build
 ```
 
-5. View the production build:
+5. Serve the production build for local testing:
 
 ```bash
 serve -s
@@ -174,11 +150,28 @@ npm install <package> --save
 ## Technical Stack
 
 - React with TypeScript
-- Redux for state management
-- Mantine UI Library for UI components
-- Leaflet for map visualization
-- Vite for build tooling
+- Redux Toolkit for state management (with slices for outbreaks, flow, UI, timeline, species, map)
+- Mantine UI Library with enhanced components and notifications
+- Leaflet for advanced map visualizations with GeoTIFF and mask overlay support
+- Vite for fast build tooling
+- Tailwind CSS for utility-first styling integration
+- GeoTIFF module for raster data handling
 
 ## Data Sources
 
-- Abundance and Movement dates are from https://github.com/birdflow-science/BirdFlowWork/tree/main/avian_influenza/dates
+- Bird abundance and movement data from BirdFlowWork repository:  
+  https://github.com/birdflow-science/BirdFlowWork/tree/main/avian_influenza/dates
+- Avian influenza outbreaks data includes Poultry, Bovine, and Wild Bird cases, updated dynamically.
+- Flow projection data fetched from BirdfluAPI (production at birdfluapi.com).
+
+## Additional Notes
+
+- The application uses pregenerated mask overlays by default for performance.
+- Inflow/outflow calculations are cached locally to minimize API requests and improve user experience.
+- UI components are designed with accessibility and mobile responsiveness in mind.
+- Users can download GeoTIFF files of flow projections directly from the interface.
+- Notifications for user feedback and error handling leverage Mantine's notification system for a modern UX.
+
+---
+
+For more details, contributions, or issues, please refer to the project repository and documentation.
