@@ -1,11 +1,23 @@
+import { useEffect, useState } from 'react';
 import { Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
 import { fetchOutbreaks, OutbreakType } from '../store/slices/outbreaksSlice';
 import { AppDispatch } from '../store/store'
+import poultryLast3Weeks from '../assets/poultry_last_3_weeks.svg';
+import poultryOver3Weeks from '../assets/poultry_over_3_weeks.svg';
+import poultryAfterSelected from '../assets/poultry_after_selected.svg';
+import bovineLast3Weeks from '../assets/bovine_last_3_weeks.svg';
+import bovineOver3Weeks from '../assets/bovine_over_3_weeks.svg';
+import bovineAfterSelected from '../assets/bovine_after_selected.svg';
+import wildBirdLast3Weeks from '../assets/wild_bird_last_3_weeks.svg';
+import wildBirdOver3Weeks from '../assets/wild_bird_over_3_weeks.svg';
+import wildBirdAfterSelected from '../assets/wild_bird_after_selected.svg';
 
 type GeoLocation = [number, number];
+
+type OutbreakAge = 'last_3_weeks' | 'over_3_weeks' | 'after_selected';
 
 type outMarker = {
   geoLoc: GeoLocation;
@@ -13,28 +25,56 @@ type outMarker = {
   yearsAgo: number;
   week: number;
   label: string;
-  opacity?: number;
+  age?: OutbreakAge;
 };
 
 const NUM_OUTBREAK_WEEKS = 3;
+const OUTBREAK_ICON_SIZE = 9;
 
-export const OUTBREAK_TYPE_COLORS: Record<OutbreakType, string> = {
-  poultry: 'red',
-  bovine: '#7e7e7eff',
-  wild_birds: '#a0522d',
+const OUTBREAK_ICONS: Record<OutbreakType, Record<OutbreakAge, string>> = {
+  poultry: {
+    last_3_weeks: poultryLast3Weeks,
+    over_3_weeks: poultryOver3Weeks,
+    after_selected: poultryAfterSelected,
+  },
+  bovine: {
+    last_3_weeks: bovineLast3Weeks,
+    over_3_weeks: bovineOver3Weeks,
+    after_selected: bovineAfterSelected,
+  },
+  wild_birds: {
+    last_3_weeks: wildBirdLast3Weeks,
+    over_3_weeks: wildBirdOver3Weeks,
+    after_selected: wildBirdAfterSelected,
+  },
 };
 
-export function circleIcon(color: string, opacity: number, size = 9) {
-  const style = `
-    width: ${size}px;
-    height: ${size}px;
-    background-color: ${color};
-    opacity: ${opacity};
-    border-radius: 50%;
-  `;
+const MAX_OUTBREAK_ICON_SIZE = 18;
+const PX_PER_ICON_PX = 160; // 1440px wide -> 9px icon, 1920px -> 12px, 2560px -> 16px
+
+function iconSizeForWidth(width: number) {
+  const size = Math.round(width / PX_PER_ICON_PX);
+  return Math.min(MAX_OUTBREAK_ICON_SIZE, Math.max(OUTBREAK_ICON_SIZE, size));
+}
+
+/** Outbreak icon size in px, scaled with the window width. */
+export function useOutbreakIconSize() {
+  const [size, setSize] = useState(() => iconSizeForWidth(window.innerWidth));
+
+  useEffect(() => {
+    const onResize = () => setSize(iconSizeForWidth(window.innerWidth));
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  return size;
+}
+
+export function outbreakIcon(type: OutbreakType, age: OutbreakAge, size = OUTBREAK_ICON_SIZE) {
+  const style = `width: ${size}px; height: ${size}px; object-fit: contain; display: block;`;
 
   return L.divIcon({
-    html: `<div style="${style}"></div>`,
+    html: `<img src="${OUTBREAK_ICONS[type][age]}" style="${style}" alt="" />`,
     iconSize: [size, size],
     className: ''
   });
@@ -49,24 +89,24 @@ function selectedOutbreaks(markers: outMarker[], week: number, type: 'recent' | 
       return false;
     })
     .map(marker => {
-      let opacity = 0.2; // default for Historic
+      let age: OutbreakAge = 'over_3_weeks'; // default for Historic
 
       if (marker.yearsAgo === 0) {
         // Marker is from current year and within NUM_OUTBREAK_WEEKS weeks before the selected week
         if (marker.week >= cutoffWeek && marker.week <= week) {
-            opacity = 1.0;
+          age = 'last_3_weeks';
         // Marker is from current year but more than NUM_OUTBREAK_WEEKS weeks before the selected week
         } else if (marker.week < cutoffWeek) {
-            opacity = 0.7;
+          age = 'over_3_weeks';
         // Marker is from current year but after the selected week
         } else {
-            opacity = 0.5;
+          age = 'after_selected';
         }
       }
 
       return {
         ...marker,
-        opacity
+        age
       };
     });
 }
@@ -79,6 +119,8 @@ export function OutbreakMarkersForType(props: { outbreakType: OutbreakType, week
       : state.map.showHistoricOutbreaks[outbreakType]
   );
 
+  const iconSize = useOutbreakIconSize();
+
   const EMPTY_ARRAY: any[] = [];
   const markers = useSelector((state: RootState) =>
     state.outbreaks[outbreakType]?.data || EMPTY_ARRAY
@@ -86,14 +128,13 @@ export function OutbreakMarkersForType(props: { outbreakType: OutbreakType, week
 
   if (!show || !markers.length) return null;
 
-  const color = OUTBREAK_TYPE_COLORS[outbreakType];
   const filteredMarkers = selectedOutbreaks(markers, week, markerType);
 
   return (
     <>
       {filteredMarkers.map((marker, i) => (
         // @ts-ignore
-        <Marker icon={circleIcon(color, marker.opacity)}
+        <Marker icon={outbreakIcon(outbreakType, marker.age!, iconSize)}
           position={marker.geoLoc}
           key={i}
           pane={markerType === "recent" ? "recentPane" : "historicPane"}
@@ -150,6 +191,7 @@ export function loadOutbreaks(dispatch: AppDispatch) {
 export function OutbreakLegend() {
   const showRecentOutbreaks = useSelector((state: RootState) => state.map.showRecentOutbreaks);
   const showHistoricOutbreaks = useSelector((state: RootState) => state.map.showHistoricOutbreaks);
+  const iconSize = useOutbreakIconSize();
 
   // If none enabled, hide legend
   const hasAnyEnabled = OUTBREAK_TYPES.some(type => showRecentOutbreaks[type] || showHistoricOutbreaks[type]);
@@ -161,17 +203,12 @@ export function OutbreakLegend() {
     wild_birds: "Wild birds"
   };
 
-  function LegendIcon({ color, opacity, size = 9 }: { color: string; opacity: number; size?: number }) {
+  function LegendIcon({ type, age, size = iconSize }: { type: OutbreakType; age: OutbreakAge; size?: number }) {
     return (
-      <div
-        style={{
-          width: size,
-          height: size,
-          backgroundColor: color,
-          opacity,
-          borderRadius: '50%',
-          marginRight: 8,
-        }}
+      <img
+        src={OUTBREAK_ICONS[type][age]}
+        alt=""
+        style={{ width: size, height: size, objectFit: 'contain', marginRight: 8 }}
       />
     );
   }
@@ -196,25 +233,25 @@ export function OutbreakLegend() {
       {OUTBREAK_TYPES.map(type =>
         (showRecentOutbreaks[type] || showHistoricOutbreaks[type]) && (
           <div key={type}>
-            <div style={{ fontSize: 12, fontWeight: 500, color: OUTBREAK_TYPE_COLORS[type], marginBottom: 2 }}>
+            <div style={{ fontSize: 12, fontWeight: 500, marginBottom: 2 }}>
               {LABELS[type]}
             </div>
             {showRecentOutbreaks[type] && (
               <>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <LegendIcon color={OUTBREAK_TYPE_COLORS[type]} opacity={1.0} /> <span>Last 3 weeks</span>
+                  <LegendIcon type={type} age="last_3_weeks" /> <span>Last 3 weeks</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <LegendIcon color={OUTBREAK_TYPE_COLORS[type]} opacity={0.75} /> <span>&gt;3 weeks before</span>
+                  <LegendIcon type={type} age="over_3_weeks" /> <span>&gt;3 weeks before</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <LegendIcon color={OUTBREAK_TYPE_COLORS[type]} opacity={0.5} /> <span>After selected week</span>
+                  <LegendIcon type={type} age="after_selected" /> <span>After selected week</span>
                 </div>
               </>
             )}
             {showHistoricOutbreaks[type] && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <LegendIcon color={OUTBREAK_TYPE_COLORS[type]} opacity={0.1} /> <span>Historic (past years)</span>
+                <LegendIcon type={type} age="over_3_weeks" /> <span>Historic (past years)</span>
               </div>
             )}
           </div>
