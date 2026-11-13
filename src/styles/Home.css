@@ -23,19 +23,17 @@
         right: 5px;
     }
 
-    .DataLegend {
-        position: absolute;
-        bottom: 160px;
-        left: 10px;
-        z-index: 10;
-        white-space: pre-line;
-    }
-
-    .OutbreakLegend {
-        position: absolute;
-        bottom: 460px;
+    .LegendStack {
+        position: fixed;
+        --flow-prompt-clearance: 120px;
+        bottom: calc(15% + 12px + var(--flow-prompt-clearance));
+        transform-origin: bottom left;
         left: 10px;
         z-index: 20;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
         white-space: pre-line;
     }
 
@@ -46,30 +44,6 @@
         left: 50%;
         z-index: 10;
         transform: translate(-50%, -50%);
-    }
-
-    .timeline-marker {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 80px;
-        height: 28px;
-        border-radius: 9999px; /* pill shape */
-        background-color: white;
-        border: 2px solid #228be6;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        transition: border 0.2s ease, color 0.2s ease;
-    }
-
-    .timeline-marker-label {
-        font-size: 13px;
-        font-weight: 500;
-        color: #228be6;
-        white-space: nowrap;
-    }
-
-    .timeline-marker:hover {
-        border: 2px solid #1864ab;
     }
 
     .timeline-label {

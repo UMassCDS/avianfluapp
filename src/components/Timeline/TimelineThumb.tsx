@@ -9,6 +9,7 @@ interface TimelineThumbProps {
   isDraggable?: boolean;
   isPlaying?: boolean;
   setupDragHandlers?: (e: React.MouseEvent | React.TouchEvent) => void;
+  pulse?: boolean;
 }
 
 export const TimelineThumb: React.FC<TimelineThumbProps> = ({
@@ -20,6 +21,7 @@ export const TimelineThumb: React.FC<TimelineThumbProps> = ({
   isPlaying = false,
   color = '#228be6',
   setupDragHandlers,
+  pulse = false,
 }) => {
   const isInteractive = isDraggable && !isPlaying;
 
@@ -63,7 +65,7 @@ export const TimelineThumb: React.FC<TimelineThumbProps> = ({
         </div>
       )}
       {type === 'circle' ? (
-        <svg width={28} height={28}>
+        <svg width={28} height={28} className={pulse ? 'pulse' : undefined}>
           <circle cx={14} cy={14} r={10} fill={color} stroke='#228be6' strokeWidth={2} />
         </svg>
       ) : type === 'inflow_arrow' ? (

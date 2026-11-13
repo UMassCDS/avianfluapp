@@ -52,11 +52,16 @@ body {
         align-items: center;
         width: 80px;
         height: 28px;
+    }
+
+    .timeline-marker-bg {
+        position: absolute;
+        inset: 0;
         border-radius: 9999px; /* pill shape */
         background-color: white;
         border: 2px solid #228be6;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        transition: border 0.2s ease, color 0.2s ease;
+        transition: border 0.2s ease;
     }
 
     .timeline-marker-label {
@@ -64,10 +69,12 @@ body {
         font-weight: 500;
         color: #228be6;
         white-space: nowrap;
+        position: relative;
+        z-index: 1;
     }
 
-    .timeline-marker:hover {
-        border: 2px solid #1864ab;
+    .timeline-marker:hover .timeline-marker-bg {
+        border-color: #1864ab;
     }
 
     .timeline-label {
@@ -102,3 +109,108 @@ body {
         z-index: 3;
         pointer-events: none;
     }
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(34, 139, 230, 0)); }
+  50% { transform: scale(1.06); filter: drop-shadow(0 0 6px rgba(34, 139, 230, 0.7)); }
+}
+
+.pulse {
+  animation: pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes invalid-location-shake {
+  0%   { opacity: 0; transform: translateX(0); }
+  4%   { opacity: 1; transform: translateX(-6px); }
+  12%  { transform: translateX(6px); }
+  20%  { transform: translateX(-5px); }
+  28%  { transform: translateX(5px); }
+  36%  { transform: translateX(-3px); }
+  44%  { transform: translateX(3px); }
+  52%, 80% { opacity: 1; transform: translateX(0); }
+  100% { opacity: 0; transform: translateX(0); }
+}
+
+.invalid-location-msg {
+  animation: invalid-location-shake 1s ease-out forwards;
+}
+
+/* restyle search to match the other buttons */
+#flow-search-slot {
+  --search-size: 34px;
+  --search-border: 2px solid #60a5fa;
+  --search-accent: #3b82f6;
+  --search-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+}
+
+/* search container */
+#flow-search-slot .leaflet-bar {
+  border: var(--search-border);
+  border-radius: 12px;
+  box-shadow: var(--search-shadow);
+  background: #fff;
+}
+
+#flow-search-slot .leaflet-bar:hover { border-color: var(--search-accent); }
+#flow-search-slot .leaflet-bar.active { border-right-width: 0; border-radius: 12px 0 0 12px; }
+
+/* search button */
+#flow-search-slot .leaflet-bar-part {
+  width: var(--search-size);
+  height: var(--search-size);
+  line-height: var(--search-size);
+  border-radius: 10px;
+}
+#flow-search-slot .leaflet-bar.active .leaflet-bar-part { border-radius: 10px 0 0 10px; }
+#flow-search-slot .leaflet-bar-part:hover { background-color: #eff6ff; }
+
+/* magnifier icon */
+#flow-search-slot a.leaflet-bar-part:before { /* handle */
+  top: 21px; left: 18px; width: 10px;
+  border-top-color: var(--search-accent);
+}
+#flow-search-slot .leaflet-bar:not(.pending):not(.error) a.leaflet-bar-part:after { /* lens */
+  top: 10px; left: 10px; width: 12px; height: 12px;
+  border-color: var(--search-accent);
+}
+
+/* search input pill */ 
+#flow-search-slot form {
+  top: -2px;
+  left: var(--search-size);
+  height: 38px;
+  border: var(--search-border);
+  border-left: none;
+  border-radius: 0 12px 12px 0;
+  box-shadow: var(--search-shadow);
+}
+
+#flow-search-slot form input { /* input field */
+  display: block;
+  height: var(--search-size);
+}
+
+#flow-search-slot button.reset { /* reset button */
+  font-size: 17px;
+  font-weight: normal;
+  height: 100%;
+  line-height: var(--search-size);
+  border-radius: 0 10px 10px 0;
+}
+
+#flow-search-slot .results:not(:empty) { /* results list */
+  position: absolute;
+  left: 0;
+  top: 100%; /* opens downward from the input */
+  width: 215px;
+  margin-top: 2px;
+  padding: 4px 0;
+  background: #f3f4f6;
+  font-size: 10px;
+  color: #6b7280;
+}
+
+#flow-search-slot .results.active > .active,
+#flow-search-slot .results.active > :hover { background-color: #e5e7eb; border-color: transparent; }
+
+#flow-search-slot .results.active:after { display: none; } /* geosearch's stray left-border helper */

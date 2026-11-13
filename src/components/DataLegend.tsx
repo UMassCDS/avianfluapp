@@ -1,6 +1,6 @@
 /* eslint-disable no-template-curly-in-string */
 import { useEffect, useState } from 'react';
-import { Grid, Stack, Tooltip } from '@mantine/core';
+import { Tooltip } from '@mantine/core';
 import { getScalingFilename, dataInfo } from '../hooks/dataUrl';
 import { isMobile } from '../utils/utils';
 import { useSelector } from 'react-redux';
@@ -93,12 +93,38 @@ function DataLegend() {
     <div
       style={{
         width: isMobile() ? '10px' : '14px',
-        height: isMobile() ? '120px' : '180px',
-        margin: isMobile() ? '0 auto' : '10px',
+        height: '120px',
+        margin: '0 auto',
         background: `linear-gradient(0deg, ${colorScale})`,
       }}
     />
   );
+
+  // Placeholder before results exist in inflow/outflow view
+  if (dataIndex >= 2 && flowResults.length === 0) {
+    const type = dataInfo[dataIndex].datatype;
+    return (
+      <div
+        className="DataLegend"
+        style={{
+          background: 'rgba(255, 255, 255, 0.6)',
+          borderRadius: 10,
+          padding: isMobile() ? '6px' : '6px 10px',
+          fontSize: 12,
+          maxWidth: isMobile() ? '60px' : '240px',
+          minHeight: isMobile() ? undefined : 170,
+          minWidth: isMobile() ? undefined : 150,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          textAlign: 'center',
+          color: '#868e96',
+        }}
+      >
+        <span style={{ fontSize }}>{type.charAt(0).toUpperCase() + type.slice(1)} not yet calculated</span>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -106,8 +132,9 @@ function DataLegend() {
       style={{
         background: 'rgba(255, 255, 255, 0.6)',
         borderRadius: 10,
-        padding: '6px',
-        maxWidth: isMobile() ? '60px' : '120px',
+        padding: isMobile() ? '6px' : '6px 10px',
+        fontSize: 12,
+        maxWidth: isMobile() ? '60px' : '240px',
       }}
     >
       <div style={{ fontWeight: 'bold', textAlign: 'center', marginBottom: 6, fontSize: fontSize}}>
@@ -123,21 +150,19 @@ function DataLegend() {
           </Tooltip>
         </>
       ) : (
-        <Grid align="stretch">
-          <Grid.Col span={4}>{ColorBar}</Grid.Col>
-          <Grid.Col span={8}>
-            <Stack h={200} align="flex-start" justify="space-between" gap="xl">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <div style={{ display: 'flex', alignItems: 'stretch', justifyContent: 'center', gap: 8 }}>
+            {ColorBar}
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', fontSize }}>
               <div>{highLabel}</div>
               <div>{midLabel}</div>
               <div>{lowLabel}</div>
-            </Stack>
-          </Grid.Col>
-          <Grid.Col span={12}>
-            <Tooltip label="Average of 10 years of data.">
-              <div style={{ textAlign: 'center' }}>{renderUnits()}</div>
-            </Tooltip>
-          </Grid.Col>
-        </Grid>
+            </div>
+          </div>
+          <Tooltip label="Average of 10 years of data.">
+            <div style={{ textAlign: 'center', fontSize }}>{renderUnits()}</div>
+          </Tooltip>
+        </div>
       )}
     </div>
   );

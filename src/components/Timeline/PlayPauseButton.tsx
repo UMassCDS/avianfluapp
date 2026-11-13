@@ -1,4 +1,4 @@
-import { ActionIcon, Tooltip } from '@mantine/core';
+import { Button, Tooltip } from '@mantine/core';
 import { IconPlayerPauseFilled, IconPlayerPlayFilled } from '@tabler/icons-react';
 
 export const PlayPauseButton = ({ isPlaying, onToggle, disabled }: {
@@ -6,19 +6,27 @@ export const PlayPauseButton = ({ isPlaying, onToggle, disabled }: {
   onToggle: () => void;
   disabled: boolean;
 }) => (
-  <div className="flex-shrink-0 mr-2" style={{ width: 48 }}>
-    <Tooltip label="No flow results to play" disabled={!disabled}>
-      <Tooltip label={isPlaying ? 'Pause' : 'Play'} disabled={disabled}>
-        <ActionIcon
-          size="xl"
+  <Tooltip label="No flow results to play" disabled={!disabled} position="bottom" withArrow>
+    <div>
+      <Tooltip label={isPlaying ? 'Pause' : 'Play'} disabled={disabled} position="bottom" withArrow>
+        <Button
+          variant="outline"
+          color="blue"
+          mt="md"
           onClick={onToggle}
-          variant={disabled ? 'default' : 'filled'}
           disabled={disabled}
-          style={{ width: 48, height: 48 }}
+          className={`flex items-center gap-2 p-[6px] rounded-xl border-2 transition 
+            font-semibold shadow-md 
+            ${disabled
+              ? 'bg-gray-200 border-gray-300 text-gray-400 cursor-not-allowed'
+              : 'bg-white border-blue-400 text-blue-500 hover:bg-blue-50 hover:border-blue-500 active:bg-blue-100'}
+          `}
         >
-          {isPlaying ? <IconPlayerPauseFilled /> : <IconPlayerPlayFilled />}
-        </ActionIcon>
+          {isPlaying
+            ? <IconPlayerPauseFilled size={22} className={disabled ? 'text-gray-400' : 'text-blue-500'} />
+            : <IconPlayerPlayFilled size={22} className={disabled ? 'text-gray-400' : 'text-blue-500'} />}
+        </Button>
       </Tooltip>
-    </Tooltip>
-  </div>
+    </div>
+  </Tooltip>
 );

@@ -2,14 +2,14 @@ import "leaflet/dist/leaflet.css";
 import "leaflet-geosearch/dist/geosearch.css";
 import { MapContainer, TileLayer, Marker, Popup, ImageOverlay, useMap } from "react-leaflet";
 import { GeoSearchControl, OpenStreetMapProvider } from "leaflet-geosearch";
-import { notifications } from '@mantine/notifications';
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { GeoTIFFImage } from "geotiff";
 import { RootState } from "../store/store";
 import { OutbreakMarkers } from "./OutbreakPoints";
 import { lngLatToMercator } from '../utils/utils'
 import MaskGeoTIFFLayer from "./MaskGeoTIFFLayer";
+import { FLOW_SEARCH_SLOT_ID } from "./FlowSearchSlot";
 
 
 const imageBounds = [
@@ -55,30 +55,60 @@ function MapClickHandler({ setMarker }: { setMarker: (lat: number, lng: number, 
 
 function SearchHandler({ setMarker }: { setMarker: (lat: number, lng: number, label: string) => void }) {
   const map = useMap();
+  const setMarkerRef = useRef(setMarker);
+  setMarkerRef.current = setMarker;
 
   useEffect(() => {
     // @ts-ignore
     const searchControl = new GeoSearchControl({
       provider: new OpenStreetMapProvider(),
       style: "button",
+      maxSuggestions: 2,
       showMarker: false,
       retainZoomLevel: true,
       notFoundMessage: "Sorry, that address could not be found.",
+      resetButton: "↺",
     });
 
     map.addControl(searchControl);
+    // Relocate the search control into toolbar
+    const slot = document.getElementById(FLOW_SEARCH_SLOT_ID);
+    if (slot) slot.appendChild((searchControl as any).getContainer());
+    const control = searchControl as any;
+    const container: HTMLElement = control.getContainer();
+
+    // reset button clears typed text
+    const handleResetClick = (e: Event) => {
+      if (e.target !== control.resetButton) return;
+      e.stopPropagation();
+      e.preventDefault();
+      control.clearResults(null, true);
+      control.searchElement.input.focus();
+    };
+    control.searchElement.form.addEventListener('click', handleResetClick, true);
+
+    // clicking anywhere outside the search closes it
+    const handleOutsidePress = (e: Event) => {
+      if (!container.classList.contains('active')) return;
+      if (container.contains(e.target as Node)) return;
+      control.close();
+    };
+    document.addEventListener('pointerdown', handleOutsidePress, true);
+
     const handleSearch = async (result: any) => {
       const { x, y, label } = result.location;
-      await setMarker(y, x, label); // y = lat, x = lng
+      await setMarkerRef.current(y, x, label); // y = lat, x = lng
     };
 
     map.on("geosearch/showlocation", handleSearch);
 
     return () => {
+      document.removeEventListener('pointerdown', handleOutsidePress, true);
+      control.searchElement.form.removeEventListener('click', handleResetClick, true);
       map.removeControl(searchControl);
       map.off("geosearch/showlocation", handleSearch);
     };
-  }, [map, setMarker]);
+  }, [map]);
 
   return null;
 }
@@ -125,6 +155,22 @@ export default function MapView({ onLocationSelect }: {onLocationSelect: (latLon
   const [markerInfo, setmarkerInfo] = useState<{ lat: number; lng: number; label: string } | null>(null);
   const isInflowOutflowView = dataIndex >= 2;
 
+  // invalid selection message shown at the mouse position
+  const mousePos = useRef({ x: 0, y: 0 });
+  const [invalidMsg, setInvalidMsg] = useState<{ x: number; y: number; id: number } | null>(null);
+
+  useEffect(() => {
+    const track = (e: MouseEvent) => { mousePos.current = { x: e.clientX, y: e.clientY }; };
+    window.addEventListener('mousemove', track);
+    return () => window.removeEventListener('mousemove', track);
+  }, []);
+
+  useEffect(() => {
+    if (!invalidMsg) return;
+    const t = setTimeout(() => setInvalidMsg(null), 1000);
+    return () => clearTimeout(t);
+  }, [invalidMsg]);
+
   // Utility to check if a marker is in valid mask region
   const isValidMaskPoint = async (lat: number, lng: number) => {
     if (!flowMaskGeoTIFFImage) return true; // if no mask, allow
@@ -155,11 +201,7 @@ export default function MapView({ onLocationSelect }: {onLocationSelect: (latLon
     if (isInflowOutflowView) {
       const valid = await isValidMaskPoint(lat, lng);
       if (!valid) {
-      notifications.show({
-        title: 'Select a Location',
-        message: 'Please select a location within the highlighted area.',
-        color: 'orange',
-      });
+        setInvalidMsg({ ...mousePos.current, id: Date.now() });
         setmarkerInfo(null);
         onLocationSelect(null);
         return;
@@ -176,6 +218,8 @@ export default function MapView({ onLocationSelect }: {onLocationSelect: (latLon
       // @ts-ignore
         center={{ lat: 45, lng: -95 }}
         zoom={3.5}
+        minZoom={3.5}
+        zoomControl={false}
         style={{ height: "100vh", width: "100%" }}
         className="Map"
         keyboard={false}
@@ -209,6 +253,24 @@ export default function MapView({ onLocationSelect }: {onLocationSelect: (latLon
         <OutbreakPanes />
         <OutbreakMarkers />
       </MapContainer>
+
+      {invalidMsg && (
+        <div
+          key={invalidMsg.id}
+          role="alert"
+          style={{
+            position: 'fixed',
+            left: Math.min(invalidMsg.x + 12, window.innerWidth - 190),
+            top: invalidMsg.y + 12,
+            zIndex: 2000,
+            maxWidth: 160,
+            pointerEvents: 'none',
+          }}
+          className="invalid-location-msg bg-gray-700 text-white px-2 py-1 text-[11px] leading-tight"
+        >
+          Please select a location within the highlighted area.
+        </div>
+      )}
     </div>
   );
 }

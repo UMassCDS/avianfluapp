@@ -8,7 +8,6 @@ import { dataInfo } from '../../hooks/dataUrl';
 import ab_dates from '../../assets/abundance_dates.json';
 import mv_dates from '../../assets/movement_dates.json';
 
-import { PlayPauseButton } from './PlayPauseButton';
 import { TimelineMarkerLabel } from './TimelineMarkerLabel';
 import { TimelineMarkerDot } from './TimelineMarkerDot';
 import { TimelineTodayMarker } from './TimelineTodayMarker';
@@ -30,14 +29,54 @@ const isNear = (a: number, b: number, range: number = 2, max: number = MAX_WEEK)
 };
 
 
+// keep a display date inside the flow window by moving it to the nearest end.
+const snapIntoWindow = (week: number, start: number, end: number, inset = 1) => {
+  const onThumb = week === start || week === end;
+  const inside = isWithinSpan(week, start, end, end < start) && (inset === 0 || !onThumb);
+  if (inside) return week;
+  // The track is linear (not a loop), so "nearest" is distance along the track: wrapping
+  // around the year boundary would pick an end on the far side of the timeline.
+  const dist = (a: number, b: number) => Math.abs(a - b);
+  return dist(week, start) <= dist(week, end)
+    ? (start + inset) % WEEKS_PER_YEAR
+    : (end - inset + WEEKS_PER_YEAR) % WEEKS_PER_YEAR;
+};
+
+// Index of the dataset entry whose date is closest to today (ignoring year).
+const closestWeekToToday = (dates: { date: string }[]) => {
+  const todayPct = getTimelinePosition(new Date());
+  let best = 0;
+  let bestDist = Infinity;
+  dates.forEach((d, i) => {
+    const dist = Math.abs(getTimelinePosition(d.date) - todayPct);
+    if (dist < bestDist) {
+      bestDist = dist;
+      best = i;
+    }
+  });
+  return best;
+};
+
 export default function Timeline({
   onChangeWeek,
   onChangeStartWeek, 
   nFlowWeeks,
+  isPlaying,
+  setIsPlaying,
+  locationKey,
+  isCalculating,
+  startDateDragged,
+  onThumbDragStart,
 }: {
   onChangeWeek: (week: number) => void;
   onChangeStartWeek: (week: number) => void; 
   nFlowWeeks: number;
+  isPlaying: boolean;
+  setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>;
+  locationKey: string; // selected location; '' if none
+  isCalculating: boolean;
+  startDateDragged: boolean; // user has dragged the start-date thumb (owned by Home)
+  onThumbDragStart?: () => void; // user started dragging the start-date thumb
 }) {
   const dispatch = useDispatch();
 
@@ -45,12 +84,12 @@ export default function Timeline({
   const isMonitor = useSelector((state: RootState) => state.ui.isMonitor);
   const flowResults = useSelector((state: RootState) => state.map.flowResults);
   const dataIndex = useSelector((state: RootState) => state.species.dataIndex);
+  const lastFlowKeys = useSelector((state: RootState) => state.map.lastFlowKeys);
 
   const localNFlowWeeks = nFlowWeeks - 1;
   const playbackRef = useRef<NodeJS.Timeout | null>(null);
   const trackRef = useRef<HTMLDivElement>(null);
 
-  const [isPlaying, setIsPlaying] = useState(false);
   const [markerWeek, setMarkerWeek] = useState(week);
   const [spanStart, setSpanStart] = useState(week);
   const [spanEnd, setSpanEnd] = useState((week + localNFlowWeeks) % WEEKS_PER_YEAR);
@@ -64,45 +103,30 @@ export default function Timeline({
 
   const todayPct = useMemo(() => getTimelinePosition(new Date()), []);
 
-  const [hasInitialized, setHasInitialized] = useState(false);
+  // Start date anchor: outflow start / inflow end. Independent of the display date (markerWeek).
+  const [anchorWeek, setAnchorWeekState] = useState(week);
+  // Mirrors anchorWeek but updates synchronously, so effects in the same render as a change see it
+  const anchorRef = useRef(week);
+  const setAnchorWeek = (w: number) => {
+    anchorRef.current = w;
+    setAnchorWeekState(w);
+  };
+  // Last start date the user set in each flow view (undefined until they set one)
+  const userAnchors = useRef<{ inflow?: number; outflow?: number }>({});
+  const [hasMovedMarker, setHasMovedMarker] = useState(false);
 
+  const isFlowMode = mode === 'inflow' || mode === 'outflow';
+  // Hint to drag the start-date thumb: only before results, until the user drags it
+  const showDragHint = isFlowMode && locationKey !== '' && !startDateDragged && !isCalculating && flowResults.length === 0 && !isPlaying;
+  // Hint that the display date can now be moved: after results appear, until the user moves it
+  const showMarkerHint = isFlowMode && flowResults.length > 0 && !hasMovedMarker && !isPlaying;
 
-const updateMarkerAndSpan = () => {
-  if (mode === 'abundance' || mode === 'movement') {
-    return;
-  }
-
-  let newSpanStart = spanStart;
-  let newSpanEnd = (spanStart + localNFlowWeeks) % WEEKS_PER_YEAR;
-  let newMarkerWeek = markerWeek;
-
-  // INITIALIZE circle at TODAY only the first time
-  if (!hasInitialized) {
-    if (mode === 'inflow') {
-      newSpanEnd = week; // TODAY
-      newSpanStart = (week - localNFlowWeeks + WEEKS_PER_YEAR) % WEEKS_PER_YEAR;
-      newMarkerWeek = week; // marker starts at today
-      // Set white circle position using todayPct, just like TimelineTodayMarker
-      setRightPct(todayPct);
-    } else if (mode === 'outflow') {
-      newSpanStart = week; // TODAY
-      newSpanEnd = (week + localNFlowWeeks) % WEEKS_PER_YEAR;
-      newMarkerWeek = week;
-      // Set white circle position using todayPct, just like TimelineTodayMarker
-      setLeftPct(todayPct);
-    }
-    setHasInitialized(true); // mark initialization done
-  }
-
-  const wrapped = newSpanEnd < newSpanStart;
-
-  setSpanStart(newSpanStart);
-  setSpanEnd(newSpanEnd);
-  setIsWrapped(wrapped);
-  setLeftPct(getTimelinePosition(datasets[dataIndex][newSpanStart].date));
-  setRightPct(getTimelinePosition(datasets[dataIndex][newSpanEnd].date));
-  onChangeWeek(newMarkerWeek);
-};
+  const spanForAnchor = (anchor: number) => {
+    const start = mode === 'inflow'
+      ? (anchor - localNFlowWeeks + WEEKS_PER_YEAR) % WEEKS_PER_YEAR
+      : anchor;
+    return { start, end: (start + localNFlowWeeks) % WEEKS_PER_YEAR };
+  };
 
   const startPlayback = () => {
     let current = markerWeek;
@@ -138,21 +162,18 @@ const updateMarkerAndSpan = () => {
 
     setSpanStart(start);
     setSpanEnd(end);
+    setAnchorWeek(weekNum);
+    if (mode === 'inflow' || mode === 'outflow') userAnchors.current[mode] = weekNum;
     setMarkerWeek(current);
     onChangeWeek(current);
-
-    // FIX: Use the new value, not the old state!
-    if (mode === "inflow") {
-      onChangeStartWeek(end);
-    } else {
-      onChangeStartWeek(start);
-    }
+    onChangeStartWeek(weekNum);
 
     dispatch(clearFlowResults());
     dispatch(clearOverlayUrl());
   };
 
   const setupDragHandlers = (e: React.MouseEvent | React.TouchEvent) => {
+    onThumbDragStart?.();
     const moveHandler = (ev: MouseEvent | TouchEvent) => {
       const clientX = 'touches' in ev ? ev.touches[0].clientX : ev.clientX;
       handleThumbDrag(clientX);
@@ -169,23 +190,80 @@ const updateMarkerAndSpan = () => {
     window.addEventListener("touchend", release);
   };
 
-  const { ref } = useMove(({ x }) => {
-    const curWeek = Math.floor(x * (WEEKS_PER_YEAR - 1));
-    setMarkerWeek(curWeek);
-    if (flowResults.length > 0 || mode === 'abundance' || mode === 'movement') onChangeWeek(curWeek);
-  });
+  // Always points at the latest render's snap logic, so the release handler never sees stale state.
+  const dragWeekRef = useRef(markerWeek);
+  const snapOnReleaseRef = useRef<() => void>(() => {});
+  snapOnReleaseRef.current = () => {
+    if (!isFlowMode || flowResults.length === 0) return;
+    const { start, end } = spanForAnchor(anchorWeek);
+    const snapped = snapIntoWindow(dragWeekRef.current, start, end, 0); // user-placed: may land on a thumb
+    setMarkerWeek(snapped);
+    onChangeWeek(snapped);
+  };
+
+  // Dragging is free anywhere on the timeline; on release in flow mode it snaps back into the window.
+  const { ref } = useMove(
+    ({ x }) => {
+      const curWeek = Math.floor(x * (WEEKS_PER_YEAR - 1));
+      dragWeekRef.current = curWeek;
+      setHasMovedMarker(true);
+      setMarkerWeek(curWeek);
+      if (flowResults.length > 0 || mode === 'abundance' || mode === 'movement') onChangeWeek(curWeek);
+    },
+    {
+      onScrubEnd: () => snapOnReleaseRef.current(),
+    }
+  );
 
   useEffect(() => {
     const mode = dataInfo[dataIndex].datatype; // 'inflow', 'outflow', 'abundance', 'movement'
     setMode(mode);
     stopPlayback();
     setIsPlaying(false);
-    setSpanStart(markerWeek);
     setMarkerPct(getTimelinePosition(datasets[dataIndex][markerWeek].date));
-    setHasInitialized(false);
   }, [dataIndex]);
 
-  useEffect(updateMarkerAndSpan, [spanStart, mode]);
+  // Derive the flow window from the persisted start date (anchor).
+  useEffect(() => {
+    if (!isFlowMode) return;
+    const { start, end } = spanForAnchor(anchorWeek);
+    setSpanStart(start);
+    setSpanEnd(end);
+    setIsWrapped(end < start);
+    setLeftPct(getTimelinePosition(datasets[dataIndex][start].date));
+    setRightPct(getTimelinePosition(datasets[dataIndex][end].date));
+  }, [mode, anchorWeek, localNFlowWeeks, dataIndex]);
+
+  // A calculation fixes that view's start date: from then on it is the view's last start date,
+  // so the other-view / today fallbacks no longer apply to it.
+  useEffect(() => {
+    Object.values(lastFlowKeys).forEach((key) => {
+      const type = dataInfo[key.dataIndex].datatype;
+      if (type === 'inflow' || type === 'outflow') userAnchors.current[type] = key.week;
+    });
+  }, [lastFlowKeys]);
+
+  // On mode switch into a flow view, pick the start date by preference:
+  // 1) this view's last start date (set by dragging or by a calculation), 2) the other flow view's last user-set one,
+  // 3) the entry closest to today. Then snap the display date into the new window.
+  useEffect(() => {
+    if (mode === '') return;
+    if (!isFlowMode) {
+      onChangeWeek(markerWeek);
+      return;
+    }
+    const other = mode === 'inflow' ? 'outflow' : 'inflow';
+    const anchor =
+      userAnchors.current[mode] ??
+      userAnchors.current[other] ??
+      closestWeekToToday(datasets[dataIndex]);
+    const { start, end } = spanForAnchor(anchor);
+    const snapped = snapIntoWindow(markerWeek, start, end);
+    setAnchorWeek(anchor);
+    setMarkerWeek(snapped);
+    onChangeWeek(snapped);
+    onChangeStartWeek(anchor);
+  }, [mode]);
 
   useEffect(() => {
     setMarkerPct(getTimelinePosition(datasets[dataIndex][markerWeek].date));
@@ -196,16 +274,24 @@ const updateMarkerAndSpan = () => {
   }, [isMonitor]);
 
   useEffect(() => {
-    const spanEnd = (spanStart + localNFlowWeeks) % WEEKS_PER_YEAR;
-    const current = mode === 'inflow' ? spanEnd : spanStart;
-    if (flowResults.length === 0) onChangeWeek(current);
-    else setMarkerWeek(current);
-    // Stop playback if no flow results are available
-    if (flowResults.length === 0 && (mode !== 'abundance' && mode !== 'movement')) stopPlayback();
-  }, [flowResults, spanStart]);
+    if (!isFlowMode) return;
+    // flow results empty: display date starts at the start date
+    if (flowResults.length === 0) {
+      onChangeWeek(anchorRef.current);
+      stopPlayback();
+    } else {
+      // results arrived: keep the display date if still valid, else re-snap it into the window
+      const { start, end } = spanForAnchor(anchorRef.current);
+      const snapped = snapIntoWindow(markerWeek, start, end);
+      setMarkerWeek(snapped);
+      onChangeWeek(snapped);
+      setHasMovedMarker(false);
+    }
+  }, [flowResults]);
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "ArrowRight" || e.key === "ArrowLeft") setHasMovedMarker(true);
       if (e.key === "ArrowRight") {
         const next = (week + 1) % WEEKS_PER_YEAR;
         onChangeWeek(next);
@@ -234,20 +320,17 @@ const updateMarkerAndSpan = () => {
       onMouseLeave={() => setShowSpanLabels(false)}
     >
       <div className={`flex items-center w-full ${!isMonitor ? 'scale-75' : ''}`}>
-        {/* Play/Pause Button */}
-        <PlayPauseButton 
-          isPlaying={isPlaying}
-          onToggle={() => setIsPlaying(p => !p)}
-          disabled={flowResults.length === 0 && (mode !== 'abundance' && mode !== 'movement')}
-        />
-
         {/* Timeline Slider Area */}
-        <div className="flex-1" style={{marginLeft: "5%"}}>
+        <div className="flex-1">
 
           {/* Thumb label and marker */}
           <div ref={ref} style={{ height: 32, position: 'relative', zIndex: 1000 }}>
-            <TimelineMarkerLabel left={markerPct} label={datasets[dataIndex][markerWeek].label} />
-            <TimelineMarkerDot left={markerPct} />
+            {(flowResults.length > 0 || (mode !== 'inflow' && mode !== 'outflow')) && (
+              <>
+                <TimelineMarkerLabel left={markerPct} label={datasets[dataIndex][markerWeek].label} pulse={showMarkerHint} />
+                <TimelineMarkerDot left={markerPct} />
+              </>
+            )}
             <TimelineTodayMarker left={todayPct} />
           </div>
 
@@ -387,6 +470,7 @@ const updateMarkerAndSpan = () => {
                     isPlaying={isPlaying}
                     color="white"
                     setupDragHandlers={setupDragHandlers}
+                    pulse={showDragHint}
                   />
                   <div className="absolute left-1/2 top-full translate-x-[-50%] mt-2 px-2 py-1 rounded bg-black text-white text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-95 transition pointer-events-none">
                     Flow start date; drag to change
@@ -418,6 +502,7 @@ const updateMarkerAndSpan = () => {
                     isPlaying={isPlaying}
                     color="white"
                     setupDragHandlers={setupDragHandlers}
+                    pulse={showDragHint}
                   />
                   <div className="absolute left-1/2 top-full translate-x-[-50%] mt-2 px-2 py-1 rounded bg-black text-white text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-95 transition pointer-events-none">
                     Flow start date; drag to change

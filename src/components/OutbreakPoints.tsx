@@ -222,7 +222,6 @@ export function OutbreakLegend() {
         padding: '6px 10px',
         fontSize: 12,
         maxWidth: '240px',
-        marginBottom: 10,
         display: 'flex',
         flexDirection: 'column',
         gap: '6px',

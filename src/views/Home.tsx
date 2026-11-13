@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useAppDispatch } from '../store/store';
 import { Combobox, ComboboxStore, useCombobox } from '@mantine/core';
@@ -6,11 +6,12 @@ import { notifications } from '@mantine/notifications';
 import L from 'leaflet';
 import AboutButtons from '../components/AboutButtons';
 import ControlBar from '../components/ControlBar';
-import InflowOutflowCalculateButton from '../components/InflowOutflowCalculateButton';
-import FlowDownloadButton from '../components/FlowDownloadButton';
 import DataLegend from '../components/DataLegend';
 import MapOverlayPanel from '../components/MapOverlayPanel';
 import MapView from '../components/MapView';
+import { PlayPauseButton } from '../components/Timeline/PlayPauseButton';
+import FlowSummary from '../components/FlowSummary';
+import FlowToolbar from '../components/FlowToolbar';
 import Timeline from '../components/Timeline/Timeline';
 import { loadOutbreaks, OutbreakLegend } from '../components/OutbreakPoints';
 import { imageURL, getScalingFilename, dataInfo } from '../hooks/dataUrl';
@@ -37,6 +38,7 @@ import 'leaflet-geosearch/dist/geosearch.css';
 import '../styles/Home.css';
 import taxa from '../assets/taxa.json';
 import { isMobile } from '../utils/utils';
+import { useFitToViewport } from '../hooks/useFitToViewport';
 
 // Fix for missing marker icon in production
 // Import marker images
@@ -89,7 +91,13 @@ const HomePage = () => {
 
   const [location, setLocation] = useState<string[]>([]);
   const [startWeek, setStartWeek] = useState(week); // default to marker week
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isCalculating, setIsCalculating] = useState(false);
+  const [startDateDragged, setStartDateDragged] = useState(false); // dragged the start date
   const mobile = isMobile();
+  const legendStackRef = useRef<HTMLDivElement>(null);
+
+  useFitToViewport(legendStackRef);
 
   // Callback passed to MapView
   const handleLocationSelect = (latLon: string | null) => {
@@ -128,17 +136,6 @@ const HomePage = () => {
     };
   }, []);
 
-  // Prompt for location if in inflow/outflow and none selected
-  useEffect(() => {
-    if (dataIndex >= 2 && location.length === 0) {
-      notifications.show({
-        title: 'Select a Location',
-        message: 'To begin inflow or outflow analysis, please select a location on the map or use the search button.',
-        color: 'blue',
-      });
-    }
-  }, [dataIndex, location.length]);
-
   async function checkImage(thisWeek: number): Promise<boolean> {
     // Skip check for inflow/outflow
     if (dataIndex >= 2) {
@@ -168,18 +165,23 @@ const HomePage = () => {
     await checkImage(thisWeek);
   }
 
+  // Re-arm the start-date hints when switching views or picking a new location
+  useEffect(() => {
+    setStartDateDragged(false);
+  }, [dataIndex, location[0]]);
+
   useEffect(() => {
     dispatch(clearOverlayUrl());
     dispatch(clearFlowResults());
     checkImage(week);
-    dispatch(loadFlowResultsFromCache({ dataIndex, speciesIndex, location, week }));
+    dispatch(loadFlowResultsFromCache({ dataIndex, speciesIndex, location, week: startWeek }));
     dispatch(updateOverlayByWeek(week));
   }, [dataIndex, speciesIndex, location, dispatch]);
 
   useEffect(() => {
-    dispatch(loadFlowResultsFromCache({ dataIndex, speciesIndex, location, week }));
+    dispatch(loadFlowResultsFromCache({ dataIndex, speciesIndex, location, week: startWeek }));
     dispatch(updateOverlayByWeek(week));
-  }, [week, dispatch]);
+  }, [week, startWeek, dispatch]);
 
 
   async function checkInputTypes(d_index: number, s_index: number) {
@@ -225,11 +227,6 @@ const HomePage = () => {
     ref_combo.closeDropdown();
   }
 
-  // Shows the Legend component if:
-	// - dataIndex < 2 (e.g., for abundance or movement), or
-	// - flowResults is a non-empty array (e.g., for inflow or outflow when results exist).
-  const shouldShowDataLegend = dataIndex < 2 || (Array.isArray(flowResults) && flowResults.length > 0);
-
   // Here is where you list the components and elements that you want rendered. 
   return (
     <div className="Home">
@@ -238,25 +235,7 @@ const HomePage = () => {
           `fixed top-4 left-1/2 -translate-x-1/2 z-10 w-[90vw] max-w-lg ${mobile ? 'scale-75' : ''}`
         }
       >
-        <MapOverlayPanel
-          location={location}
-          startWeek={startWeek}
-        >
-          {dataIndex >= 2 && (
-            <div className="flex flex-row items-center justify-center gap-4">
-              {/* Inflow/Outflow Calculate Button */}
-              <InflowOutflowCalculateButton
-                dataIndex={dataIndex}
-                week={week}
-                speciesIndex={speciesIndex}
-                location={location}
-                nFlowWeeks={N_FLOW_WEEKS}
-                speciesOptions={taxa}
-                disabled={location.length === 0 || (Array.isArray(flowResults) && flowResults.length > 0)}
-              />
-              <FlowDownloadButton />
-            </div>
-          )}
+        <MapOverlayPanel>
         </MapOverlayPanel>
       </div>
 
@@ -278,13 +257,41 @@ const HomePage = () => {
         />
       </div>
 
-      {shouldShowDataLegend && <DataLegend />}
-      { !mobile && <OutbreakLegend /> }
+      <div className="LegendStack" ref={legendStackRef}>
+        { !mobile && <OutbreakLegend /> }
+        <DataLegend />
+        <FlowSummary location={location} startWeek={startWeek} hidden={dataIndex < 2} />
+      </div>
+
+      <div className={`fixed top-[82%] left-[5%] z-[11] flex flex-row items-center justify-center gap-4 ${mobile ? 'scale-75' : ''}`}>
+        <PlayPauseButton
+          isPlaying={isPlaying}
+          onToggle={() => setIsPlaying(p => !p)}
+          disabled={dataIndex >= 2 && !(Array.isArray(flowResults) && flowResults.length > 0)}
+        />
+        {dataIndex >= 2 && (
+          <FlowToolbar
+            key={dataIndex}
+            location={location}
+            startWeek={startWeek}
+            nFlowWeeks={N_FLOW_WEEKS}
+            isCalculating={isCalculating}
+            startDateDragged={startDateDragged}
+            onCalculatingChange={setIsCalculating}
+          />
+        )}
+      </div>
 
       <Timeline
         onChangeWeek={onChangeWeek}
         onChangeStartWeek={setStartWeek}
         nFlowWeeks={N_FLOW_WEEKS}
+        isPlaying={isPlaying}
+        setIsPlaying={setIsPlaying}
+        locationKey={location[0] ?? ''}
+        isCalculating={isCalculating}
+        startDateDragged={startDateDragged}
+        onThumbDragStart={() => setStartDateDragged(true)}
       />
     </div>
   );
