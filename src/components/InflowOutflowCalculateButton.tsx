@@ -13,22 +13,24 @@ const BirdflowRApiBaseUrl = "https://www.birdfluapi.com/api"; // BirdflowR REST 
 
 type Props = {
   dataIndex: number; // 2 for inflow, 3 for outflow
-  week: number;
+  startWeek: number; // the flow start date
   speciesIndex: number;
   location: string[]; // e.g. ['42.4,-73.45']
   nFlowWeeks: number;
   speciesOptions: { label: string; value: string }[]; // list with species codes
   disabled?: boolean;
+  onCalculatingChange?: (calculating: boolean) => void;
 };
 
 const InflowOutflowCalculateButton: React.FC<Props> = ({
   dataIndex,
-  week,
+  startWeek,
   speciesIndex,
   location,
   nFlowWeeks,
   speciesOptions,
   disabled,
+  onCalculatingChange,
 }) => {
   const dispatch = useDispatch();
   // Get flowResults from Redux to determine if calculation has already been done
@@ -49,7 +51,7 @@ const InflowOutflowCalculateButton: React.FC<Props> = ({
     const [lat, lon] = location[0].split(',').map(Number);
     const latStr = `${lat.toFixed(1)} N`;
     const lonStr = `${Math.abs(lon).toFixed(1)} W`;
-    const dateLabel = datasets[dataIndex][week]?.label || datasets[dataIndex][week]?.date || `week ${week}`;
+    const dateLabel = datasets[dataIndex][startWeek]?.label || datasets[dataIndex][startWeek]?.date || `week ${startWeek}`;
     tooltipLabel = `Calculate flow from ${latStr} ${lonStr}, ${dateLabel}`;
   }
 
@@ -70,7 +72,7 @@ const InflowOutflowCalculateButton: React.FC<Props> = ({
     const functionName = dataIndex === 2 ? 'inflow' : 'outflow';
     const taxa = speciesOptions[speciesIndex]?.value || 'total';
     const locParam = location.join(';');
-    const url = `${BirdflowRApiBaseUrl}/${functionName}?loc=${locParam}&week=${week+1}&taxa=${taxa}&n=${nFlowWeeks}`;
+    const url = `${BirdflowRApiBaseUrl}/${functionName}?loc=${locParam}&week=${startWeek+1}&taxa=${taxa}&n=${nFlowWeeks}`;
 
     notifications.show({
       title: 'Calculation in Progress',
@@ -78,13 +80,14 @@ const InflowOutflowCalculateButton: React.FC<Props> = ({
       color: 'green',
     });
 
+    onCalculatingChange?.(true);
     try {
       const response = await axios.get(url);
       const data = response.data;
 
-      if (data.status === 'success') {
-        dispatch(setAndCacheFlowResults({data,  key: {dataIndex, speciesIndex, location, week}}));
-        dispatch(updateOverlayByWeek(week));
+      if (data.status === 'success' || data.status === 'cached') {
+        dispatch(setAndCacheFlowResults({data,  key: {dataIndex, speciesIndex, location, week: startWeek}}));
+        dispatch(updateOverlayByWeek(startWeek));
       } else if (data.status === 'outside mask') {
         notifications.show({
           title: 'Outside prediction area',
@@ -110,6 +113,8 @@ const InflowOutflowCalculateButton: React.FC<Props> = ({
         message: 'Unable to contact the server. Please check your internet connection.',
         color: 'red',
       });
+    } finally {
+      onCalculatingChange?.(false);
     }
   };
 

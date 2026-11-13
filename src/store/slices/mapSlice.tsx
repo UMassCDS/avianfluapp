@@ -26,6 +26,7 @@ interface MapState {
   flowResults: FlowResult[];
   flowGeoTiffUrl: string;
   flowResultsCache: FlowResultsCache;
+  lastFlowKeys: Record<number, FlowResultsKey>;
   showRecentOutbreaks: Record<OutbreakType, boolean>;
   showHistoricOutbreaks: Record<OutbreakType, boolean>;
 }
@@ -35,6 +36,7 @@ const initialState: MapState = {
   flowResults: [],
   flowGeoTiffUrl: "",
   flowResultsCache: {},
+  lastFlowKeys: {},
   showRecentOutbreaks: {
     poultry: true,
     bovine: false,
@@ -65,6 +67,7 @@ const mapSlice = createSlice({
       const {data, key} = action.payload;
       const cacheKey = makeCacheKey(key);
       state.flowResultsCache[cacheKey] = data;
+      state.lastFlowKeys[key.dataIndex] = key;
       state.flowResults = data.result;
       state.flowGeoTiffUrl = data.geotiff || "";
     },

@@ -4,9 +4,10 @@ import { Tooltip } from '@mantine/core';
 type MarkerLabelProps = {
   left: number;
   label: string;
+  pulse?: boolean;
 };
 
-export const TimelineMarkerLabel = ({ left, label }: MarkerLabelProps) => (
+export const TimelineMarkerLabel = ({ left, label, pulse = false }: MarkerLabelProps) => (
   <Tooltip label="Display date. Drag to change." position="top" withArrow offset={8}>
     <div
       className="timeline-marker"
@@ -17,7 +18,7 @@ export const TimelineMarkerLabel = ({ left, label }: MarkerLabelProps) => (
       cursor: 'pointer',
     }}
   >
-    
+      <span className={pulse ? 'timeline-marker-bg pulse' : 'timeline-marker-bg'} />
       <div className="timeline-marker-label">{label}</div>
   </div>
   </Tooltip>
